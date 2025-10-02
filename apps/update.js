@@ -9,12 +9,12 @@ export class GloryOfKingsUpdate extends plugin {
       priority: 2000,
       rule: [
         {
-          reg: '^#*(王者|农药)(插件)?(强制)?更新$',
+          reg: '^#*和平(插件)?(强制)?更新$',
           fnc: 'update',
           permission: 'master'
         },
         {
-          reg: '^#*(王者|农药)(插件)?更新(日志|记录)$',
+          reg: '^#*和平(插件)?更新(日志|记录)$',
           fnc: 'update_log',
           permission: 'master'
         }

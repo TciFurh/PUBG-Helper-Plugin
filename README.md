@@ -39,7 +39,7 @@
 git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-Helper-Plugin/
 ```
 
-3. 重启 Bot 即可使用
+2. 重启 Bot 即可使用
 
 ## 🎯 使用指南
 

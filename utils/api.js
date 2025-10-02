@@ -8,7 +8,6 @@ class ApiService {
             rolecard3: '/game/rolecard3',
             gethonorinfo: '/play/gethonorinfo',
             getweaponinfos2: '/play/getweaponinfos2',
-            getvsteamrecord: '/play/getvsteamrecord',
             getrecentbattlelist: '/play/getrecentbattlelist'
 
         }
