@@ -3,11 +3,19 @@ import querystring from 'node:querystring'
 
 class ApiService {
     constructor() {
-        this.baseUrl = 'https://formal.api.gp.qq.com/game/rolecard3'
+        this.main = 'https://formal.api.gp.qq.com'
+        this.baseUrl = {
+            rolecard3: '/game/rolecard3',
+            gethonorinfo: '/play/gethonorinfo',
+            getweaponinfos2: '/play/getweaponinfos2',
+            getvsteamrecord: '/play/getvsteamrecord',
+            getrecentbattlelist: '/play/getrecentbattlelist'
+
+        }
         this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
     }
 
-    async getMyHomepage(friendUserId) {
+    async get_rolecard3(friendUserId) {
         // 获取参数
         const paramRes = await fetch(this.paramUrl)
         const p = await paramRes.json()
@@ -29,7 +37,7 @@ class ApiService {
 
         const postData = querystring.stringify(params)
 
-        const res = await fetch(this.baseUrl, {
+        const res = await fetch(this.main + this.baseUrl.rolecard3, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

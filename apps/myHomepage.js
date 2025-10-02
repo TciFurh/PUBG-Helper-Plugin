@@ -29,7 +29,7 @@ export class MyHomepage extends plugin {
             return
         }
 
-        const data = await apiService.getMyHomepage(ID)
+        const data = await apiService.get_rolecard3(ID)
         const roleCard = data.data.roleCard
         const { mainRecord = [], escapeRecord = [], vsteamRecord = [] } = roleCard
 
