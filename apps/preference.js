@@ -1,15 +1,11 @@
 import { getUserInfo, saveUserInfo } from '../utils/storage.js'
 
-const helpTips = [
-	'索引与模式：',
-	'0 第三人称-四排',
-	'1 第三人称-双排',
-	'2 第三人称-单排',
-	'3 第一人称-四排',
-	'4 第一人称-双排',
-	'5 第一人称-单排',
-	'12 创意工坊'
-].join('\n')
+const MODES = ['第三人称-四排-全部', '第三人称-双排-全部', '第三人称-单排-全部', 
+	'第一人称-四排-全部', '第一人称-双排-全部', '第一人称-单排-全部',
+	'第三人称-四排-经典', '第三人称-双排经典', '第三人称-单排经典',
+	'第一人称-四排经典', '第一人称-双排经典', '第一人称-单排经典', '创意工坊']
+
+const helpTips = '索引与模式：\n' + MODES.map((mode, i) => `${i} ${mode}`).join('\n') + '\n(全部的意思就是包含创意工坊)'
 
 export class Preference extends plugin {
 	constructor() {
@@ -40,12 +36,11 @@ export class Preference extends plugin {
 		const userId = e.user_id
 		const match = e.msg.match(/#设置对局(?:索引)?\s*(-?\d{1,2})/i)
 		if (!match) return e.reply('用法：#设置对局索引 0\n' + helpTips)
+		
 		const idx = Number(match[1])
-		const allow = new Set([0,1,2,3,4,5,12])
-		if (!allow.has(idx)) return e.reply('只支持索引：0,1,2,3,4,5,12')
-		saveUserInfo(userId, (cur) => { cur.prefMainIndex = idx; return cur })
+		if (idx < 0 || idx >= MODES.length) return e.reply(`只支持索引：0-${MODES.length - 1}`)
+		
+		saveUserInfo(userId, cur => { cur.prefMainIndex = idx; return cur })
 		return e.reply(`已设置默认对局索引为：${idx}`)
 	}
 }
-
-
