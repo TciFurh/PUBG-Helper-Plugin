@@ -1,0 +1,71 @@
+import { ApiService } from '../utils/api.js'
+import { getUserInfo } from '../utils/storage.js'
+import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+
+const apiService = new ApiService()
+
+export class MyHomepage extends plugin {
+    constructor() {
+        super({
+            name: '[PHP]枪械熟练度',
+            dsc: '和平精英枪械熟练度查询',
+            event: 'message',
+            priority: 1,
+            rule: [
+                {
+                    reg: /^#?和平(精英|英精)?主页(\d+)?$/i,
+                    fnc: 'showMyHomepage'
+                }
+            ]
+        })
+    }
+
+    async marksmanshipSkills(e) {
+        let ID = (e.msg.match(/^#?和平(精英|英精)?主页(\d+)?$/i)?.[2]) || ''
+        if (!ID) {
+            const { info } = getUserInfo(e.user_id)
+            ID = info.ids?.[info.current] || ''
+        }
+        if (!/^\d+$/.test(ID)) {
+            await e.reply('请输入正确的用户ID（纯数字），或使用 #绑定和平+ID 先绑定')
+            return
+        }
+        const data = await apiService.get_getweaponinfos2(ID)
+        const firearmsList = data.data.list
+
+        let list = []
+        for (let i = 0; i < firearmsList.length; i++) {
+            const levelUpExp = firearmsList[i].LevelUpExp || 0
+            const weaponExp = firearmsList[i].WeaponExp || 0
+            const expRatio = levelUpExp > 0 ? Math.max(0, Math.min(weaponExp / levelUpExp, 1)) : 0
+            const circumference = 125.6
+            const progressOffset = Number((circumference * (1 - expRatio)).toFixed(1))
+            list.push({
+                Type: firearmsList[i].Type,
+                Name: firearmsList[i].Name,
+                TotalOwnTime: isNaN(firearmsList[i].TotalOwnTime / 60 / 60) ? 0 : (firearmsList[i].TotalOwnTime / 60 / 60).toFixed(1),
+                WeaponLv: firearmsList[i].WeaponLv || 0,
+                WeaponExp: firearmsList[i].WeaponExp || 0,
+                LevelUpExp: firearmsList[i].LevelUpExp || 0,
+                progressOffset,
+                TotalUseTimes: firearmsList[i].TotalUseTimes || 0,
+                KillCount: firearmsList[i].KillCount || 0,
+                MaxDamage: firearmsList[i].MaxDamage || 0,
+                MaxKill: firearmsList[i].MaxKill || 0,
+                HeadCount: firearmsList[i].HeadCount || 0,
+                KillPerGame: (firearmsList[i].KillPerGame || 0).toFixed(2),
+                DamagePerGame: (firearmsList[i].DamagePerGame || 0).toFixed(0),
+                HeadPerGame: (firearmsList[i].HeadPerGame || 0).toFixed(2),
+                HitRate: (firearmsList[i].HitRate || 0).toFixed(1),
+                HeadRate: (firearmsList[i].HeadRate || 0).toFixed(1)
+            })
+        }
+
+        const image = await puppeteer.screenshot('marksmanshipSkills', {
+            tplFile: 'plugins/PUBG-Helper-Plugin/resources/marksmanshipSkills.html',
+            list
+        })
+
+        e.reply(image)
+    }
+}

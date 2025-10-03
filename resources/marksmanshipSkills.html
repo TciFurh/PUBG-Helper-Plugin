@@ -1,0 +1,274 @@
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      width: 1280px;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .table-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      overflow-x: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .gun-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+    }
+
+    .gun-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .gun-table th {
+      padding: 16px 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .gun-table th.core-data {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .gun-table tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.2s ease;
+    }
+
+    .gun-table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .gun-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .gun-table td {
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #2c3e50;
+    }
+
+    .gun-table td.core-data {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #d63031;
+      background-color: #fff5f5;
+    }
+
+    .gun-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .gun-image {
+      width: 80px;
+      height: 50px;
+      object-fit: contain;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .gun-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gun-type {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .gun-name {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .proficiency-cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+
+    .circular-progress {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      flex-shrink: 0;
+    }
+
+    .circular-progress svg {
+      transform: rotate(-90deg);
+    }
+
+    .circular-progress circle {
+      fill: none;
+      stroke-width: 6;
+    }
+
+    .circular-progress .bg-circle {
+      stroke: #e0e0e0;
+    }
+
+    .circular-progress .progress-circle {
+      stroke: #4CAF50;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .circular-progress .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .proficiency-info {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .proficiency-level {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .proficiency-exp {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* 仅让熟练度列靠左 */
+    .proficiency-td {
+      text-align: left;
+    }
+
+    /* 高亮数据样式 */
+    .highlight {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .table-container {
+        border-radius: 12px;
+      }
+    }
+  </style>
+<body>
+  <div class="container">
+    <h1>枪械熟练度</h1>
+    
+    <div class="table-container">
+      <table class="gun-table">
+        <thead>
+          <tr>
+            <th>枪械</th>
+            <th class="core-data">使用时长</th>
+            <th class="core-data">熟练度</th>
+            <th class="core-data">使用场次</th>
+            <th>总淘汰</th>
+            <th>最高伤害</th>
+            <th>最高淘汰</th>
+            <th>暴击次数</th>
+            <th>场均淘汰</th>
+            <th>场均伤害</th>
+            <th>场均暴击</th>
+            <th>命中率</th>
+            <th>暴击率</th>
+          </tr>
+        </thead>
+        <tbody>
+            {{each list item}}
+          <tr>
+            <td>
+              <div class="gun-info">
+                <img src="'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/img/PUBG/Firearms/{{item.Name}}.jpg" alt="gun" class="gun-image" onerror='this.onerror=null;this.src="data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;80&quot; height=&quot;50&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23e9ecef&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; font-size=&quot;10&quot; fill=&quot;%2399a&quot;><tspan>NO</tspan> <tspan>IMAGE</tspan></text></svg>"'>
+                <div class="gun-details">
+                  <span class="gun-type">{{item.Type}}</span>
+                  <span class="gun-name">{{item.Name}}</span>
+                </div>
+              </div>
+            </td>
+            <td class="core-data">{{item.TotalOwnTime}}h</td>
+            <td class="core-data proficiency-td">
+              <div class="proficiency-cell">
+                <div class="circular-progress">
+                  <svg width="50" height="50">
+                    <circle class="bg-circle" cx="25" cy="25" r="20"></circle>
+                    <circle class="progress-circle" cx="25" cy="25" r="20" 
+                            stroke-dasharray="125.6" stroke-dashoffset="{{item.progressOffset}}"></circle>
+                  </svg>
+                  <div class="progress-text">{{item.WeaponLv}}</div>
+                </div>
+                <div class="proficiency-info">
+                  <span class="proficiency-level">Lv.{{item.WeaponLv}}</span>
+                  <span class="proficiency-exp">{{item.WeaponExp}}/{{item.LevelUpExp}}</span>
+                </div>
+              </div>
+            </td>
+            <td class="core-data">{{item.TotalUseTimes}}</td>
+            <td>{{item.KillCount}}</td>
+            <td class="highlight">{{item.MaxDamage}}</td>
+            <td class="highlight">{{item.MaxKill}}</td>
+            <td>{{item.HeadCount}}</td>
+            <td>{{item.KillPerGame}}</td>
+            <td>{{item.DamagePerGame}}</td>
+            <td>{{item.HeadPerGame}}</td>
+            <td>{{item.HitRate}}%</td>
+            <td>{{item.HeadRate}}%</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+  </script>
+</body>
+</html>
