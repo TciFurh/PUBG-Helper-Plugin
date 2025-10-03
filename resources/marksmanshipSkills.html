@@ -93,13 +93,15 @@
     }
 
     .gun-image {
-      width: 80px;
-      height: 50px;
+      width: 150px;
+      height: 90px;
       object-fit: contain;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       border-radius: 8px;
-      padding: 6px;
+      padding: 10px;
       flex-shrink: 0;
+      filter: brightness(1.1) contrast(1.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .gun-details {
@@ -178,12 +180,10 @@
       color: #666;
     }
 
-    /* 仅让熟练度列靠左 */
     .proficiency-td {
       text-align: left;
     }
 
-    /* 高亮数据样式 */
     .highlight {
       color: #e74c3c;
       font-weight: 600;
@@ -227,7 +227,7 @@
           <tr>
             <td>
               <div class="gun-info">
-                <img src="'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/img/PUBG/Firearms/{{item.Type}}/{{item.Name}}.jpg" alt="gun" class="gun-image" onerror='this.onerror=null;this.src="data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;80&quot; height=&quot;50&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23e9ecef&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; font-size=&quot;10&quot; fill=&quot;%2399a&quot;><tspan>NO</tspan> <tspan>IMAGE</tspan></text></svg>"'>
+                <img src="https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/img/PUBG/Firearms/{{item.Type}}/{{item.Name}}.jpg" alt="gun" class="gun-image">
                 <div class="gun-details">
                   <span class="gun-type">{{item.Type}}</span>
                   <span class="gun-name">{{item.Name}}</span>
