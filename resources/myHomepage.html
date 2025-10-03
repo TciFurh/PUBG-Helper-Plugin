@@ -62,13 +62,10 @@
             </div>
         </div>
 
-        <!-- 荣誉展示卡片 -->
         <div class="stat-card rounded-2xl shadow-xl p-6 mb-8">
             <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">荣誉展示</h3>
             
-            <!-- 上二：历史最高和队友点赞 -->
             <div class="grid grid-cols-2 gap-6 mb-6">
-                <!-- 历史最高/王牌次数 -->
                 <div class="flex items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mr-4 w-20 h-20 flex items-center justify-center flex-shrink-0">
                         <img src="{{honorData.highestDivUrl}}" class="w-full h-full object-cover" alt="历史最高">
@@ -80,7 +77,6 @@
                     </div>
                 </div>
                 
-                <!-- 队友点赞 -->
                 <div class="flex items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mr-4 w-20 h-20 flex items-center justify-center flex-shrink-0">
                         <img src="{{honorData.likeIcon}}" class="w-full h-full object-cover" alt="队友点赞">
@@ -93,9 +89,7 @@
                 </div>
             </div>
             
-            <!-- 下四：印记展示 -->
             <div class="grid grid-cols-4 gap-4">
-                <!-- 王牌印记 -->
                 <div class="flex flex-col items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mb-3 w-16 h-16 flex items-center justify-center">
                         <img src="{{honorData.wangpaiIcon}}" class="w-full h-full object-cover" alt="王牌印记">
@@ -104,7 +98,6 @@
                     <span class="text-xs text-gray-600 text-center">{{honorData.wangpaiLevelName}}</span>
                 </div>
                 
-                <!-- 卓越印记 -->
                 <div class="flex flex-col items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mb-3 w-16 h-16 flex items-center justify-center">
                         <img src="{{honorData.zywpIcon}}" class="w-full h-full object-cover" alt="卓越印记">
@@ -113,7 +106,6 @@
                     <span class="text-xs text-gray-600 text-center">{{honorData.zywpTimes}}次</span>
                 </div>
                 
-                <!-- 传奇印记 -->
                 <div class="flex flex-col items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mb-3 w-16 h-16 flex items-center justify-center">
                         <img src="{{honorData.cqwpIcon}}" class="w-full h-full object-cover" alt="传奇印记">
@@ -122,7 +114,6 @@
                     <span class="text-xs text-gray-600 text-center">{{honorData.cqwpTimes}}次</span>
                 </div>
                 
-                <!-- 绝世印记 -->
                 <div class="flex flex-col items-center p-4 rounded-xl">
                     <div class="overflow-hidden rounded-lg mb-3 w-16 h-16 flex items-center justify-center">
                         <img src="{{honorData.jswpIcon}}" class="w-full h-full object-cover" alt="绝世印记">

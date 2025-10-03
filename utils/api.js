@@ -7,10 +7,20 @@ class ApiService {
         this.baseUrl = {
             rolecard3: '/game/rolecard3',
             gethonorinfo: '/play/gethonorinfo',
-            getweaponinfos2: '/play/getweaponinfos2',
-            getrecentbattlelist: '/play/getrecentbattlelist'
+            //getweaponinfos2: '/play/getweaponinfos2',
+            //getrecentbattlelist: '/play/getrecentbattlelist'
         }
-        this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
+        this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json',
+        this.params = {            roleId: '0',
+            count: '5',
+            gameId: '20004',
+            cGameId: '20004',
+            cCurrentGameId: '20004'
+        },
+        this.headers = {
+              'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ONEPLUS A6000) AppleWebKit/537.36'
+        }
     }
 
     async get_param() {
@@ -37,24 +47,17 @@ class ApiService {
             openId: p.openId,
             gameOpenId: p.gameOpenId,
             userId: p.userId,
-            friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
-            roleId: '0',
             token: p.token,
             seasonId: p.seasonId,
-            count: '5',
-            gameId: '20004',
-            cGameId: '20004',
-            cCurrentGameId: '20004'
+            friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
+            ...this.params
         }
 
         const postData = querystring.stringify(params)
 
         const res = await fetch(this.main + this.baseUrl.rolecard3, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ONEPLUS A6000) AppleWebKit/537.36'
-            },
+            headers: this.headers,
             body: postData
         })
         return res.json()
@@ -63,31 +66,24 @@ class ApiService {
     async get_gethonorinfo(friendUserId) {
         const p = await this.get_param()
         if (!p) {
-            throw new Error('获取参数失败，无法请求rolecard3')
+            throw new Error('获取参数失败，无法请求gethonorinfo')
         }
 
         const params = {
             openId: p.openId,
             gameOpenId: p.gameOpenId,
             userId: p.userId,
-            friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
-            roleId: '0',
             token: p.token,
             seasonId: p.seasonId,
-            count: '5',
-            gameId: '20004',
-            cGameId: '20004',
-            cCurrentGameId: '20004'
+            friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
+            ...this.params
         }
 
         const postData = querystring.stringify(params)
 
         const res = await fetch(this.main + this.baseUrl.gethonorinfo, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ONEPLUS A6000) AppleWebKit/537.36'
-            },
+            headers: this.headers,
             body: postData
         })
         return res.json()
