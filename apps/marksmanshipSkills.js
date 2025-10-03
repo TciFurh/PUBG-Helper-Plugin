@@ -64,6 +64,7 @@ export class MarksmanshipSkills extends plugin {
             const circumference = 125.6
             const progressOffset = Number((circumference * (1 - expRatio)).toFixed(1))
             list.push({
+                ResID: firearmsList[i].ResID,
                 Type: firearmsList[i].Type,
                 Name: firearmsList[i].Name,
                 TotalOwnTime: isNaN(firearmsList[i].TotalOwnTime / 60 / 60) ? 0 : (firearmsList[i].TotalOwnTime / 60 / 60).toFixed(1),
