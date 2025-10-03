@@ -44,14 +44,12 @@ export class MyHomepage extends plugin {
 
         const get = (obj, arr, def = '失败') => arr.reduce((o, k) => (o && o[k] !== undefined) ? o[k] : undefined, obj) ?? def
 
-        // 获取荣誉数据
         let honorData = {}
         try {
             const honorResponse = await apiService.get_gethonorinfo(ID)
             honorData = honorResponse.data
         } catch (error) {
             console.error('获取荣誉信息失败:', error)
-            // 荣誉数据获取失败时使用默认值
             honorData = {
                 highestDivUrl: '',
                 wangpaiLevel: 0,
@@ -115,8 +113,11 @@ export class MyHomepage extends plugin {
             teamBanditKills: get(escape, ['subPro', 2, 'v', 'v']),
             teamMonsterKills: get(escape, ['subPro', 3, 'v', 'v']),
 
-            // 荣誉数据
-            honorData: honorData
+            honorData: honorData,
+
+            sys: {
+                scale: `style=transform:scale(2)`
+            }
         }
 
         const image = await puppeteer.screenshot('myHomepage', {

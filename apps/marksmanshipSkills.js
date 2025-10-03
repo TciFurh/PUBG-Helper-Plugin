@@ -4,7 +4,7 @@ import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 
 const apiService = new ApiService()
 
-export class MyHomepage extends plugin {
+export class MarksmanshipSkills extends plugin {
     constructor() {
         super({
             name: '[PHP]枪械熟练度',
@@ -98,6 +98,9 @@ export class MyHomepage extends plugin {
 
         const image = await puppeteer.screenshot('marksmanshipSkills', {
             tplFile: 'plugins/PUBG-Helper-Plugin/resources/marksmanshipSkills.html',
+            sys: {
+                scale: `style=transform:scale(2)`
+            },
             list
         })
 
