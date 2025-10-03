@@ -11,10 +11,12 @@ export class MyHomepage extends plugin {
             dsc: '和平精英个人主页查询',
             event: 'message',
             priority: 1,
-            rule: [{
-                reg: /^#?和平(精英|英精)?主页(\d+)?$/i,
-                fnc: 'showMyHomepage'
-            }]
+            rule: [
+                {
+                    reg: /^#?和平(精英|英精)?主页(\d+)?$/i,
+                    fnc: 'showMyHomepage'
+                }
+            ]
         })
     }
 
@@ -42,6 +44,31 @@ export class MyHomepage extends plugin {
 
         const get = (obj, arr, def = '失败') => arr.reduce((o, k) => (o && o[k] !== undefined) ? o[k] : undefined, obj) ?? def
 
+        // 获取荣誉数据
+        let honorData = {}
+        try {
+            const honorResponse = await apiService.get_gethonorinfo(ID)
+            honorData = honorResponse.data
+        } catch (error) {
+            console.error('获取荣誉信息失败:', error)
+            // 荣誉数据获取失败时使用默认值
+            honorData = {
+                highestDivUrl: '',
+                wangpaiLevel: 0,
+                highestDivName: '暂无数据',
+                likeIcon: '',
+                likeTimes: 0,
+                wangpaiIcon: '',
+                wangpaiLevelName: '暂无数据',
+                zywpIcon: '',
+                zywpTimes: 0,
+                cqwpIcon: '',
+                cqwpTimes: 0,
+                jswpIcon: '',
+                jswpTimes: 0
+            }
+        }
+
         const tplData = {
             roleIcon: roleCard.roleBigIcon,
             roleName: roleCard.roleName,
@@ -49,7 +76,7 @@ export class MyHomepage extends plugin {
             roleArea: roleCard.roleArea,
             roleJob: roleCard.roleJob,
 
-            pattern: chosen.class === '创意工坊' ? '创意工坊' : chosen.title,
+            pattern: chosen.class === '创意工坊' ? '创意工坊' : `${chosen.title}-${chosen.class}`,
             rankProgressText: `${chosen.currentScore ?? 0}/${chosen.levelUpScore ?? 0}`,
             rankProgressPercent: chosen.levelProc ?? 0,
             chosenMatches: get(chosen, ['pro', 0, 'v', 'v']),
@@ -86,7 +113,10 @@ export class MyHomepage extends plugin {
             teamEscapeRate: get(escape, ['subPro', 0, 'v', 'v']),
             teamKills2: get(escape, ['subPro', 1, 'v', 'v']),
             teamBanditKills: get(escape, ['subPro', 2, 'v', 'v']),
-            teamMonsterKills: get(escape, ['subPro', 3, 'v', 'v'])
+            teamMonsterKills: get(escape, ['subPro', 3, 'v', 'v']),
+
+            // 荣誉数据
+            honorData: honorData
         }
 
         const image = await puppeteer.screenshot('myHomepage', {
