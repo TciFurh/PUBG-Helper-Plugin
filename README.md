@@ -63,6 +63,8 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 
 ## 🎯 使用指南
 
+[抓包教程](https://blog.csdn.net/2503_92066923/article/details/148075143)-手机Root了可以忽略虚拟机
+
 > 💡 **提示：请先使用 `#绑定和平<营地ID>` 绑定你的账号，再使用其它查询指令。**
 
 ### 账号管理
