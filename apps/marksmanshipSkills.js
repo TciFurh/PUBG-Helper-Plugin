@@ -19,11 +19,20 @@ export class MarksmanshipSkills extends plugin {
                 {
                     reg: /^#?枪械熟练度\s*(.+)$/i,
                     fnc: 'marksmanshipSkillsByType'
-                }
+                },
+                /* {
+                    reg: /^和平签到$/i,
+                    fnc: 'signIn'
+                } */
             ]
         })
     }
-
+/* 
+    async signIn(e) {
+        const data = await apiService.get_act_dailysigninmonthly()
+        await e.reply(JSON.stringify(data))
+    }
+ */
     async marksmanshipSkills(e) {
         const weaponType = null
         await this.processWeaponData(e, weaponType)

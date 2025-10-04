@@ -9,6 +9,7 @@ class ApiService {
             gethonorinfo: '/play/gethonorinfo',
             getweaponinfos2: '/play/getweaponinfos2',
             getresultbytypev2: '/search/getresultbytypev2',
+            act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
         this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
@@ -153,6 +154,34 @@ class ApiService {
         })
         return res.json()
     }
+/* 
+    async get_act_dailysigninmonthly() {
+        const p = await this.get_param()
+        if (!p) {
+            throw new Error('获取参数失败，无法请求act_dailysigninmonthly')
+        }
+
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            ...this.params
+        }
+
+        const postData = querystring.stringify(params)
+
+        const res = await fetch(this.baseUrl.act_dailysigninmonthly, {
+            method: 'POST',
+            headers: {
+                ...this.headers
+            },
+            body: postData
+        })
+        return res.json()
+    }
+     */
 }
 
 export { ApiService }

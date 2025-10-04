@@ -75,6 +75,7 @@ export class MyHomepage extends plugin {
             roleJob: roleCard.roleJob,
 
             pattern: chosen.class === '创意工坊' ? '创意工坊' : `${chosen.title}-${chosen.class}`,
+            divUrl: chosen.divUrl,
             rankProgressText: `${chosen.currentScore ?? 0}/${chosen.levelUpScore ?? 0}`,
             rankProgressPercent: chosen.levelProc ?? 0,
             chosenMatches: get(chosen, ['pro', 0, 'v', 'v']),
