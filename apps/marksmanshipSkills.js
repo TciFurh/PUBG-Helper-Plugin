@@ -58,6 +58,10 @@ export class MarksmanshipSkills extends plugin {
             return
         }
         const data = await apiService.get_getweaponinfos2(ID)
+        //logger.mark(JSON.stringify(data, null, 4))
+        if (data.returnCode === -30003 && data.returnMsg === '登录态失效，请重新登录') {
+            return e.reply('公共查询Token已失效')
+        }
         const firearmsList = data.data.list
 
         let list = []

@@ -32,6 +32,10 @@ export class MyHomepage extends plugin {
         }
 
         const data = await apiService.get_rolecard3(ID)
+        //logger.mark(JSON.stringify(data, null, 4))
+        if (data.returnCode === -30003 && data.returnMsg === '登录态失效，请重新登录') {
+            return e.reply('公共查询Token已失效')
+        }
         const roleCard = data.data.roleCard
         const { mainRecord = [], escapeRecord = [], vsteamRecord = [] } = roleCard
 
