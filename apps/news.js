@@ -30,8 +30,6 @@ export class News extends plugin {
             apiService.get_getcertusernews(TARGET_NEWS_IDS[1], page)
         ])
 
-        logger.mark(JSON.stringify(dataA.data.list[0], null, 4))
-
         if (
             (dataA && dataA.returnCode === -30003 && dataA.returnMsg === '登录态失效，请重新登录') ||
             (dataB && dataB.returnCode === -30003 && dataB.returnMsg === '登录态失效，请重新登录')
