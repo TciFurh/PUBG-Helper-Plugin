@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资讯详情</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      width: 960px;
+    }
+  </style>
+  <!-- 变量：item -->
+</head>
+
+<body class="bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-5xl font-bold text-gray-900 mb-5">{{item.sTitle || '资讯详情'}}</h1>
+    <div class="text-lg text-gray-600 mb-7 flex items-center flex-wrap gap-5">
+      <div class="flex items-center gap-2">
+        <img src="{{item.sUseravatar || item.avatar}}" alt="头像" class="w-8 h-8 rounded-full object-cover bg-gray-200" />
+        <span class="font-medium text-gray-800">{{item.sUserCreator || item.nickname || '-'}}</span>
+      </div>
+      <span>发布时间：{{item.dtReleaseTime || '-'}}</span>
+      <span>阅读：{{item.views || '0'}}</span>
+      <span>评论：{{item.comments || '0'}}</span>
+      <span>点赞：{{item.likes || '0'}}</span>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="p-6 text-2xl leading-10 text-gray-800">
+        {{if item.sDesc}}
+        <p class="whitespace-pre-wrap">{{item.sDesc}}</p>
+        {{else if item.sIntro}}
+        <p class="whitespace-pre-wrap">{{item.sIntro}}</p>
+        {{else if item.sContent}}
+        <p class="whitespace-pre-wrap">{{item.sContent}}</p>
+        {{else}}
+        <p class="italic text-gray-400">暂无详细内容</p>
+        {{/if}}
+      </div>
+
+      {{if item.sImgList && item.sImgList.length}}
+      <div class="px-6 pb-6">
+        <div class="flex flex-col gap-4">
+          {{each item.sImgList img idx}}
+          {{if idx > 0}}
+          <div class="w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center">
+            <img src="{{img.urlCI}}" alt="配图" class="max-w-[520px] w-full h-auto object-contain bg-white" />
+          </div>
+          {{/if}}
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</body>
+</html>
+
+

@@ -9,6 +9,7 @@ class ApiService {
             gethonorinfo: '/play/gethonorinfo',
             getweaponinfos2: '/play/getweaponinfos2',
             getresultbytypev2: '/search/getresultbytypev2',
+            getcertusernews: '/game/getcertusernews',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
@@ -150,6 +151,36 @@ class ApiService {
             headers: {
                 ...this.headers
             },
+            body: postData
+        })
+        return res.json()
+    }
+
+    async get_getcertusernews(friendUserId, page = 1) {
+        const p = await this.get_param()
+        if (!p) {
+            throw new Error('获取参数失败，无法请求getcertusernews')
+        }
+
+        const safeFriendUserId = String(friendUserId).replace(/[^\x00-\x7F]/g, '')
+
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            friendUserId: safeFriendUserId,
+            feedsInfoType: '0',
+            ext_params: JSON.stringify({ pageId: '105001', ext1: safeFriendUserId }),
+            page: String(page),
+            ...this.params
+        }
+
+        const postData = querystring.stringify(params)
+
+        const res = await fetch(this.main + this.baseUrl.getcertusernews, {
+            method: 'POST',
+            headers: this.headers,
             body: postData
         })
         return res.json()
