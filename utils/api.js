@@ -10,7 +10,7 @@ class ApiService {
             getweaponinfos2: '/play/getweaponinfos2',
             getresultbytypev2: '/search/getresultbytypev2',
             getcertusernews: '/game/getcertusernews',
-            getpubgbattlelist: '/play/getpubgbattlelist',
+            allrolelistv2: '/game/allrolelistv2',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
@@ -180,38 +180,6 @@ class ApiService {
         const postData = querystring.stringify(params)
 
         const res = await fetch(this.main + this.baseUrl.getcertusernews, {
-            method: 'POST',
-            headers: this.headers,
-            body: postData
-        })
-        return res.json()
-    }
-
-    async get_getpubgbattlelist(friendUserId) {
-        const p = await this.get_param()
-        if (!p) {
-            throw new Error('获取参数失败，无法请求getpubgbattlelist')
-        }
-
-        const safeFriendUserId = String(friendUserId).replace(/[^\x00-\x7F]/g, '')
-
-        let RoleID = await this.get_getresultbytypev2(friendUserId)
-        this.params.roleId = RoleID.data.user.list[0].roleId
-        const params = {
-            ...this.params,
-            openId: p.openId,
-            gameOpenId: p.gameOpenId,
-            userId: p.userId,
-            token: p.token,
-            seasonId: p.seasonId,
-            friendUserId: safeFriendUserId,
-            page: '1',
-            pageSize: '20',
-        }
-
-        const postData = querystring.stringify(params)
-
-        const res = await fetch(this.main + this.baseUrl.getpubgbattlelist, {
             method: 'POST',
             headers: this.headers,
             body: postData
