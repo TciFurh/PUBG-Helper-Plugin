@@ -10,7 +10,6 @@ class ApiService {
             getweaponinfos2: '/play/getweaponinfos2',
             getresultbytypev2: '/search/getresultbytypev2',
             getcertusernews: '/game/getcertusernews',
-            allrolelistv2: '/game/allrolelistv2',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
