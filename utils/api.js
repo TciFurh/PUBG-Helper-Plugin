@@ -193,14 +193,20 @@ class ApiService {
             throw new Error('获取参数失败，无法请求getpubgbattlelist')
         }
 
+        const safeFriendUserId = String(friendUserId).replace(/[^\x00-\x7F]/g, '')
+
+        let RoleID = await this.get_getresultbytypev2(friendUserId)
+        this.params.roleId = RoleID.data.user.list[0].roleId
         const params = {
+            ...this.params,
             openId: p.openId,
             gameOpenId: p.gameOpenId,
             userId: p.userId,
             token: p.token,
             seasonId: p.seasonId,
-            friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
-            ...this.params
+            friendUserId: safeFriendUserId,
+            page: '1',
+            pageSize: '20',
         }
 
         const postData = querystring.stringify(params)
@@ -212,34 +218,34 @@ class ApiService {
         })
         return res.json()
     }
-/* 
-    async get_act_dailysigninmonthly() {
-        const p = await this.get_param()
-        if (!p) {
-            throw new Error('获取参数失败，无法请求act_dailysigninmonthly')
+    /* 
+        async get_act_dailysigninmonthly() {
+            const p = await this.get_param()
+            if (!p) {
+                throw new Error('获取参数失败，无法请求act_dailysigninmonthly')
+            }
+    
+            const params = {
+                openId: p.openId,
+                gameOpenId: p.gameOpenId,
+                userId: p.userId,
+                token: p.token,
+                seasonId: p.seasonId,
+                ...this.params
+            }
+    
+            const postData = querystring.stringify(params)
+    
+            const res = await fetch(this.baseUrl.act_dailysigninmonthly, {
+                method: 'POST',
+                headers: {
+                    ...this.headers
+                },
+                body: postData
+            })
+            return res.json()
         }
-
-        const params = {
-            openId: p.openId,
-            gameOpenId: p.gameOpenId,
-            userId: p.userId,
-            token: p.token,
-            seasonId: p.seasonId,
-            ...this.params
-        }
-
-        const postData = querystring.stringify(params)
-
-        const res = await fetch(this.baseUrl.act_dailysigninmonthly, {
-            method: 'POST',
-            headers: {
-                ...this.headers
-            },
-            body: postData
-        })
-        return res.json()
-    }
-     */
+         */
 }
 
 export { ApiService }

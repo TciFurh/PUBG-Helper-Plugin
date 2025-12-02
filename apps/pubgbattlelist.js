@@ -1,5 +1,6 @@
 import { ApiService } from '../utils/api.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import { getUserInfo } from '../utils/storage.js'
 
 const apiService = new ApiService()
 
@@ -35,10 +36,24 @@ export class PubgBattleList extends plugin {
             return e.reply('公共查询Token已失效')
         }
 
-        logger.mark(JSON.stringify(data, null, 4))
+        const list = (data.data && Array.isArray(data.data.list)) ? data.data.list : []
+        logger.mark(list.length)
+        if (list.length === 0) {
+            return e.reply('未找到该玩家的战绩信息')
+        }
+
+        const lines = [`获取到${list.length}条数据：`]
+        list.slice(0, 5).forEach((item, idx) => {
+            lines.push(
+            `${idx + 1}. ${item.modeDesc || ''} ${item.mapDesc || ''} | 排名 ${item.teamRank || ''} | 段位分 ${item.ratingValue || ''} ${item.ratingChange || '0'} | 击杀 ${item.killingCount || ''} | 伤害 ${item.damageAmount || ''} | 生存 ${item.survivalTime || ''} | 时间 ${item.playTime || ''}`
+            )
+        })
+        if (list.length > 5) lines.push(`... 仅显示前5条`)
+
+        return e.reply(lines.join('\n'))
         return
 
-        const list = (data.data && Array.isArray(data.data.list)) ? data.data.list : []
+        /* const list = (data.data && Array.isArray(data.data.list)) ? data.data.list : []
 
         if (list.length === 0) {
             return e.reply('未找到该玩家的战绩信息')
@@ -59,7 +74,7 @@ export class PubgBattleList extends plugin {
         } catch (err) {
             console.error('screenshot error:', err)
             return e.reply('生成战绩图片失败')
-        }
+        } */
     }
 }
 

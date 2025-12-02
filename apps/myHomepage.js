@@ -74,6 +74,8 @@ export class MyHomepage extends plugin {
         const tplData = {
             roleIcon: roleCard.roleBigIcon,
             roleName: roleCard.roleName,
+            onlineText: (Number(roleCard.gameOnline) === 1) ? '游戏在线' : '游戏离线',
+            onlineTextClass: (Number(roleCard.gameOnline) === 1) ? 'text-emerald-400' : 'text-zinc-500',
             level: roleCard.level,
             roleArea: roleCard.roleArea,
             roleJob: roleCard.roleJob,

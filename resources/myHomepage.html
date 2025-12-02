@@ -12,12 +12,15 @@
     
     <header class="flex items-stretch gap-6 mb-6">
       <div class="relative flex-shrink-0">
-        <div class="w-32 h-32 p-[3px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 rounded-xl">
+        <div class="relative w-32 h-32 p-[3px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 rounded-xl">
           <img 
             src="{{roleIcon}}" 
             alt="用户头像"
             class="w-full h-full rounded-lg object-cover border-4 border-zinc-950"
           />
+        </div>
+        <div class="mt-2 text-center">
+          <span class="{{onlineTextClass}} text-sm font-medium">{{onlineText}}</span>
         </div>
       </div>
       
