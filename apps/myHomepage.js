@@ -60,6 +60,7 @@ export class MyHomepage extends plugin {
                 highestDivName: '暂无数据',
                 likeIcon: '',
                 likeTimes: 0,
+                likedHonorIcon: '',
                 wangpaiIcon: '',
                 wangpaiLevelName: '暂无数据',
                 zywpIcon: '',
@@ -67,7 +68,13 @@ export class MyHomepage extends plugin {
                 cqwpIcon: '',
                 cqwpTimes: 0,
                 jswpIcon: '',
-                jswpTimes: 0
+                jswpTimes: 0,
+                dtdhIcon: '',
+                dtdhTimes: 0,
+                dtdhName: '地铁大亨',
+                highestIncomeUrl: '',
+                highestIncomeName: '',
+                highestIncomeTimes: 0
             }
         }
 
