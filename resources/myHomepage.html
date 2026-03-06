@@ -7,10 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { 
-      width: 1280px;
+    body {
+      width: 1300px;
       zoom: 1.5;
-      font-family: 'Noto Sans SC', sans-serif; 
+      font-family: 'Noto Sans SC', sans-serif;
       margin: 0;
       padding: 0;
     }
@@ -94,66 +94,109 @@
 <body class="min-h-screen">
   <div class="w-full px-8 py-6">
     
-  <div class="flex items-center gap-6 mb-6">
-      
-  <div class="card rounded-xl p-4 flex items-center gap-4 flex-shrink-0">
-        <div class="gradient-border p-[3px] rounded-full w-28 h-28">
-          <div class="card rounded-full p-1">
-            <img 
-              src="{{roleIcon}}" 
-              alt="用户头像"
-              class="w-full h-full rounded-full object-cover"
-            />
+  <div class="grid grid-cols-[500px_350px_350px] gap-4 mb-6 items-stretch justify-start">
+      <div class="flex flex-col gap-6">
+        <div class="card rounded-xl p-4 flex items-center gap-6 flex-shrink-0 h-[170px]">
+          <div class="gradient-border p-[3px] rounded-full w-24 h-24">
+            <div class="card rounded-full p-1">
+              <img
+                src="{{roleIcon}}"
+                alt="用户头像"
+                class="w-full h-full rounded-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col min-w-0">
+            <h1 class="text-2xl font-bold mb-1 truncate-text">{{roleName}}</h1>
+            <div class="flex gap-2 items-center mb-1">
+              <span class="card px-3 py-1 rounded-lg text-sm font-medium">Lv.{{level}}</span>
+              <span class="card px-3 py-1 rounded-lg text-sm font-medium">{{roleArea}}</span>
+            </div>
+            <span class="card px-3 py-1 rounded-lg text-sm font-medium {{onlineTextClass}} self-center text-center">{{onlineText}}</span>
+          </div>
+
+          <div class="ml-4 flex items-center gap-3">
+            <div class="w-14 h-14 card-alt rounded-xl overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.likedHonorIcon}}" alt="队友点赞" class="w-full h-full object-contain" />
+            </div>
+            <div>
+              <p class="text-xs text-secondary mb-1">队友点赞</p>
+              <p class="text-2xl font-bold" style="color: var(--accent-sky);">{{honorData.likeTimes}}</p>
+              <p class="text-xs text-tertiary">获得队友认可</p>
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-col min-w-0">
-          <h1 class="text-2xl font-bold mb-1 truncate-text">{{roleName}}</h1>
-          <div class="flex gap-2 items-center mb-1">
-            <span class="card px-3 py-1 rounded-lg text-sm font-medium">Lv.{{level}}</span>
-            <span class="card px-3 py-1 rounded-lg text-sm font-medium">{{roleArea}}</span>
+        <div class="card rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
+                <img src="{{teamLevelIcon}}" alt="团竞图标" class="w-full h-full object-contain" />
+              </div>
+              <div>
+                <p class="text-xs text-secondary">团竞模式</p>
+                <p class="text-sm font-semibold">{{teamLevelName}}</p>
+              </div>
+            </div>
+            <span class="text-xs text-secondary">{{teamFeatProgressText}}</span>
           </div>
-          <span class="card px-3 py-1 rounded-lg text-sm font-medium {{onlineTextClass}} self-center text-center">{{onlineText}}</span>
-        </div>
 
-        <div class="ml-4 flex items-center gap-3">
-          <div class="w-14 h-14 card-alt rounded-xl overflow-hidden flex items-center justify-center">
-            <img src="{{honorData.likedHonorIcon}}" alt="队友点赞" class="w-full h-full object-contain" />
+          <div class="h-2 card-alt rounded-full overflow-hidden mb-4">
+            <div class="h-full rounded-full" style="width: {{teamFeatProgressPercent}}%; background: linear-gradient(to right, var(--accent-rose), var(--accent-amber));"></div>
           </div>
-          <div>
-            <p class="text-xs text-secondary mb-1">队友点赞</p>
-            <p class="text-2xl font-bold" style="color: var(--accent-sky);">{{honorData.likeTimes}}</p>
-            <p class="text-xs text-tertiary">获得队友认可</p>
+
+          <div class="grid grid-cols-5 gap-2">
+            <div class="text-center card-alt rounded-lg py-3">
+              <p class="text-[10px] text-secondary mb-1">场数</p>
+              <p class="text-sm font-semibold">{{teamMatches}}</p>
+            </div>
+            <div class="text-center card-alt rounded-lg py-3">
+              <p class="text-[10px] mb-1" style="color: var(--accent-rose);">获胜</p>
+              <p class="text-sm font-semibold">{{teamWins}}</p>
+            </div>
+            <div class="text-center card-alt rounded-lg py-3">
+              <p class="text-[10px] mb-1" style="color: var(--accent-emerald);">胜率</p>
+              <p class="text-sm font-semibold">{{teamWinRate}}</p>
+            </div>
+            <div class="text-center card-alt rounded-lg py-3">
+              <p class="text-[10px] mb-1" style="color: var(--accent-amber);">淘汰</p>
+              <p class="text-sm font-semibold">{{teamKills}}</p>
+            </div>
+            <div class="text-center card-alt rounded-lg py-3">
+              <p class="text-[10px] mb-1" style="color: var(--accent-sky);">战损</p>
+              <p class="text-sm font-semibold">{{teamDamage}}</p>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="card rounded-xl p-5 flex-shrink-0">
+      <div class="card rounded-xl p-5 flex-shrink-0 h-full max-w-[350px] justify-self-stretch flex flex-col">
         <p class="text-xs text-secondary mb-3">王牌印记</p>
-        <div class="grid grid-cols-4 gap-3 mb-3">
-          <div class="text-center">
-              <div class="card-alt w-16 h-16 mx-auto mb-1 rounded-lg overflow-hidden">
+        <div class="grid grid-cols-2 grid-rows-2 gap-3 mb-3">
+          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
                 <img src="{{honorData.wangpaiIcon}}" alt="王牌印记" class="w-full h-full object-cover"/>
               </div>
               <p class="text-[10px] text-secondary">王牌</p>
               <p class="text-xs font-bold">{{honorData.wangpaiLevelName}}</p>
           </div>
-          <div class="text-center">
-              <div class="card-alt w-16 h-16 mx-auto mb-1 rounded-lg overflow-hidden">
+          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
                 <img src="{{honorData.zywpIcon}}" alt="卓越印记" class="w-full h-full object-cover"/>
               </div>
               <p class="text-[10px] text-secondary">卓越</p>
               <p class="text-xs font-bold">{{honorData.zywpTimes}}次</p>
           </div>
-          <div class="text-center">
-              <div class="card-alt w-16 h-16 mx-auto mb-1 rounded-lg overflow-hidden">
+          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
                 <img src="{{honorData.cqwpIcon}}" alt="传奇印记" class="w-full h-full object-cover"/>
               </div>
               <p class="text-[10px] text-secondary">传奇</p>
               <p class="text-xs font-bold">{{honorData.cqwpTimes}}次</p>
           </div>
-          <div class="text-center">
-              <div class="card-alt w-16 h-16 mx-auto mb-1 rounded-lg overflow-hidden">
+          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
                 <img src="{{honorData.jswpIcon}}" alt="绝世印记" class="w-full h-full object-cover"/>
               </div>
               <p class="text-[10px] text-secondary">绝世</p>
@@ -172,36 +215,36 @@
         </div>
       </div>
 
-      <div class="card rounded-xl p-5 flex-1 min-w-0">
+      <div class="card rounded-xl p-5 h-full max-w-[350px] justify-self-stretch flex flex-col">
         <p class="text-xs text-secondary mb-3">地铁印记</p>
-        <div class="grid grid-cols-4 gap-3 mb-3">
-          <div class="text-center">
-            <div class="card-alt w-14 h-14 mx-auto mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+        <div class="grid grid-cols-2 grid-rows-2 gap-3 mb-3">
+          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
               <img src="{{honorData.xmbIcon}}" alt="{{honorData.xmbName}}" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary truncate-text">{{honorData.xmbName}}</p>
-            <p class="text-sm font-semibold">{{honorData.xmbTimes}}次</p>
+            <p class="text-xs font-semibold">{{honorData.xmbTimes}}次</p>
           </div>
-          <div class="text-center">
-            <div class="card-alt w-14 h-14 mx-auto mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
               <img src="{{honorData.zmbIcon}}" alt="{{honorData.zmbName}}" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary truncate-text">{{honorData.zmbName}}</p>
-            <p class="text-sm font-semibold">{{honorData.zmbTimes}}次</p>
+            <p class="text-xs font-semibold">{{honorData.zmbTimes}}次</p>
           </div>
-          <div class="text-center">
-            <div class="card-alt w-14 h-14 mx-auto mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
               <img src="{{honorData.dmbIcon}}" alt="{{honorData.dmbName}}" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary truncate-text">{{honorData.dmbName}}</p>
-            <p class="text-sm font-semibold">{{honorData.dmbTimes}}次</p>
+            <p class="text-xs font-semibold">{{honorData.dmbTimes}}次</p>
           </div>
-          <div class="text-center">
-            <div class="card-alt w-14 h-14 mx-auto mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
               <img src="{{honorData.dtdhIcon}}" alt="{{honorData.dtdhName}}" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary truncate-text">{{honorData.dtdhName}}</p>
-            <p class="text-sm font-semibold">{{honorData.dtdhTimes}}次</p>
+            <p class="text-xs font-semibold">{{honorData.dtdhTimes}}次</p>
           </div>
         </div>
         <div class="pt-3 border-t flex items-center gap-3" style="border-color: var(--border-color);">
@@ -218,51 +261,9 @@
       
     </div>
     
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-[390px_390px_420px] gap-4 items-stretch">
 
-      <div class="card rounded-xl p-5">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
-              <img src="{{teamLevelIcon}}" alt="团竞图标" class="w-full h-full object-contain" />
-            </div>
-            <div>
-              <p class="text-xs text-secondary">团竞模式</p>
-              <p class="text-sm font-semibold">{{teamLevelName}}</p>
-            </div>
-          </div>
-          <span class="text-xs text-secondary">{{teamFeatProgressText}}</span>
-        </div>
-
-        <div class="h-2 card-alt rounded-full overflow-hidden mb-4">
-          <div class="h-full rounded-full" style="width: {{teamFeatProgressPercent}}%; background: linear-gradient(to right, var(--accent-rose), var(--accent-amber));"></div>
-        </div>
-
-        <div class="grid grid-cols-5 gap-2">
-          <div class="text-center card-alt rounded-lg py-3">
-            <p class="text-[10px] text-secondary mb-1">场数</p>
-            <p class="text-sm font-semibold">{{teamMatches}}</p>
-          </div>
-          <div class="text-center card-alt rounded-lg py-3">
-            <p class="text-[10px] mb-1" style="color: var(--accent-rose);">获胜</p>
-            <p class="text-sm font-semibold">{{teamWins}}</p>
-          </div>
-          <div class="text-center card-alt rounded-lg py-3">
-            <p class="text-[10px] mb-1" style="color: var(--accent-emerald);">胜率</p>
-            <p class="text-sm font-semibold">{{teamWinRate}}</p>
-          </div>
-          <div class="text-center card-alt rounded-lg py-3">
-            <p class="text-[10px] mb-1" style="color: var(--accent-amber);">淘汰</p>
-            <p class="text-sm font-semibold">{{teamKills}}</p>
-          </div>
-          <div class="text-center card-alt rounded-lg py-3">
-            <p class="text-[10px] mb-1" style="color: var(--accent-sky);">战损</p>
-            <p class="text-sm font-semibold">{{teamDamage}}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card rounded-xl p-5">
+      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[460px] justify-self-start">
         <div class="flex items-center justify-between mb-3">
           <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">{{pattern}}</span>
           <span class="text-xs text-secondary">{{rankProgressText}}</span>
@@ -335,7 +336,7 @@
         </div>
       </div>
 
-      <div class="card rounded-xl p-5">
+      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[390px] justify-self-start">
         <div class="flex items-center justify-between mb-3">
           <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(16, 185, 129, 0.1); color: var(--accent-emerald);">地铁逃生</span>
           <span class="text-xs text-secondary">{{teamExpProgressText}}</span>
@@ -388,7 +389,109 @@
           </div>
         </div>
       </div>
-      
+      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[550px] justify-self-stretch">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(245, 158, 11, 0.1); color: var(--accent-amber);">古墓模式</span>
+            <p class="text-xs text-secondary mt-2">古金币 / 轮回石 / 职业成长</p>
+          </div>
+          <div class="card-alt rounded-xl p-2 flex items-center gap-3 min-w-0 max-w-[320px]">
+            <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{tombBestIncomeIcon}}" alt="最高收益成就" class="w-full h-full object-contain" />
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] text-secondary">最高收益成就</p>
+              <p class="text-sm font-semibold truncate-text">{{tombBestIncomeName}}</p>
+            </div>
+          </div>
+        </div>
+
+      <div class="grid grid-cols-3 gap-3 mb-3">
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">场数</p>
+          <p class="text-sm font-semibold">{{tombMatches}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">古金币总收益</p>
+          <p class="text-sm font-semibold" style="color: var(--accent-amber);">{{tombCoinIncome}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">轮回石总收益</p>
+          <p class="text-sm font-semibold" style="color: var(--accent-purple);">{{tombStoneIncome}}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-3">
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">单局最高古金币</p>
+          <p class="text-sm font-semibold">{{tombCoinMaxIncome}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">场均古金币</p>
+          <p class="text-sm font-semibold">{{tombCoinAvgIncome}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">单局最高轮回石</p>
+          <p class="text-sm font-semibold">{{tombStoneMaxIncome}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">场均轮回石</p>
+          <p class="text-sm font-semibold">{{tombStoneAvgIncome}}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-3">
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">淘汰/被淘汰</p>
+          <p class="text-sm font-semibold" style="color: var(--accent-emerald);">{{tombKd}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">淘汰玩家</p>
+          <p class="text-sm font-semibold">{{tombPlayerKills}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">淘汰首领</p>
+          <p class="text-sm font-semibold">{{tombBossKills}}</p>
+        </div>
+        <div class="text-center card-alt rounded-lg py-3">
+          <p class="text-[10px] text-secondary mb-1">淘汰怪物</p>
+          <p class="text-sm font-semibold">{{tombMonsterKills}}</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-xs text-secondary mb-3">职业熟练度</p>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="text-center card-alt rounded-lg py-3 px-2">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{tombPioneerIcon}}" alt="先锋" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary mb-1">先锋</p>
+            <p class="text-sm font-semibold">{{tombPioneerLevel}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3 px-2">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{tombRangerIcon}}" alt="游侠" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary mb-1">游侠</p>
+            <p class="text-sm font-semibold">{{tombRangerLevel}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3 px-2">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{tombTaoistIcon}}" alt="道士" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary mb-1">道士</p>
+            <p class="text-sm font-semibold">{{tombTaoistLevel}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3 px-2">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{tombWitchDoctorIcon}}" alt="巫医" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary mb-1">巫医</p>
+            <p class="text-sm font-semibold">{{tombWitchDoctorLevel}}</p>
+          </div>
+        </div>
+      </div>
     </div>
     
   </div>

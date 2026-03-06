@@ -37,7 +37,7 @@ export class MyHomepage extends plugin {
             return e.reply('公共查询Token已失效')
         }
         const roleCard = data.data.roleCard
-        const { mainRecord = [], escapeRecord = [], vsteamRecord = [] } = roleCard
+        const { mainRecord = [], escapeRecord = [], losttombRecord = [], vsteamRecord = [] } = roleCard
 
         const { info } = getUserInfo(e.user_id)
         const idx = mainRecord[Number.isInteger(info.prefMainIndex) ? info.prefMainIndex : 0] ? (info.prefMainIndex || 0) : 0
@@ -45,6 +45,7 @@ export class MyHomepage extends plugin {
 
         const vsteam = vsteamRecord[0] || {}
         const escape = escapeRecord[0] || {}
+        const losttomb = losttombRecord[0] || {}
 
         const get = (obj, arr, def = '失败') => arr.reduce((o, k) => (o && o[k] !== undefined) ? o[k] : undefined, obj) ?? def
 
@@ -126,6 +127,28 @@ export class MyHomepage extends plugin {
             teamKills2: get(escape, ['subPro', 1, 'v', 'v']),
             teamBanditKills: get(escape, ['subPro', 2, 'v', 'v']),
             teamMonsterKills: get(escape, ['subPro', 3, 'v', 'v']),
+
+            tombMatches: get(losttomb, ['pro', 0, 'v', 'v']),
+            tombCoinIncome: get(losttomb, ['pro', 1, 'v', 'v']),
+            tombStoneIncome: get(losttomb, ['pro', 2, 'v', 'v']),
+            tombCoinMaxIncome: get(losttomb, ['subPro', 0, 'v', 'v']),
+            tombCoinAvgIncome: get(losttomb, ['subPro', 1, 'v', 'v']),
+            tombStoneMaxIncome: get(losttomb, ['subPro', 2, 'v', 'v']),
+            tombStoneAvgIncome: get(losttomb, ['subPro', 3, 'v', 'v']),
+            tombKd: get(losttomb, ['subPro', 4, 'v', 'v']),
+            tombPlayerKills: get(losttomb, ['subPro', 5, 'v', 'v']),
+            tombBossKills: get(losttomb, ['subPro', 6, 'v', 'v']),
+            tombMonsterKills: get(losttomb, ['subPro', 7, 'v', 'v']),
+            tombBestIncomeName: losttomb.maxIncomeName || '暂无数据',
+            tombBestIncomeIcon: losttomb.maxIncomeIcon || '',
+            tombPioneerLevel: get(losttomb, ['profPro', 0, 'v', 'v']),
+            tombPioneerIcon: get(losttomb, ['profPro', 0, 'v', 'bi'], ''),
+            tombRangerLevel: get(losttomb, ['profPro', 1, 'v', 'v']),
+            tombRangerIcon: get(losttomb, ['profPro', 1, 'v', 'bi'], ''),
+            tombTaoistLevel: get(losttomb, ['profPro', 2, 'v', 'v']),
+            tombTaoistIcon: get(losttomb, ['profPro', 2, 'v', 'bi'], ''),
+            tombWitchDoctorLevel: get(losttomb, ['profPro', 3, 'v', 'v']),
+            tombWitchDoctorIcon: get(losttomb, ['profPro', 3, 'v', 'bi'], ''),
 
             honorData: honorData,
 
