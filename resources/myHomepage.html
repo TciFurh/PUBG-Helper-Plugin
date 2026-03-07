@@ -31,6 +31,9 @@
         --accent-rose: #f43f5e;
         --gradient-start: #f093fb;
         --gradient-end: #f5576c;
+        --icon-chip-bg: #e8edf5;
+        --icon-chip-border: #cfd8e3;
+        --icon-chip-shadow: rgba(15, 23, 42, 0.12);
       }
     }
     
@@ -50,6 +53,9 @@
         --accent-rose: #f43f5e;
         --gradient-start: #f093fb;
         --gradient-end: #f5576c;
+        --icon-chip-bg: #222831;
+        --icon-chip-border: #313a46;
+        --icon-chip-shadow: rgba(0, 0, 0, 0.28);
       }
     }
     
@@ -88,6 +94,16 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .profession-icon-chip {
+      background: linear-gradient(180deg, color-mix(in srgb, var(--icon-chip-bg) 92%, white 8%) 0%, var(--icon-chip-bg) 100%);
+      border: 1px solid var(--icon-chip-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 4px 10px var(--icon-chip-shadow);
+    }
+
+    .profession-icon-chip img {
+      filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.18));
     }
   </style>
 </head>
@@ -463,28 +479,28 @@
         <p class="text-xs text-secondary mb-3">职业熟练度</p>
         <div class="grid grid-cols-4 gap-3">
           <div class="text-center card-alt rounded-lg py-3 px-2">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="profession-icon-chip w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center p-1">
               <img src="{{tombPioneerIcon}}" alt="先锋" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary mb-1">先锋</p>
             <p class="text-sm font-semibold">{{tombPioneerLevel}}</p>
           </div>
           <div class="text-center card-alt rounded-lg py-3 px-2">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="profession-icon-chip w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center p-1">
               <img src="{{tombRangerIcon}}" alt="游侠" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary mb-1">游侠</p>
             <p class="text-sm font-semibold">{{tombRangerLevel}}</p>
           </div>
           <div class="text-center card-alt rounded-lg py-3 px-2">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="profession-icon-chip w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center p-1">
               <img src="{{tombTaoistIcon}}" alt="道士" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary mb-1">道士</p>
             <p class="text-sm font-semibold">{{tombTaoistLevel}}</p>
           </div>
           <div class="text-center card-alt rounded-lg py-3 px-2">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="profession-icon-chip w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center p-1">
               <img src="{{tombWitchDoctorIcon}}" alt="巫医" class="w-full h-full object-contain" />
             </div>
             <p class="text-[10px] text-secondary mb-1">巫医</p>
