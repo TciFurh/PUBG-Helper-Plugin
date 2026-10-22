@@ -215,6 +215,20 @@ export class RecentBattle extends plugin {
         }
       })
 
+      // 晋级赛标识：promotion = {taskId, process, target, protect, pass, rank, divName}
+      const promo = d.promotion || null
+      const promoPass = promo ? String(promo.pass) === '1' : false
+      const promoText = promo
+        ? promoPass
+          ? '晋级赛成功'
+          : promo.protect
+            ? '晋级赛保护'
+            : '晋级赛中'
+        : ''
+      const promoRank = promo && promo.rank ? promo.rank : ''
+      const promoProc = promo && promo.process != null ? promo.process : ''
+      const promoTarget = promo && promo.target != null ? promo.target : ''
+
       const image = await puppeteer.screenshot('battledetail', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battledetail.html',
         roleName: camp.roleName || camp.nickName || battleCache.roleId,
@@ -222,6 +236,10 @@ export class RecentBattle extends plugin {
         modeIcon: d.modeIcon || '',
         divName: d.divName || '',
         playTime: d.playTime || '',
+        promoText,
+        promoRank,
+        promoProc,
+        promoTarget,
         rank: val(d.rank) ?? '—',
         playerNum: val(d.playerNum) ?? '—',
         peakCombat: d.peakCombat ?? '—',

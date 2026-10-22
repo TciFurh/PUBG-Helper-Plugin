@@ -35,6 +35,18 @@
     .map-bar .map-sub { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
     .map-bar .time { margin-left: auto; font-size: 13px; color: #8e8e8e; }
 
+    .promo-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 8px 18px; margin-bottom: 12px;
+    }
+    .promo-tag {
+      font-size: 12px; font-weight: 700; color: #ffffff;
+      background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+      border: 1px solid #3a3a3a; padding: 2px 10px; border-radius: 999px;
+    }
+    .promo-item { font-size: 12px; color: #a8a8a8; }
+
     .result-bar {
       display: flex; align-items: center; gap: 16px;
       background: #121212; border: 1px solid #262626;
@@ -155,6 +167,14 @@
     </div>
     <div class="time">{{playTime}}</div>
   </div>
+
+  {{ if promoText }}
+  <div class="promo-bar">
+    <span class="promo-tag">{{promoText}}</span>
+    {{ if promoRank }}<span class="promo-item">个人排名 #{{promoRank}}</span>{{ /if }}
+    {{ if promoProc !== '' }}<span class="promo-item">晋级进度 {{promoProc}}/{{promoTarget}}</span>{{ /if }}
+  </div>
+  {{ /if }}
 
   <div class="result-bar">
     <div class="rank-box">
