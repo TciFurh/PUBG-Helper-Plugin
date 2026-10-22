@@ -43,4 +43,32 @@ export function formatIdList(info) {
 	return info.ids.map((id, index) => `${index === info.current ? '✅' : '☑️'} ${index + 1}. ${id}`).join('\n')
 }
 
+// ---- 营地登录凭证(抓包提交) ----
+// camp = { openId, gameOpenId, userId, token, seasonId, updatedAt }
+
+export function getCamp(qqUserId) {
+	const { info } = getUserInfo(qqUserId)
+	return info.camp || null
+}
+
+export function saveCamp(qqUserId, camp) {
+	saveUserInfo(qqUserId, (cur) => {
+		cur.camp = { ...camp, updatedAt: Date.now() }
+		return cur
+	})
+}
+
+export function deleteCamp(qqUserId) {
+	saveUserInfo(qqUserId, (cur) => {
+		delete cur.camp
+		return cur
+	})
+}
+
+export function maskToken(token) {
+	if (!token) return ''
+	if (token.length <= 8) return token.slice(0, 2) + '****'
+	return token.slice(0, 6) + '****' + token.slice(-4)
+}
+
 
