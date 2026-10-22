@@ -196,10 +196,12 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
   - 分类判定注意：**地铁一定带 `hardType`，团竞一定带 `result`**，两者互斥，不能只看 `result`（团竞的 `Win` 曾被误判成地铁）
 
 - **最近战绩与单局详情**（`apps/recentBattle.js` + `utils/battleView.js` + `resources/recentbattle.html` / `resources/battledetail.html`）：`#和平最近战绩` 全模式最近对局列表（默认10局）；`#和平战绩详情 <编号>` 单局详情，走营地 HTTP 接口（`/play/getrecentbattlelist`、`/gp/api/php/getpubgplaydetail.php`）。`buildDetailView` 按返回结构归一化，模板只判断「有没有这个区块」，四种形态：
-  - **地铁**（`income` + `hardType` 存在）：本局收益卡（含新纪录/钻石）、总击败/击败玩家/击败匪徒/击败怪物/狩猎积分/声望、装备栏（`equipment.list` 为对象，需 `Object.values`；按 `quality` 101~108 上色，带配件与词条）、背包（`bag` / `safebag`，含价值、数量、品质分布）
+  - **地铁**（`income` + `hardType` 存在）：本局收益卡（含新纪录/钻石）、总击败/击败玩家/击败匪徒/击败怪物/狩猎积分/声望、装备栏（`equipment.list` 为对象，需 `Object.values`；按 `quality` 101~108 上色，带配件与词条）、背包（`bag` / `safebag`，含价值、数量、品质分布）、淘汰明细（伤害/距离/护甲/头盔/弹药）；标题条带段位图标（`divOriIcon`）
   - **超体**（`isSuperBody`）：`heroInfo` 英雄卡 + `heroLevel` / `heroRating`、`heroPlugins` + `craftPlugins` 插件、`achievement` 称号徽章、`analysis` 伤害（基础/增伤/技能）与治疗（基础/技能/插件）构成条
-  - **团竞**（`viewType=vsteam`，`dataList[0].data` 为 `[{list},{list}]` 双方）：双阵营阵容，成员数值取自 `infoList` 的 淘汰/助攻/战损/连击
+  - **团竞**（`viewType=vsteam`，`dataList[0].data` 为 `[{list},{list}]` 双方）：双阵营阵容，成员数值取自 `infoList` 的 淘汰/助攻/战损/连击；数值条显示队伍排名/淘汰/助攻/战损/连击/积分（`ratingValue` + `ratingChange`，胜负已在标题条 chip 上，不再重复占格）
   - **经典**：`ability` 数值、`equipment` 枪械伤害与命中部位、`team` 队伍、`kills`/`killer`/`top5`
+  - **能力雷达**（`ability.data.radar`，5 维 排名/淘汰/物资/治疗/伤害，满分 100）：`buildRadar` 在 JS 里算好 SVG 坐标（网格/轴线/数据多边形/标签锚点），模板只填空，不碰三角函数。经典与超体都有，地铁接口不返回该块
+  - **荣誉标记**（`honorIcon` 前十 / `rankIcon` 前五）：标题条右侧小图标，`mvpIcon` 不放这里（图大字重，与成员行 MVP 徽章重复）
   - 成员数值列不写死字段名，直接按 `infoList` 的 key 顺序取（经典是伤害/救援，团竞是战损/连击）
 - **主页渲染重构**（`resources/myHomepage.html` + `apps/myHomepage.js`）：
   - ins 深色风格，黑白灰三色主题（仅"游戏在线"状态用绿色背景）

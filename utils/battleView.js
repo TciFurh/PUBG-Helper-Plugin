@@ -156,6 +156,68 @@ function memberRow(m, index) {
   }
 }
 
+/** 五点能力雷达 → 直接算好 SVG 坐标，模板不碰三角函数 */
+function buildRadar(raw) {
+  const node = raw?.radar || raw
+  const items = (node?.data || [])
+    .map((it) => {
+      // 营地给的是 #RRGGBBAA，转成 CSS 能认的 6 位；不能直接 replace('ff') 会切坏 #FFFFFFff
+      const hex = String(it.ksup?.c || '').replace(/^#/, '')
+      const color = hex.length === 8 ? `#${hex.slice(0, 6)}` : hex ? `#${hex}` : ''
+      return { k: it.k || '', v: Number(it.v) || 0, color }
+    })
+    .filter((x) => x.k)
+  if (items.length < 3) return null
+
+  const max = Number(node.max) || 100
+  const CX = 130
+  const CY = 100
+  const R = 70
+  const n = items.length
+  const pt = (ratio, i) => {
+    const a = (-90 + (360 / n) * i) * (Math.PI / 180)
+    return [CX + R * ratio * Math.cos(a), CY + R * ratio * Math.sin(a)]
+  }
+  const poly = (ratio) =>
+    items.map((_, i) => pt(ratio, i).map((v) => v.toFixed(1)).join(',')).join(' ')
+
+  return {
+    max,
+    // 三层网格 + 轴线，都是模板直接填的字符串
+    grids: [1, 0.75, 0.5, 0.25].map((r) => poly(r)),
+    axes: items.map((_, i) => {
+      const [x, y] = pt(1, i)
+      return { x1: CX, y1: CY, x2: x.toFixed(1), y2: y.toFixed(1) }
+    }),
+    shape: items
+      .map((it, i) => {
+        const ratio = Math.max(0.03, Math.min(1, it.v / max))
+        return pt(ratio, i)
+          .map((v) => v.toFixed(1))
+          .join(',')
+      })
+      .join(' '),
+    points: items.map((it, i) => {
+      const ratio = Math.max(0.03, Math.min(1, it.v / max))
+      const [x, y] = pt(ratio, i)
+      const [lx, ly] = pt(1.32, i)
+      const anchor = Math.abs(lx - CX) < 8 ? 'middle' : lx > CX ? 'start' : 'end'
+      return {
+        x: x.toFixed(1),
+        y: y.toFixed(1),
+        k: it.k,
+        v: it.v,
+        color: it.color,
+        lx: lx.toFixed(1),
+        ly: (ly + 3.5).toFixed(1),
+        anchor,
+      }
+    }),
+    cx: CX,
+    cy: CY,
+  }
+}
+
 /**
  * 单局详情 → 展示模型
  * 经典/地铁/超体/团竞返回的结构完全不同，这里统一归一化；
@@ -187,6 +249,11 @@ export function buildDetailView(d, camp = {}) {
       .filter(Boolean)
       .join(' · '),
     mvpIcon: d.mvpIcon || '',
+    // 段位图标（地铁用 divOriIcon/divUrl，其它模式用 divUrl）
+    divIcon: d.divOriIcon || d.divUrl || '',
+    // 荣誉标记：前十/前五，营地标题条右侧同款（MVP 图太大且与成员行徽章重复，不放）
+    honors: [d.honorIcon, d.rankIcon].filter(Boolean),
+    radar: null,
     hero: null,
     plugins: [],
     badges: [],
@@ -233,18 +300,21 @@ export function buildDetailView(d, camp = {}) {
     const self = members.find((m) => m.roleName && m.roleName === d.roleName) || members[0]
     const selfInfo = infoMap(self?.infoList)
     const pick = (k, fallback) => (selfInfo[k] !== undefined ? val(selfInfo[k]) : fallback)
+    // 结果已经在标题条右上角的 chip 上，这里换成积分（营地详情页也带积分变化）
     out.stats = [
       { n: val(d.rank) != null ? `#${val(d.rank)}` : '—', l: '队伍排名' },
-      { n: resultText(d.result) || '—', l: '结果' },
       { n: pick('淘汰', d.killingCount ?? '—'), l: '淘汰' },
       { n: pick('助攻', '—'), l: '助攻' },
       { n: pick('战损', '—'), l: '战损' },
       { n: d.lianshaNum || pick('连击', '—'), l: '连击' },
+      { n: d.ratingValue || '—', l: '积分', sup: d.ratingChange || '' },
     ]
   } else {
-    const abilityList = block(d, 'ability')?.data?.list || []
+    const abilityBlock = block(d, 'ability')
+    const abilityList = abilityBlock?.data?.list || []
     const flat = []
     for (const group of abilityList) for (const it of group) flat.push(it)
+    out.radar = buildRadar(abilityBlock?.data?.radar)
     out.ability = flat.slice(0, 6).map((it) => ({
       label: it.k || '',
       num: String(val(it.v) ?? '—'),
@@ -389,6 +459,8 @@ export function buildDetailView(d, camp = {}) {
         damage: sw.healthDamage ?? '—',
         distance: sw.hitDistance ?? '',
         vest: sw.vestDamage ?? 0,
+        helmet: sw.helmetDamage ?? 0,
+        ammo: sw.ammoName || '',
       })),
     }
   })

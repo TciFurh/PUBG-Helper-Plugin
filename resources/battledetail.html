@@ -32,7 +32,10 @@
     .map-bar .mi { width: 42px; height: 42px; object-fit: contain; }
     .map-bar .mn { font-size: 16px; font-weight: 700; }
     .map-bar .ms { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
-    .map-bar .right { margin-left: auto; text-align: right; }
+    .map-bar .trail { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .map-bar .honors { display: flex; align-items: center; gap: 6px; }
+    .map-bar .honors img { height: 22px; object-fit: contain; }
+    .map-bar .right { text-align: right; }
     .map-bar .t { font-size: 12px; color: #8e8e8e; }
     .res-chip {
       display: inline-block; margin-top: 4px;
@@ -48,7 +51,8 @@
     .promo .tag.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
     .promo .it { font-size: 12px; color: #a8a8a8; }
     .promo .bar-wrap { flex: 1; height: 5px; background: #232323; border-radius: 999px; overflow: hidden; }
-    .promo .bar-fill { height: 100%; background: linear-gradient(90deg, #8A6A25, #F5C451); }
+    /* span 默认 inline，不加 block 高度不生效，进度条会整条看不见 */
+    .promo .bar-fill { display: block; height: 100%; background: linear-gradient(90deg, #8A6A25, #F5C451); }
 
     /* 收益卡（地铁） */
     .income .lbl { font-size: 11px; color: #8e8e8e; }
@@ -78,6 +82,14 @@
     .plugin .pd { font-size: 9px; color: #7A7A7A; margin-top: 1px; max-width: 190px; }
     .badges { display: flex; gap: 8px; flex-wrap: wrap; }
     .badges img { width: 34px; height: 34px; object-fit: contain; }
+
+    /* 能力雷达（超体/经典，营地 ability.radar） */
+    .radar { display: flex; align-items: center; justify-content: center; gap: 40px; }
+    .radar svg { flex: none; width: 300px; height: 231px; }
+    .radar .rlist { flex: none; width: 200px; display: grid; grid-template-columns: 1fr; gap: 9px; }
+    .radar .rl { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a8a8a8; }
+    .radar .rl i { width: 6px; height: 6px; border-radius: 2px; flex: none; background: #F5C451; }
+    .radar .rl b { margin-left: auto; font-size: 15px; color: #fafafa; }
 
     /* 数值条 */
     .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
@@ -193,15 +205,28 @@
 
   <!-- 对局信息 -->
   <div class="card map-bar">
-    {{ if modeIcon }}<img class="mi" src="{{modeIcon}}" alt="" />{{ /if }}
+    {{ if modeIcon }}<img class="mi" src="{{modeIcon}}" alt="" />
+    {{ else if divIcon }}<img class="mi" src="{{divIcon}}" alt="" />{{ /if }}
     <div>
       <div class="mn">{{mapMode || '—'}}</div>
       <div class="ms">{{subLine}}</div>
     </div>
-    <div class="right">
+    {{ if honors.length }}
+    <div class="trail">
+      <div class="honors">
+        {{ each honors h }}<img src="{{h}}" alt="" />{{ /each }}
+      </div>
+      <div class="right">
+        <div class="t">{{playTime}}</div>
+        {{ if resultText }}<span class="res-chip {{resultTone}}">{{resultText}}{{ if resultDesc }} · {{resultDesc}}{{ /if }}</span>{{ /if }}
+      </div>
+    </div>
+    {{ else }}
+    <div class="right" style="margin-left:auto">
       <div class="t">{{playTime}}</div>
       {{ if resultText }}<span class="res-chip {{resultTone}}">{{resultText}}{{ if resultDesc }} · {{resultDesc}}{{ /if }}</span>{{ /if }}
     </div>
+    {{ /if }}
   </div>
 
   <!-- 晋级赛 -->
@@ -252,7 +277,7 @@
     </div>
     {{ if plugins.length }}
     <div class="plugins">
-      {{ each plugins as p }}
+      {{ each plugins p }}
       <div class="plugin">
         {{ if p.url }}<img src="{{p.url}}" alt="" />{{ /if }}
         <div><div class="pn">{{p.name}}</div>{{ if p.desc }}<div class="pd">{{p.desc}}</div>{{ /if }}</div>
@@ -269,7 +294,7 @@
     <div style="display:flex;align-items:center;gap:12px">
       <div style="font-size:11px;color:#8e8e8e;flex:none">称号徽章</div>
       <div class="badges">
-        {{ each badges as b }}
+        {{ each badges b }}
         <div style="display:flex;align-items:center;gap:5px">
           {{ if b.icon }}<img src="{{b.icon}}" alt="" style="width:30px;height:30px;object-fit:contain" />{{ /if }}
           {{ if b.name }}<span style="font-size:10px;color:#d4d4d4">{{b.name}}</span>{{ /if }}
@@ -282,7 +307,7 @@
 
   <!-- 主体数值 -->
   <div class="stats">
-    {{ each stats as s }}
+    {{ each stats s }}
     <div class="sbox">
       <div class="n">{{s.n}}{{ if s.sup }}<small>{{s.sup}}</small>{{ /if }}</div>
       <div class="l">{{s.l}}</div>
@@ -290,13 +315,38 @@
     {{ /each }}
   </div>
 
+  <!-- 能力雷达（营地 ability.radar，超体/经典都有） -->
+  {{ if radar }}
+  <div class="sec-title"><div class="bar"></div>能力详情<span class="cnt">满分 {{radar.max}}</span></div>
+  <div class="card radar">
+    <svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+      {{ each radar.grids g }}
+      <polygon points="{{g}}" fill="none" stroke="#2A2A2A" stroke-width="1" />
+      {{ /each }}
+      {{ each radar.axes a }}
+      <line x1="{{a.x1}}" y1="{{a.y1}}" x2="{{a.x2}}" y2="{{a.y2}}" stroke="#232323" stroke-width="1" />
+      {{ /each }}
+      <polygon points="{{radar.shape}}" fill="rgba(245,196,81,.24)" stroke="#F5C451" stroke-width="1.6" />
+      {{ each radar.points p }}
+      <circle cx="{{p.x}}" cy="{{p.y}}" r="2.6" fill="#F5C451" />
+      <text x="{{p.lx}}" y="{{p.ly}}" text-anchor="{{p.anchor}}" fill="#8E8E8E" font-size="10">{{p.k}}</text>
+      {{ /each }}
+    </svg>
+    <div class="rlist">
+      {{ each radar.points p }}
+      <div class="rl"><i style="background:{{p.color || '#F5C451'}}"></i>{{p.k}}<b>{{p.v}}</b></div>
+      {{ /each }}
+    </div>
+  </div>
+  {{ /if }}
+
   <!-- 伤害/治疗构成（超体/创意） -->
   {{ if analysis }}
   <div class="sec-title"><div class="bar"></div>数据构成</div>
   <div class="card ana">
     <div class="col">
       <div class="t">总伤害 <b>{{analysis.damage.total}}</b></div>
-      {{ each analysis.damage.list as it }}
+      {{ each analysis.damage.list it }}
       <div class="row2">
         <div class="k">{{it.name}}</div>
         <div class="track"><div class="fill" style="width:{{it.percent}}%"></div></div>
@@ -306,7 +356,7 @@
     </div>
     <div class="col">
       <div class="t">总治疗 <b>{{analysis.heal.total}}</b></div>
-      {{ each analysis.heal.list as it }}
+      {{ each analysis.heal.list it }}
       <div class="row2">
         <div class="k">{{it.name}}</div>
         <div class="track"><div class="fill" style="width:{{it.percent}}%"></div></div>
@@ -321,7 +371,7 @@
   {{ if weapons.length }}
   <div class="sec-title"><div class="bar"></div>本局枪械</div>
   <div class="weapons">
-    {{ each weapons as w }}
+    {{ each weapons w }}
     <div class="weapon">
       <div class="top2">
         {{ if w.icon }}<img src="{{w.icon}}" alt="" />{{ /if }}
@@ -332,7 +382,7 @@
         <div class="ws"><div class="n">{{w.damage}}</div><div class="l">伤害</div></div>
       </div>
       <div class="parts">
-        {{ each w.parts as p }}
+        {{ each w.parts p }}
         <div class="p"><div class="n">{{p.v}}%</div><div class="l">{{p.k}}</div></div>
         {{ /each }}
       </div>
@@ -345,7 +395,7 @@
   {{ if gear.length }}
   <div class="sec-title"><div class="bar"></div>装备<span class="cnt">{{gear.length}} 件</span></div>
   <div class="gear">
-    {{ each gear as g }}
+    {{ each gear g }}
     <div class="gitem">
       <div class="qbar" style="background:{{g.color}}"></div>
       <div class="top2">
@@ -357,7 +407,7 @@
       </div>
       {{ if g.parts.length }}
       <div class="parts">
-        {{ each g.parts as p }}{{ if p.icon }}<img src="{{p.icon}}" alt="" title="{{p.name}}" />{{ /if }}{{ /each }}
+        {{ each g.parts p }}{{ if p.icon }}<img src="{{p.icon}}" alt="" title="{{p.name}}" />{{ /if }}{{ /each }}
       </div>
       {{ /if }}
       {{ if g.affixes.length }}<div class="affix">{{g.affixes.join(' · ')}}</div>{{ /if }}
@@ -371,7 +421,7 @@
   <div class="sec-title"><div class="bar"></div>背包<span class="cnt">{{bag.length}} 项</span></div>
   <div class="card">
     <div class="bag">
-      {{ each bag as b }}
+      {{ each bag b }}
       <div class="bitem">
         <div class="qbar" style="background:{{b.color}}"></div>
         {{ if b.num > 1 }}<div class="bnum">×{{b.num}}</div>{{ /if }}
@@ -384,7 +434,7 @@
     {{ if bagCounts.length }}
     <div class="bagcounts">
       <span class="bc">品质分布</span>
-      {{ each bagCounts as c }}
+      {{ each bagCounts c }}
       <span class="bc"><i style="background:{{c.color}}"></i>{{c.n}}</span>
       {{ /each }}
     </div>
@@ -394,9 +444,9 @@
 
   <!-- 团竞双方 -->
   {{ if teams.length }}
-  {{ each teams as t, ti }}
+  {{ each teams t }}
   <div class="sec-title"><div class="bar"></div>{{t.name}}</div>
-  {{ each t.list as m }}
+  {{ each t.list m }}
   <div class="mrow {{ if m.isSelf }}self{{ /if }}">
     {{ if m.avatar }}<img class="av" src="{{m.avatar}}" alt="" />{{ /if }}
     <div style="min-width:0">
@@ -408,7 +458,7 @@
       <div class="md">{{m.div}}</div>
     </div>
     <div class="cols">
-      {{ each m.cols as c }}
+      {{ each m.cols c }}
       <div class="c"><div class="n">{{c.n}}</div><div class="l">{{c.l}}</div></div>
       {{ /each }}
     </div>
@@ -420,7 +470,7 @@
   <!-- 我的队伍（经典） -->
   {{ if team.length }}
   <div class="sec-title"><div class="bar"></div>我的队伍</div>
-  {{ each team as m }}
+  {{ each team m }}
   <div class="mrow {{ if m.isSelf }}self{{ /if }}">
     {{ if m.avatar }}<img class="av" src="{{m.avatar}}" alt="" />{{ /if }}
     <div style="min-width:0">
@@ -435,7 +485,7 @@
     <div class="ev"><img src="{{m.evalIcon}}" alt="" /><div class="t">{{m.evalText}}</div></div>
     {{ /if }}
     <div class="cols">
-      {{ each m.cols as c }}
+      {{ each m.cols c }}
       <div class="c"><div class="n">{{c.n}}</div><div class="l">{{c.l}}</div></div>
       {{ /each }}
     </div>
@@ -446,7 +496,7 @@
   <!-- 我的淘汰 -->
   {{ if kills.length }}
   <div class="sec-title"><div class="bar"></div>我的淘汰<span class="cnt">{{killTotal}} 人</span></div>
-  {{ each kills as k }}
+  {{ each kills k }}
   <div class="krow">
     <div class="main">
       {{ if k.avatar }}<img class="av" src="{{k.avatar}}" alt="" />{{ /if }}
@@ -458,10 +508,10 @@
     </div>
     {{ if k.weapons.length }}
     <div class="sw">
-      {{ each k.weapons as w }}
+      {{ each k.weapons w }}
       <div class="w">
         {{ if w.icon }}<img src="{{w.icon}}" alt="" />{{ /if }}
-        <span><b>{{w.damage}}</b> 伤害{{ if w.distance }} · {{w.distance}}m{{ /if }}{{ if w.vest }} · 护甲{{w.vest}}{{ /if }}</span>
+        <span><b>{{w.damage}}</b> 伤害{{ if w.distance }} · {{w.distance}}m{{ /if }}{{ if w.vest }} · 护甲{{w.vest}}{{ /if }}{{ if w.helmet }} · 头盔{{w.helmet}}{{ /if }}{{ if w.ammo }} · {{w.ammo}}{{ /if }}</span>
       </div>
       {{ /each }}
     </div>
@@ -473,7 +523,7 @@
   <!-- 淘汰我的人 -->
   {{ if killer.length }}
   <div class="sec-title"><div class="bar"></div>淘汰我的人</div>
-  {{ each killer as k }}
+  {{ each killer k }}
   <div class="krow">
     <div class="main">
       {{ if k.avatar }}<img class="av" src="{{k.avatar}}" alt="" />{{ /if }}
@@ -490,7 +540,7 @@
   <!-- 第一名队伍 -->
   {{ if top1.length }}
   <div class="sec-title"><div class="bar"></div>第一名队伍</div>
-  {{ each top1 as m }}
+  {{ each top1 m }}
   <div class="mrow">
     {{ if m.avatar }}<img class="av" src="{{m.avatar}}" alt="" />{{ /if }}
     <div style="min-width:0">
@@ -498,7 +548,7 @@
       <div class="md">{{m.div}}{{ if m.survivalTime }} · 生存 {{m.survivalTime}}{{ /if }}</div>
     </div>
     <div class="cols">
-      {{ each m.cols as c }}
+      {{ each m.cols c }}
       <div class="c"><div class="n">{{c.n}}</div><div class="l">{{c.l}}</div></div>
       {{ /each }}
     </div>

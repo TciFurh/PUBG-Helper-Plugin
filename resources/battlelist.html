@@ -155,14 +155,14 @@
       {{ if profile.featLevel }}<div class="div">属性Lv.{{profile.featLevel}}</div>{{ /if }}
     </div>
     <div class="grid">
-      {{ each profile.rows as r }}
+      {{ each profile.rows r }}
       <div class="g"><div class="n">{{r.v}}</div><div class="l">{{r.k}}</div></div>
       {{ /each }}
     </div>
   </div>
   {{ /if }}
 
-  {{ each rows as r }}
+  {{ each rows r }}
   <div class="row">
     {{ if r.ribbon }}
     <div class="ribbon {{r.ribbon.tone}}">{{r.ribbon.small}}<b>{{r.ribbon.big}}</b></div>
@@ -183,7 +183,7 @@
       <div class="m">{{r.mapDesc || r.modeDesc}}</div>
       <div class="tags">
         <span class="chip">{{r.modeDesc}}</span>
-        {{ each r.records as rc }}
+        {{ each r.records rc }}
         <span class="chip gold">{{rc}}</span>
         {{ /each }}
       </div>
