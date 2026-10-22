@@ -4,9 +4,9 @@
 
 **PUBG-Helper-Plugin** · 在群里发一句话，把营地数据变成一张能看的图
 
-[![访问量](https://count.kjchmc.cn/get/@PUBG-Helper-Plugin?theme=rule34)](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin)
-[![Star](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin/badge/star.svg?theme=dark)](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin)
-[![Fork](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin/badge/fork.svg?theme=dark)](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin)
+[![访问量](https://count.kjchmc.cn/get/@PUBG-Helper-Plugin?theme=rule34)](https://github.com/TciFurh/PUBG-Helper-Plugin)
+[![Star](https://img.shields.io/github/stars/TciFurh/PUBG-Helper-Plugin?style=social)](https://github.com/TciFurh/PUBG-Helper-Plugin/stargazers)
+[![Fork](https://img.shields.io/github/forks/TciFurh/PUBG-Helper-Plugin?style=social)](https://github.com/TciFurh/PUBG-Helper-Plugin/network/members)
 [![License](https://img.shields.io/badge/license-MulanPSL--2.0-2ea44f)](./LICENSE)
 
 <sub>Yunzai-Bot V3 插件 · 支持 QQ / 微信双通道登录 · 战绩 / 主页 / 资产 / 周报全模式覆盖</sub>
@@ -36,7 +36,7 @@
 在 Yunzai-Bot **根目录**执行：
 
 ```bash
-git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-Helper-Plugin/
+git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helper-Plugin/
 ```
 
 重启 Bot，日志里出现 `和平精英插件载入中...` 即加载成功。
@@ -372,10 +372,10 @@ Fork → 新建 `feature_xxx` 分支 → 提交 → 发 Pull Request。
 
 **找作者**
 
-[@Tloml-Starry](https://gitee.com/Tloml-Starry) ·
+[@TciFurh](https://github.com/TciFurh) ·
 [加 QQ](https://qm.qq.com/q/h9UHpRmomc) ·
 [进群](https://qm.qq.com/q/b6XzgZ7YLS) ·
-[提 Issue](https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin/issues)
+[提 Issue](https://github.com/TciFurh/PUBG-Helper-Plugin/issues)
 
 <div align="center">
 <br>
