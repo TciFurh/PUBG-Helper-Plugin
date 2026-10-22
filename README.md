@@ -149,7 +149,22 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 </details>
 
 <details>
-<summary><b>④ 数据查询</b> — 主页 / 资产 / 熟练度 / 资讯</summary>
+<summary><b>④ 每日任务</b> — 福利中心自动做任务、领奖</summary>
+
+<br>
+
+| 指令 | 作用 |
+|---|---|
+| `#和平任务` | 自动完成营地每日任务（点赞 / 分享 / 浏览 / 工具 / 充能）并领取奖励，回结果清单 |
+| `#和平任务状态` | 只看两类任务（积分任务 + 福利任务）的完成情况，不做任何动作 |
+| `#开启/关闭和平自动任务` | 定时自动跑的开关，默认每天 07:40，结果发给主人 |
+
+> 点赞做完会自动撤回，不在营地留社交痕迹；「启动游戏 / 取胜一局 / 好友观战」需要真实游戏行为，做不了，会用福利任务的刷新次数换掉。
+
+</details>
+
+<details>
+<summary><b>⑤ 数据查询</b> — 主页 / 资产 / 熟练度 / 资讯</summary>
 
 <br>
 
@@ -166,7 +181,7 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 </details>
 
 <details>
-<summary><b>⑤ 设置与系统</b></summary>
+<summary><b>⑥ 设置与系统</b></summary>
 
 <br>
 

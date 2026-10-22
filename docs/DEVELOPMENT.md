@@ -10,6 +10,7 @@
 - [列表字段](#列表字段)
 - [详情四种结构](#详情四种结构)
 - [踩坑清单](#踩坑清单)
+- [每日任务（福利中心）](#每日任务福利中心)
 - [本地增强记录](#本地增强记录)
 - [开发工具](#开发工具)
 
@@ -136,6 +137,49 @@ const isSuper = d.isSuperBody === true
 | 收益小数值被转万 | `4128` 显示成 `0.4万` | 绝对值 < 10000 时走 `toLocaleString` 原样显示 |
 | art-template 旧语法 | 每次渲染刷一堆 `Template upgrade` 告警 | 用 4.x 的 `{{ each list item }}`，不写 `as` |
 | `equipment.list` 是对象 | `.map()` 报 not a function | `Array.isArray() ? list : Object.values(list)` |
+
+---
+
+## 每日任务（福利中心）
+
+签到页那份任务的自动化在 `utils/dailyTask.js`（编排）+ `apps/campTask.js`（指令/定时），接口要点：
+
+| 接口 | 用途 |
+|---|---|
+| `c.gp.qq.com/gp/api/php/act_getscoretasklist.php` | 积分任务列表（10 条 + 活跃度礼包） |
+| `c.gp.qq.com/gp/api/php/completescoretask.php` | 上报完成积分任务（多数完成即自动入账） |
+| `c.gp.qq.com/gp/api/php/act_receivelivenessgift.php` | 领活跃度礼包（giftId 1/2/3） |
+| `c.gp.qq.com/gp/api/php/activity/welfare/tasklist.php` | 福利任务列表（每天 3 条，refreshCount 剩余刷新） |
+| `c.gp.qq.com/gp/api/php/activity/welfare/refreshtask.php` | 刷新福利任务 |
+| `c.gp.qq.com/gp/api/php/activity/welfare/completetask.php` | 领福利任务奖励（带 taskIndex） |
+| `formal.api.gp.qq.com/game/batchmodulelogreport` | 行为埋点（浏览 5 分钟/看直播 5 分钟任务全靠它） |
+| `formal.api.gp.qq.com/user/sharecallback` | 分享回调（shareInfo/shareAssets/shareMatch/shareH5） |
+| `formal.api.gp.qq.com/user/addlike` / `moment/like` | 点赞与取消（1=赞 0=取消） |
+| `formal.api.gp.qq.com/play/gametoolchange` | 开关对局工具 |
+| `formal.api.gp.qq.com/game/recharge` | 资讯充能 |
+
+**状态机**（实测 2026-10-23）：
+
+- 积分任务 `status`：0=未完成 → 做动作 → 2=已完成（自动入账）；`1` 是「完成待上报」，`completescoretask` 兜底
+- 福利任务 `status`：0=未做 → 做动作 → 1=可领 → `completetask(index)` 领奖 → 2=已领
+- 网上教程说 H5 接口要抓包拿 `sig/msdkEncodeParam/timestamp`，**实测不需要**：插件现有 `openId/userId/token` 直接过（`-30003` 才是登录态问题）
+
+**踩坑**：
+
+- H5 接口要带 `algorithm=v2&encode=2&source=heping_yingdi&version=3.1.96i&roleId` 这组固定参数
+- 王者营地（kohcamp.qq.com）同族接口要求 `gameId` 在 body 和 header 各一份；和平营地不需要
+- 分享任务为什么能「按了就算」：客户端分享服务端收不到回调，服务端只认 `sharecallback` 这个口
+- 撤赞只撤**本次为任务点的**（记录 iInfoId/momentId 再逐个取消），`/user/likerecords` 全量取消会动用户的历史点赞
+
+**还没自动化、值得做的方向**（来自 apktool 解包的 322 个接口路径，见 `D:/rea/api_paths.txt`）：
+
+- **营地动态/社区**（`/moment/*` 40+ 接口）：热帖聚合、发动态、评论
+- **访客与好友**：`/user/getvisits`（访客记录）、`/user/getonlinefriends`（在线好友）
+- **赛事**：`/leagues/*` 15 个接口（赛程/战队/战绩），可做 PEL 赛程订阅
+- **直播**：`/game/getwatchanchorlist`、`anchorlivedetail`，可做主播开播提醒
+- **UGC 攻略**：`/ugc/list`、`/ugc/getmodsformoment`
+- **营地币**：`/user/getusercoins` 余额；兑换体系在王者营地走 `/operation/lotteryquery`，和平侧未验证
+- **精彩时刻**：`/play/getwonderfulmoments`
 
 ---
 

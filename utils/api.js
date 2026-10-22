@@ -23,6 +23,25 @@ class ApiService {
             getlosttombrecord: '/play/getlosttombrecord',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             getpubgplaydetail: 'https://c.gp.qq.com/gp/api/php/getpubgplaydetail.php',
+            // 福利中心 / 每日任务
+            act_getscoretasklist: 'https://c.gp.qq.com/gp/api/php/act_getscoretasklist.php',
+            completescoretask: 'https://c.gp.qq.com/gp/api/php/completescoretask.php',
+            act_receivelivenessgift: 'https://c.gp.qq.com/gp/api/php/act_receivelivenessgift.php',
+            welfare_tasklist: 'https://c.gp.qq.com/gp/api/php/activity/welfare/tasklist.php',
+            welfare_refreshtask: 'https://c.gp.qq.com/gp/api/php/activity/welfare/refreshtask.php',
+            welfare_completetask: 'https://c.gp.qq.com/gp/api/php/activity/welfare/completetask.php',
+            getpubgreplaydata4: 'https://c.gp.qq.com/h5/getpubgreplaydata4.php',
+            infomainpage: '/game/infomainpage',
+            addlike: '/user/addlike',
+            likerecords: '/user/likerecords',
+            squaretagmoments: '/moment/squaretagmoments',
+            momentlike: '/moment/like',
+            batchmodulelogreport: '/game/batchmodulelogreport',
+            gametoolchange: '/play/gametoolchange',
+            sharecallback: '/user/sharecallback',
+            getrechargerank: '/game/getrechargerank',
+            recharge: '/game/recharge',
+            getstationhome: '/game/getstationhome',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
         this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
@@ -499,6 +518,133 @@ class ApiService {
             body: postData,
         })
         return res.json()
+    }
+
+    /* ================= 福利中心 / 每日任务 =================
+     * 接口来源：营地 APP 抓包 + 反编译交叉验证（GameHelperAction 同款）。
+     * 积分任务（签到页那份，完成即自动入账）走 c.gp.qq.com 的 H5 php；
+     * 福利任务（每天 3 条，可刷新）领奖走 welfare/completetask.php；
+     * 行为动作（点赞/分享/充能/工具）全部走 formal.api.gp.qq.com。
+     * 实测（2026-10-23）：插件现有 openId/userId/token 凭证即可通，
+     * 教程里的 sig/msdkEncodeParam/timestamp 并非必需。
+     */
+
+    /** 通用表单 POST（营地接口都是这一套） */
+    async _postForm(url, params) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求营地接口')
+        const postData = querystring.stringify({
+            openId: p.openId,
+            gameOpenId: p.gameOpenId || p.openId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            ...this.params,
+            ...params,
+        })
+        const res = await fetch(url, { method: 'POST', headers: this.headers, body: postData })
+        return res.json()
+    }
+
+    /** H5 侧公共参数（source/version 固定为营地客户端值，roleId 由调用方传入） */
+    _h5Base(roleId) {
+        return {
+            algorithm: 'v2',
+            encode: '2',
+            source: 'heping_yingdi',
+            version: '3.1.96i',
+            roleId: String(roleId || this.params.roleId || '0'),
+        }
+    }
+
+    /** 积分任务列表（签到页那份，10 条，含活跃度礼包） */
+    async get_score_tasklist(roleId) {
+        return this._postForm(this.baseUrl.act_getscoretasklist, this._h5Base(roleId))
+    }
+
+    /** 上报完成积分任务（实测多数任务完成即自动入账，此口用于 status=1 的兜底） */
+    async complete_score_task(taskId, roleId) {
+        return this._postForm(this.baseUrl.completescoretask, { ...this._h5Base(roleId), taskId: String(taskId) })
+    }
+
+    /** 领活跃度礼包（giftId 1=福利币*100 2=营地装饰碎片*50 3=福利币*200） */
+    async receive_liveness_gift(giftId, roleId) {
+        return this._postForm(this.baseUrl.act_receivelivenessgift, { ...this._h5Base(roleId), giftId: String(giftId) })
+    }
+
+    /** 福利任务列表（每天 3 条，refreshCount=剩余刷新次数） */
+    async get_welfare_tasklist(roleId) {
+        return this._postForm(this.baseUrl.welfare_tasklist, this._h5Base(roleId))
+    }
+
+    /** 刷新福利任务（把做不了的任务换掉，次数有限） */
+    async refresh_welfare_task(roleId) {
+        return this._postForm(this.baseUrl.welfare_refreshtask, this._h5Base(roleId))
+    }
+
+    /** 领取福利任务奖励（taskIndex 来自 tasklist 的 index 字段） */
+    async complete_welfare_task(taskIndex, roleId) {
+        return this._postForm(this.baseUrl.welfare_completetask, { ...this._h5Base(roleId), taskIndex: String(taskIndex) })
+    }
+
+    /** 资讯流（浏览/点赞任务从这取 iInfoId） */
+    async get_info_main_page() {
+        return this._postForm(this.main + this.baseUrl.infomainpage, { type: '51005184', pos1: '2', sort: '2', page: '1' })
+    }
+
+    /** 资讯点赞 / 取消点赞（like: 1=赞 0=取消） */
+    async add_info_like(iInfoId, like = '1') {
+        return this._postForm(this.main + this.baseUrl.addlike, { iInfoId: String(iInfoId), like: String(like) })
+    }
+
+    /** 我的点赞记录（做完任务后取消点赞用，避免留下社交痕迹） */
+    async get_like_records() {
+        return this._postForm(this.main + this.baseUrl.likerecords, {})
+    }
+
+    /** 动态广场（动态点赞任务从这取 momentId） */
+    async get_square_moments() {
+        return this._postForm(this.main + this.baseUrl.squaretagmoments, { tagId: '1' })
+    }
+
+    /** 动态点赞 / 取消（type: 1=赞 0=取消） */
+    async add_moment_like(momentId, type = '1') {
+        return this._postForm(this.main + this.baseUrl.momentlike, { momentId: String(momentId), type: String(type) })
+    }
+
+    /** 行为埋点上报（浏览资讯5分钟 / 看直播5分钟任务靠这个模拟） */
+    async batch_module_report(extData) {
+        return this._postForm(this.main + this.baseUrl.batchmodulelogreport, { extData: JSON.stringify(extData) })
+    }
+
+    /** 开关对局工具（任务要求「启用 N 个工具」） */
+    async change_game_tool(id, status = '1') {
+        return this._postForm(this.main + this.baseUrl.gametoolchange, { id: String(id), status: String(status) })
+    }
+
+    /** 分享回调（分享类任务的服务端记数口，客户端真实分享服务端收不到） */
+    async share_callback(action, id = '') {
+        return this._postForm(this.main + this.baseUrl.sharecallback, { action: String(action), id: String(id) })
+    }
+
+    /** 充能排行榜（充能任务从这取可充能的资讯） */
+    async get_recharge_rank() {
+        return this._postForm(this.main + this.baseUrl.getrechargerank, {})
+    }
+
+    /** 给资讯充能 */
+    async recharge_info(iInfoId, cnt = '1') {
+        return this._postForm(this.main + this.baseUrl.recharge, { iInfoId: String(iInfoId), rechargeCnt: String(cnt) })
+    }
+
+    /** 攻略专区首页（浏览攻略任务） */
+    async get_station_home() {
+        return this._postForm(this.main + this.baseUrl.getstationhome, {})
+    }
+
+    /** 战绩复盘数据（观看复盘任务） */
+    async get_replay_data() {
+        return this._postForm(this.baseUrl.getpubgreplaydata4, {})
     }
 }
 
