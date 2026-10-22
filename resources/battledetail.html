@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>战绩详情</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 980px;
+      zoom: 2.0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #000000;
+      color: #fafafa;
+      padding: 28px 30px;
+    }
+    .head { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+    .head .logo {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #1a1a1a; border: 1px solid #262626;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .head .title { font-size: 22px; font-weight: 700; }
+    .head .sub { font-size: 12px; color: #737373; margin-top: 2px; }
+    .head .spacer { flex: 1; }
+
+    .map-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: #121212; border: 1px solid #262626;
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;
+    }
+    .map-bar .mode-icon { width: 44px; height: 44px; object-fit: contain; }
+    .map-bar .map-name { font-size: 16px; font-weight: 600; }
+    .map-bar .map-sub { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .map-bar .time { margin-left: auto; font-size: 13px; color: #8e8e8e; }
+
+    .result-bar {
+      display: flex; align-items: center; gap: 16px;
+      background: #121212; border: 1px solid #262626;
+      border-radius: 12px; padding: 16px 18px; margin-bottom: 12px;
+    }
+    .rank-box { text-align: center; min-width: 90px; }
+    .rank-box .r { font-size: 30px; font-weight: 700; }
+    .rank-box .l { font-size: 12px; color: #8e8e8e; }
+    .div-info { min-width: 0; flex: 1; }
+    .div-info .d { font-size: 15px; font-weight: 600; }
+    .div-info .s { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .surv { text-align: center; min-width: 100px; }
+    .surv .s { font-size: 17px; font-weight: 700; }
+    .surv .l { font-size: 12px; color: #8e8e8e; }
+    .grade-box { text-align: center; min-width: 80px; }
+    .grade-box img { height: 34px; object-fit: contain; }
+    .mvp-tag {
+      font-size: 12px; font-weight: 700; color: #ffffff;
+      background: linear-gradient(135deg, #4a4a4a, #222222);
+      border: 1px solid #3a3a3a; padding: 3px 10px; border-radius: 999px;
+    }
+
+    .fight {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px;
+    }
+    .fstat {
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 12px 8px; text-align: center;
+    }
+    .fstat .num { font-size: 20px; font-weight: 700; }
+    .fstat .num small { font-size: 13px; font-weight: 600; color: #a8a8a8; }
+    .fstat .label { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
+
+    .sec-title { font-size: 14px; font-weight: 700; color: #a8a8a8; margin: 16px 0 10px; display: flex; align-items: center; gap: 8px; }
+    .sec-title .bar { width: 4px; height: 14px; background: #fafafa; border-radius: 2px; }
+
+    .weapons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .weapon {
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+    }
+    .weapon img { width: 42px; height: 42px; object-fit: contain; }
+    .weapon .wn { font-size: 14px; font-weight: 600; }
+    .weapon .wd { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
+    .weapon .ws { margin-left: auto; text-align: right; }
+    .weapon .ws .n { font-size: 17px; font-weight: 700; }
+    .weapon .ws .l { font-size: 11px; color: #8e8e8e; }
+
+    .killer-row {
+      display: flex; align-items: center; gap: 12px;
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 12px 16px; margin-bottom: 8px;
+    }
+    .killer-row img.avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .killer-row .kn { font-size: 14px; font-weight: 600; }
+    .killer-row .kd { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .killer-row .kdiv { font-size: 12px; color: #a8a8a8; white-space: nowrap; }
+
+    .foot { font-size: 12px; color: #737373; margin-top: 14px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">▦</div>
+    <div>
+      <div class="title">战绩详情</div>
+      <div class="sub">BATTLE DETAIL · {{roleName}}</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="map-bar">
+    <img class="mode-icon" src="{{modeIcon}}" alt="" />
+    <div>
+      <div class="map-name">{{mapMode}}</div>
+      <div class="map-sub">{{divName}}</div>
+    </div>
+    <div class="time">{{playTime}}</div>
+  </div>
+
+  <div class="result-bar">
+    <div class="rank-box">
+      <div class="r">#{{rank}}</div>
+      <div class="l">第{{rank}}名 / {{playerNum}}队</div>
+    </div>
+    <div class="div-info">
+      <div class="d">{{divName}}</div>
+      <div class="s">巅峰战力 {{peakCombat}}</div>
+    </div>
+    <div class="surv">
+      <div class="s">{{survivalTime}}</div>
+      <div class="l">生存 {{survivalProc}}%</div>
+    </div>
+    <div class="grade-box">{{ if gradeIcon }}<img src="{{gradeIcon}}" alt="" />{{ /if }}{{ if isMvp }}<div class="mvp-tag" style="margin-top:4px">MVP</div>{{ /if }}</div>
+  </div>
+
+  <div class="fight">
+    {{ each fights as f }}
+    <div class="fstat">
+      <div class="num">{{f.num}}</div>
+      <div class="label">{{f.label}}</div>
+    </div>
+    {{ /each }}
+  </div>
+
+  {{ if weapons.length }}
+  <div class="sec-title"><div class="bar"></div>武器伤害</div>
+  <div class="weapons">
+    {{ each weapons as w }}
+    <div class="weapon">
+      <img src="{{w.icon}}" alt="" />
+      <div>
+        <div class="wn">{{w.name}}</div>
+        <div class="wd">命中率 {{w.hitRate}}% · 爆头率 {{w.critRate}}%</div>
+      </div>
+      <div class="ws"><div class="n">{{w.damage}}</div><div class="l">伤害</div></div>
+    </div>
+    {{ /each }}
+  </div>
+  {{ /if }}
+
+  {{ if kills.length }}
+  <div class="sec-title"><div class="bar"></div>我的淘汰（{{killTotal}}）</div>
+  {{ each kills as k }}
+  <div class="killer-row">
+    <img class="avatar" src="{{k.avatar}}" alt="" />
+    <div style="flex:1;min-width:0">
+      <div class="kn">{{k.name}}</div>
+      <div class="kd">{{k.desc}}</div>
+    </div>
+    <div class="kdiv">{{k.weapon}}</div>
+  </div>
+  {{ /each }}
+  {{ /if }}
+
+  {{ if killer.length }}
+  <div class="sec-title"><div class="bar"></div>淘汰我的人</div>
+  {{ each killer as k }}
+  <div class="killer-row">
+    <img class="avatar" src="{{k.avatar}}" alt="" />
+    <div style="flex:1;min-width:0">
+      <div class="kn">{{k.name}}</div>
+      <div class="kd">{{k.desc}}</div>
+    </div>
+    <div class="kdiv">{{k.div}}</div>
+  </div>
+  {{ /each }}
+  {{ /if }}
+
+  <div class="foot">数据来自营地 · 更新于 {{updateTime}}</div>
+</body>
+</html>

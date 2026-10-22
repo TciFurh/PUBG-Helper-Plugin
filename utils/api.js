@@ -15,7 +15,10 @@ class ApiService {
             getcertusernews: '/game/getcertusernews',
             getmaintabs: '/game/getmaintabs',
             getdepotdetail: '/game/getdepotdetail',
+            getweeklyreport: '/game/getweeklyreport',
+            getrecentbattlelist: '/play/getrecentbattlelist',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
+            getpubgplaydetail: 'https://c.gp.qq.com/gp/api/php/getpubgplaydetail.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
         this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
@@ -328,6 +331,74 @@ class ApiService {
         return res.json()
     }
 
+    /** 周报：本周对局数据（场次/胜场/前10/淘汰/KD/段位分变化） */
+    async get_weeklyreport() {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getweeklyreport')
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            friendUserId: String(p.userId),
+            ...this.params,
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getweeklyreport, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 最近对局列表（全模式，roleId 为游戏角色ID） */
+    async get_recentbattlelist(roleId, count) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getrecentbattlelist')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+            count: String(count || 10),
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getrecentbattlelist, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 单局战绩详情（battleId/battleMode 来自最近对局列表，roleId 为本人角色ID） */
+    async get_pubgplaydetail(battleId, battleMode, roleId) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getpubgplaydetail')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+            battleId: String(battleId),
+            battleMode: String(battleMode),
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.baseUrl.getpubgplaydetail, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
 }
 
 export { ApiService }

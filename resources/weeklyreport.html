@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本周数据</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 900px;
+      zoom: 2.0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #000000;
+      color: #fafafa;
+      padding: 28px 30px;
+    }
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .head .logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: #1a1a1a;
+      border: 1px solid #262626;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .head .title { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+    .head .sub { font-size: 13px; color: #737373; margin-top: 2px; }
+    .head .spacer { flex: 1; }
+    .head .season {
+      font-size: 13px; color: #a8a8a8;
+      background: #1a1a1a; border: 1px solid #262626;
+      padding: 6px 14px; border-radius: 999px;
+    }
+
+    /* 段位卡 */
+    .div-card {
+      display: flex; align-items: center; gap: 18px;
+      background: #121212;
+      border: 1px solid #262626;
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+    .div-card img { width: 56px; height: 56px; object-fit: contain; }
+    .div-card .div-name { font-size: 19px; font-weight: 700; }
+    .div-card .div-score { font-size: 13px; color: #8e8e8e; margin-top: 3px; }
+    .div-card .rating-change {
+      margin-left: auto; text-align: right;
+    }
+    .rating-change .arrow { font-size: 20px; font-weight: 700; }
+    .rating-change .desc { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .up { color: #e0e0e0; }
+    .down { color: #9a9a9a; }
+
+    /* 指标格 */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: #121212;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat .num { font-size: 22px; font-weight: 700; }
+    .stat .label { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
+    .stat .delta { font-size: 12px; margin-top: 2px; }
+
+    /* 周报备注 */
+    .foot {
+      display: flex; align-items: center;
+      font-size: 12px; color: #737373;
+      background: #121212; border: 1px solid #262626;
+      border-radius: 12px; padding: 12px 16px;
+    }
+    .foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #fafafa; margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">▦</div>
+    <div>
+      <div class="title">本周数据</div>
+      <div class="sub">WEEKLY REPORT · {{roleName}}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="season">赛季 {{seasonId}}</div>
+  </div>
+
+  <div class="div-card">
+    <img src="{{segmentPic}}" alt="" />
+    <div>
+      <div class="div-name">{{segmentName}}</div>
+      <div class="div-score">当前积分 {{currentRating}}</div>
+    </div>
+    <div class="rating-change">
+      <div class="arrow {{ratingClass}}">{{ratingChangeText}}</div>
+      <div class="desc">{{ratingChangeBefore}} → {{ratingChangeAfter}}</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">{{battleNum}}</div><div class="label">场次</div></div>
+    <div class="stat"><div class="num">{{winNum}}</div><div class="label">胜场</div></div>
+    <div class="stat"><div class="num">{{top10Num}}</div><div class="label">前10</div></div>
+    <div class="stat"><div class="num">{{killNum}}</div><div class="label">淘汰</div></div>
+    <div class="stat"><div class="num">{{deadNum}}</div><div class="label">阵亡</div></div>
+    <div class="stat">
+      <div class="num">{{kd}}</div>
+      <div class="label">K/D</div>
+      <div class="delta" style="color:{{kdClass}}">{{kdChangeText}}</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="dot"></div>
+    平均每场段位分变化 {{ratingChangeAvg}} · 数据更新于 {{updateTime}}
+  </div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最近战绩</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1100px;
+      zoom: 2.0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #000000;
+      color: #fafafa;
+      padding: 28px 30px;
+    }
+    .head {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+    }
+    .head .logo {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #1a1a1a; border: 1px solid #262626;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .head .title { font-size: 24px; font-weight: 700; }
+    .head .sub { font-size: 13px; color: #737373; margin-top: 2px; }
+    .head .spacer { flex: 1; }
+    .head .count {
+      font-size: 13px; color: #a8a8a8;
+      background: #1a1a1a; border: 1px solid #262626;
+      padding: 6px 14px; border-radius: 999px;
+    }
+
+    .row {
+      display: flex; align-items: center; gap: 14px;
+      background: #121212; border: 1px solid #262626;
+      border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    }
+    .idx {
+      width: 28px; text-align: center; font-weight: 700; color: #8e8e8e; font-size: 15px;
+    }
+    .mode-icon { width: 40px; height: 40px; object-fit: contain; }
+    .mid {
+      min-width: 0; flex: 1;
+    }
+    .mode-name { font-size: 15px; font-weight: 600; }
+    .map-name { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .rank-tag {
+      font-size: 13px; font-weight: 700;
+      background: #1a1a1a; border: 1px solid #333333;
+      padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+    }
+    .kill {
+      text-align: center; min-width: 54px;
+    }
+    .kill .k { font-size: 18px; font-weight: 700; }
+    .kill .l { font-size: 11px; color: #8e8e8e; }
+    .dmg {
+      text-align: center; min-width: 64px;
+    }
+    .dmg .d { font-size: 15px; font-weight: 600; }
+    .dmg .l { font-size: 11px; color: #8e8e8e; }
+    .grade { text-align: center; min-width: 64px; }
+    .grade img { height: 30px; object-fit: contain; }
+    .time { font-size: 12px; color: #737373; text-align: right; min-width: 96px; }
+
+    .foot {
+      font-size: 12px; color: #737373; text-align: center; margin-top: 12px;
+    }
+    .mvp {
+      font-size: 11px; font-weight: 700; color: #ffffff;
+      background: linear-gradient(135deg, #4a4a4a, #222222);
+      border: 1px solid #3a3a3a;
+      padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">▦</div>
+    <div>
+      <div class="title">最近战绩</div>
+      <div class="sub">RECENT BATTLES · {{roleName}}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="count">共 {{total}} 局</div>
+  </div>
+
+  {{ each rows as row }}
+  <div class="row">
+    <div class="idx">{{row.idx}}</div>
+    <img class="mode-icon" src="{{row.modeIcon}}" alt="" />
+    <div class="mid">
+      <div class="mode-name">{{row.modeDesc}} {{ if row.isMvp }}<span class="mvp">MVP</span>{{ /if }}</div>
+      <div class="map-name">{{row.mapDesc}}</div>
+    </div>
+    <div class="rank-tag">{{row.teamRank}}</div>
+    <div class="kill"><div class="k">{{row.killingCount}}</div><div class="l">淘汰</div></div>
+    <div class="dmg"><div class="d">{{row.damageAmount}}</div><div class="l">伤害</div></div>
+    <div class="grade">{{ if row.gradeIcon }}<img src="{{row.gradeIcon}}" alt="" />{{ else }}<div class="gd">{{row.gradeText}}</div>{{ /if }}</div>
+    <div class="time">{{row.playTime}}</div>
+  </div>
+  {{ /each }}
+
+  <div class="foot">发送「#和平战绩详情 编号」查看对应单局详情（如 #和平战绩详情 1）</div>
+</body>
+</html>
