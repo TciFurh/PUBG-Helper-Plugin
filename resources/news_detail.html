@@ -8,18 +8,19 @@
   <style>
     body {
       width: 960px;
+      background: #000000;
     }
   </style>
   <!-- 变量：item -->
 </head>
 
-<body class="bg-gray-50 p-6">
+<body class="p-6">
   <div class="max-w-5xl mx-auto">
-    <h1 class="text-5xl font-bold text-gray-900 mb-5">{{item.sTitle || '资讯详情'}}</h1>
-    <div class="text-lg text-gray-600 mb-7 flex items-center flex-wrap gap-5">
+    <h1 class="text-5xl font-bold text-white mb-5">{{item.sTitle || '资讯详情'}}</h1>
+    <div class="text-lg text-gray-400 mb-7 flex items-center flex-wrap gap-5">
       <div class="flex items-center gap-2">
-        <img src="{{item.sUseravatar || item.avatar}}" alt="头像" class="w-8 h-8 rounded-full object-cover bg-gray-200" />
-        <span class="font-medium text-gray-800">{{item.sUserCreator || item.nickname || '-'}}</span>
+        <img src="{{item.sUseravatar || item.avatar}}" alt="头像" class="w-8 h-8 rounded-full object-cover bg-[#262626]" />
+        <span class="font-medium text-gray-200">{{item.sUserCreator || item.nickname || '-'}}</span>
       </div>
       <span>发布时间：{{item.dtReleaseTime || '-'}}</span>
       <span>阅读：{{item.views || '0'}}</span>
@@ -27,8 +28,8 @@
       <span>点赞：{{item.likes || '0'}}</span>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <div class="p-6 text-2xl leading-10 text-gray-800">
+    <div class="bg-[#121212] border border-[#262626] rounded-lg overflow-hidden">
+      <div class="p-6 text-2xl leading-10 text-gray-200">
         {{if item.sDesc}}
         <p class="whitespace-pre-wrap">{{item.sDesc}}</p>
         {{else if item.sIntro}}
@@ -36,7 +37,7 @@
         {{else if item.sContent}}
         <p class="whitespace-pre-wrap">{{item.sContent}}</p>
         {{else}}
-        <p class="italic text-gray-400">暂无详细内容</p>
+        <p class="italic text-gray-600">暂无详细内容</p>
         {{/if}}
       </div>
 
@@ -45,8 +46,8 @@
         <div class="flex flex-col gap-4">
           {{each item.sImgList img idx}}
           {{if idx > 0}}
-          <div class="w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center">
-            <img src="{{img.urlCI}}" alt="配图" class="max-w-[520px] w-full h-auto object-contain bg-white" />
+          <div class="w-full bg-[#161616] border border-[#262626] rounded-md overflow-hidden flex items-center justify-center">
+            <img src="{{img.urlCI}}" alt="配图" class="max-w-[520px] w-full h-auto object-contain bg-black" />
           </div>
           {{/if}}
           {{/each}}
@@ -57,5 +58,3 @@
   </div>
 </body>
 </html>
-
-

@@ -9,7 +9,7 @@
   <style>
     body {
       width: 1300px;
-      zoom: 1.5;
+      zoom: 2.0;
       font-family: 'Noto Sans SC', sans-serif;
       margin: 0;
       padding: 0;
@@ -19,21 +19,22 @@
       :root {
         --bg-primary: #fafafa;
         --bg-secondary: #ffffff;
-        --bg-tertiary: #f5f5f5;
+        --bg-tertiary: #f0f0f0;
         --border-color: #dbdbdb;
         --text-primary: #262626;
         --text-secondary: #8e8e8e;
-        --text-tertiary: #c7c7c7;
-        --accent-purple: #a855f7;
-        --accent-emerald: #10b981;
-        --accent-sky: #0ea5e9;
-        --accent-amber: #f59e0b;
-        --accent-rose: #f43f5e;
-        --gradient-start: #f093fb;
-        --gradient-end: #f5576c;
-        --icon-chip-bg: #e8edf5;
-        --icon-chip-border: #cfd8e3;
-        --icon-chip-shadow: rgba(15, 23, 42, 0.12);
+        --text-tertiary: #b0b0b0;
+        --accent-purple: #444444;
+        --accent-emerald: #555555;
+        --accent-sky: #555555;
+        --accent-amber: #222222;
+        --accent-rose: #444444;
+        --gradient-start: #666666;
+        --gradient-end: #cccccc;
+        --icon-chip-bg: #eaeaea;
+        --icon-chip-border: #cfcfcf;
+        --icon-chip-shadow: rgba(0, 0, 0, 0.12);
+        --chip-bg: rgba(0, 0, 0, 0.06);
       }
     }
     
@@ -46,16 +47,17 @@
         --text-primary: #fafafa;
         --text-secondary: #a8a8a8;
         --text-tertiary: #737373;
-        --accent-purple: #a855f7;
-        --accent-emerald: #10b981;
-        --accent-sky: #0ea5e9;
-        --accent-amber: #f59e0b;
-        --accent-rose: #f43f5e;
-        --gradient-start: #f093fb;
-        --gradient-end: #f5576c;
-        --icon-chip-bg: #222831;
-        --icon-chip-border: #313a46;
-        --icon-chip-shadow: rgba(0, 0, 0, 0.28);
+        --accent-purple: #f5f5f5;
+        --accent-emerald: #dcdcdc;
+        --accent-sky: #d4d4d4;
+        --accent-amber: #ffffff;
+        --accent-rose: #e0e0e0;
+        --gradient-start: #fafafa;
+        --gradient-end: #7a7a7a;
+        --icon-chip-bg: #1e1e1e;
+        --icon-chip-border: #333333;
+        --icon-chip-shadow: rgba(0, 0, 0, 0.45);
+        --chip-bg: rgba(255, 255, 255, 0.08);
       }
     }
     
@@ -105,184 +107,65 @@
     .profession-icon-chip img {
       filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.18));
     }
+
+    .mode-chip {
+      background-color: var(--chip-bg);
+      color: var(--accent-purple);
+    }
+
+    .imprint-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
   </style>
 </head>
 <body class="min-h-screen">
   <div class="w-full px-8 py-6">
     
-  <div class="grid grid-cols-[500px_350px_350px] gap-4 mb-6 items-stretch justify-start">
-      <div class="flex flex-col gap-6">
-        <div class="card rounded-xl p-4 flex items-center gap-6 flex-shrink-0 h-[170px]">
-          <div class="gradient-border p-[3px] rounded-full w-24 h-24">
-            <div class="card rounded-full p-1">
-              <img
-                src="{{roleIcon}}"
-                alt="用户头像"
-                class="w-full h-full rounded-full object-cover"
-              />
-            </div>
+  <div class="grid grid-cols-[360px_470px_374px] gap-4 items-start">
+
+    <!-- 左列：个人卡 > 经典模式 > 团竞-排位 > 团竞-传统 -->
+    <div class="flex flex-col gap-4">
+        <div class="card rounded-xl p-4 flex items-center gap-4">
+          <div class="gradient-border p-[3px] rounded-full w-20 h-20 flex-shrink-0">
+            <img src="{{roleIcon}}" alt="用户头像" class="w-full h-full rounded-full object-cover" />
           </div>
 
-          <div class="flex flex-col min-w-0">
-            <h1 class="text-2xl font-bold mb-1 truncate-text">{{roleName}}</h1>
-            <div class="flex gap-2 items-center mb-1">
-              <span class="card px-3 py-1 rounded-lg text-sm font-medium">Lv.{{level}}</span>
-              <span class="card px-3 py-1 rounded-lg text-sm font-medium">{{roleArea}}</span>
+          <div class="flex flex-col min-w-0 flex-1">
+            <div class="flex items-center gap-1 mb-1 min-w-0">
+              <h1 class="text-2xl font-bold truncate-text min-w-0">{{roleName}}</h1>
+              <span class="w-4 h-4 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <img src="{{areaChannelIcon}}" alt="登录渠道" class="w-3 h-3 object-contain" />
+              </span>
+              <span class="w-4 h-4 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <img src="{{areaDeviceIcon}}" alt="设备系统" class="w-3 h-3 object-contain" />
+              </span>
             </div>
-            <span class="card px-3 py-1 rounded-lg text-sm font-medium {{onlineTextClass}} self-center text-center">{{onlineText}}</span>
+            <div class="flex gap-2 items-center mb-1.5">
+              <span class="card px-3 py-1 rounded-lg text-sm font-medium flex-shrink-0 no-wrap">Lv.{{level}}</span>
+            </div>
+            <span class="px-3 py-1 rounded-lg text-sm font-medium {{onlineTextClass}} text-center no-wrap self-start flex-shrink-0">{{onlineText}}</span>
+            <p class="text-[10px] text-tertiary mt-1.5 no-wrap">最近战斗 {{lastBattle}}</p>
           </div>
 
-          <div class="ml-4 flex items-center gap-3">
-            <div class="w-14 h-14 card-alt rounded-xl overflow-hidden flex items-center justify-center">
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="w-10 h-10 card-alt rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0">
               <img src="{{honorData.likedHonorIcon}}" alt="队友点赞" class="w-full h-full object-contain" />
             </div>
-            <div>
-              <p class="text-xs text-secondary mb-1">队友点赞</p>
-              <p class="text-2xl font-bold" style="color: var(--accent-sky);">{{honorData.likeTimes}}</p>
-              <p class="text-xs text-tertiary">获得队友认可</p>
+            <div class="no-wrap">
+              <p class="text-[10px] text-secondary no-wrap">队友点赞</p>
+              <p class="text-base font-bold no-wrap" style="color: var(--accent-sky);">{{honorData.likeTimes}}</p>
             </div>
           </div>
         </div>
 
-        <div class="card rounded-xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-3">
-              <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
-                <img src="{{teamLevelIcon}}" alt="团竞图标" class="w-full h-full object-contain" />
-              </div>
-              <div>
-                <p class="text-xs text-secondary">团竞模式</p>
-                <p class="text-sm font-semibold">{{teamLevelName}}</p>
-              </div>
-            </div>
-            <span class="text-xs text-secondary">{{teamFeatProgressText}}</span>
-          </div>
-
-          <div class="h-2 card-alt rounded-full overflow-hidden mb-4">
-            <div class="h-full rounded-full" style="width: {{teamFeatProgressPercent}}%; background: linear-gradient(to right, var(--accent-rose), var(--accent-amber));"></div>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <div class="text-center card-alt rounded-lg py-3">
-              <p class="text-[10px] text-secondary mb-1">场数</p>
-              <p class="text-sm font-semibold">{{teamMatches}}</p>
-            </div>
-            <div class="text-center card-alt rounded-lg py-3">
-              <p class="text-[10px] mb-1" style="color: var(--accent-rose);">获胜</p>
-              <p class="text-sm font-semibold">{{teamWins}}</p>
-            </div>
-            <div class="text-center card-alt rounded-lg py-3">
-              <p class="text-[10px] mb-1" style="color: var(--accent-emerald);">胜率</p>
-              <p class="text-sm font-semibold">{{teamWinRate}}</p>
-            </div>
-            <div class="text-center card-alt rounded-lg py-3">
-              <p class="text-[10px] mb-1" style="color: var(--accent-amber);">淘汰</p>
-              <p class="text-sm font-semibold">{{teamKills}}</p>
-            </div>
-            <div class="text-center card-alt rounded-lg py-3">
-              <p class="text-[10px] mb-1" style="color: var(--accent-sky);">战损</p>
-              <p class="text-sm font-semibold">{{teamDamage}}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card rounded-xl p-5 flex-shrink-0 h-full max-w-[350px] justify-self-stretch flex flex-col">
-        <p class="text-xs text-secondary mb-3">王牌印记</p>
-        <div class="grid grid-cols-2 grid-rows-2 gap-3 mb-3">
-          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
-              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
-                <img src="{{honorData.wangpaiIcon}}" alt="王牌印记" class="w-full h-full object-cover"/>
-              </div>
-              <p class="text-[10px] text-secondary">王牌</p>
-              <p class="text-xs font-bold">{{honorData.wangpaiLevelName}}</p>
-          </div>
-          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
-              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
-                <img src="{{honorData.zywpIcon}}" alt="卓越印记" class="w-full h-full object-cover"/>
-              </div>
-              <p class="text-[10px] text-secondary">卓越</p>
-              <p class="text-xs font-bold">{{honorData.zywpTimes}}次</p>
-          </div>
-          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
-              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
-                <img src="{{honorData.cqwpIcon}}" alt="传奇印记" class="w-full h-full object-cover"/>
-              </div>
-              <p class="text-[10px] text-secondary">传奇</p>
-              <p class="text-xs font-bold">{{honorData.cqwpTimes}}次</p>
-          </div>
-          <div class="card-alt rounded-lg p-1 text-center min-h-[108px] flex flex-col justify-center">
-              <div class="w-9 h-9 mx-auto mb-2 rounded-lg overflow-hidden">
-                <img src="{{honorData.jswpIcon}}" alt="绝世印记" class="w-full h-full object-cover"/>
-              </div>
-              <p class="text-[10px] text-secondary">绝世</p>
-              <p class="text-xs font-bold">{{honorData.jswpTimes}}次</p>
-          </div>
-        </div>
-        <div class="pt-3 border-t flex items-center gap-3" style="border-color: var(--border-color);">
-          <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
-            <img src="{{honorData.highestDivUrl}}" alt="段位历史最高" class="w-full h-full object-contain" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-xs text-secondary">段位历史最高</p>
-            <p class="text-sm font-semibold truncate-text" style="color: var(--accent-amber);">{{honorData.highestDivName}}</p>
-            <p class="text-[10px] text-tertiary">次数：{{honorData.highestDivTimes}}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card rounded-xl p-5 h-full max-w-[350px] justify-self-stretch flex flex-col">
-        <p class="text-xs text-secondary mb-3">地铁印记</p>
-        <div class="grid grid-cols-2 grid-rows-2 gap-3 mb-3">
-          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
-              <img src="{{honorData.xmbIcon}}" alt="{{honorData.xmbName}}" class="w-full h-full object-contain" />
-            </div>
-            <p class="text-[10px] text-secondary truncate-text">{{honorData.xmbName}}</p>
-            <p class="text-xs font-semibold">{{honorData.xmbTimes}}次</p>
-          </div>
-          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
-              <img src="{{honorData.zmbIcon}}" alt="{{honorData.zmbName}}" class="w-full h-full object-contain" />
-            </div>
-            <p class="text-[10px] text-secondary truncate-text">{{honorData.zmbName}}</p>
-            <p class="text-xs font-semibold">{{honorData.zmbTimes}}次</p>
-          </div>
-          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
-              <img src="{{honorData.dmbIcon}}" alt="{{honorData.dmbName}}" class="w-full h-full object-contain" />
-            </div>
-            <p class="text-[10px] text-secondary truncate-text">{{honorData.dmbName}}</p>
-            <p class="text-xs font-semibold">{{honorData.dmbTimes}}次</p>
-          </div>
-          <div class="card-alt rounded-lg p-3 text-center min-h-[108px] flex flex-col justify-center">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden flex items-center justify-center">
-              <img src="{{honorData.dtdhIcon}}" alt="{{honorData.dtdhName}}" class="w-full h-full object-contain" />
-            </div>
-            <p class="text-[10px] text-secondary truncate-text">{{honorData.dtdhName}}</p>
-            <p class="text-xs font-semibold">{{honorData.dtdhTimes}}次</p>
-          </div>
-        </div>
-        <div class="pt-3 border-t flex items-center gap-3" style="border-color: var(--border-color);">
-          <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
-            <img src="{{honorData.highestIncomeUrl}}" alt="地铁历史最高" class="w-full h-full object-contain" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-xs text-secondary">地铁历史最高</p>
-            <p class="text-sm font-semibold truncate-text" style="color: var(--accent-amber);">{{honorData.highestIncomeName}} · {{honorData.highestIncomeValue}}</p>
-            <p class="text-[10px] text-tertiary truncate-text">赛季：{{honorData.highestIncomeSeason}} · 次数：{{honorData.highestIncomeTimes}}</p>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-    
-    <div class="grid grid-cols-[390px_390px_420px] gap-4 items-stretch">
-
-      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[460px] justify-self-start">
+      <div class="card rounded-xl p-5">
         <div class="flex items-center justify-between mb-3">
-          <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">{{pattern}}</span>
-          <span class="text-xs text-secondary">{{rankProgressText}}</span>
+          <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">{{pattern}}</span>
+          <span class="text-xs text-secondary no-wrap">{{rankProgressText}}</span>
         </div>
         <div class="flex items-center gap-4 mb-4">
           <img src="{{divUrl}}" alt="段位图标" class="w-20 h-20 object-contain"/>
@@ -352,10 +235,253 @@
         </div>
       </div>
 
-      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[390px] justify-self-start">
+      <div class="card rounded-xl p-5">
         <div class="flex items-center justify-between mb-3">
-          <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(16, 185, 129, 0.1); color: var(--accent-emerald);">地铁逃生</span>
-          <span class="text-xs text-secondary">{{teamExpProgressText}}</span>
+          <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">团竞-排位</span>
+        </div>
+
+        <div class="flex items-center gap-3 mb-2 card-alt rounded-lg px-3 py-2">
+          <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            <img src="{{vsTeamHighestIcon}}" alt="团竞历史最高" class="w-full h-full object-contain" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[10px] text-secondary no-wrap">历史最高</p>
+            <p class="text-sm font-semibold truncate-text">{{vsTeamHighestName}}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mb-4 card-alt rounded-lg px-3 py-2">
+          <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            <img src="{{honorData.qiangwangIcon}}" alt="团竞印记" class="w-full h-full object-contain" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[10px] text-secondary no-wrap">团竞印记 · {{honorData.qiangwangName}}</p>
+            <p class="text-sm font-semibold no-wrap">{{honorData.qiangwangTimes}}次</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-5 gap-2">
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] text-secondary mb-1">场数</p>
+            <p class="text-sm font-semibold">{{rankedMatches}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-rose);">获胜</p>
+            <p class="text-sm font-semibold">{{rankedWins}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-emerald);">胜率</p>
+            <p class="text-sm font-semibold">{{rankedWinRate}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-amber);">淘汰</p>
+            <p class="text-sm font-semibold">{{rankedKills}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-sky);">K/D</p>
+            <p class="text-sm font-semibold">{{rankedKd}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+              <img src="{{teamLevelIcon}}" alt="团竞图标" class="w-full h-full object-contain" />
+            </div>
+            <div class="no-wrap">
+              <p class="text-xs text-secondary">团竞-传统</p>
+              <p class="text-sm font-semibold">{{teamLevelName}}</p>
+            </div>
+          </div>
+          <span class="text-xs text-secondary no-wrap">{{teamFeatProgressText}}</span>
+        </div>
+
+        <div class="h-2 card-alt rounded-full overflow-hidden mb-4">
+          <div class="h-full rounded-full" style="width: {{teamFeatProgressPercent}}%; background: linear-gradient(to right, var(--accent-rose), var(--accent-amber));"></div>
+        </div>
+
+        <div class="grid grid-cols-5 gap-2">
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] text-secondary mb-1">场数</p>
+            <p class="text-sm font-semibold">{{teamMatches}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-rose);">获胜</p>
+            <p class="text-sm font-semibold">{{teamWins}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-emerald);">胜率</p>
+            <p class="text-sm font-semibold">{{teamWinRate}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-amber);">淘汰</p>
+            <p class="text-sm font-semibold">{{teamKills}}</p>
+          </div>
+          <div class="text-center card-alt rounded-lg py-3">
+            <p class="text-[10px] mb-1" style="color: var(--accent-sky);">战损</p>
+            <p class="text-sm font-semibold">{{teamDamage}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中列：三个印记卡上中下 -->
+    <div class="flex flex-col gap-4">
+      <div class="card rounded-xl p-5">
+        <p class="text-xs text-secondary mb-3">王牌印记</p>
+        <div class="grid grid-cols-4 gap-3 mb-3">
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+              <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden">
+                <img src="{{honorData.wangpaiIcon}}" alt="王牌印记" class="w-full h-full object-contain"/>
+              </div>
+              <p class="text-[10px] text-secondary no-wrap">王牌</p>
+              <p class="text-xs font-bold no-wrap">{{honorData.wangpaiLevelName}}</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+              <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden">
+                <img src="{{honorData.zywpIcon}}" alt="卓越印记" class="w-full h-full object-contain"/>
+              </div>
+              <p class="text-[10px] text-secondary no-wrap">卓越</p>
+              <p class="text-xs font-bold no-wrap">{{honorData.zywpTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+              <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden">
+                <img src="{{honorData.cqwpIcon}}" alt="传奇印记" class="w-full h-full object-contain"/>
+              </div>
+              <p class="text-[10px] text-secondary no-wrap">传奇</p>
+              <p class="text-xs font-bold no-wrap">{{honorData.cqwpTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+              <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden">
+                <img src="{{honorData.jswpIcon}}" alt="绝世印记" class="w-full h-full object-contain"/>
+              </div>
+              <p class="text-[10px] text-secondary no-wrap">绝世</p>
+              <p class="text-xs font-bold no-wrap">{{honorData.jswpTimes}}次</p>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex items-center gap-3" style="border-color: var(--border-color);">
+          <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            <img src="{{honorData.highestDivUrl}}" alt="段位历史最高" class="w-full h-full object-contain" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-secondary">段位历史最高</p>
+            <p class="text-sm font-semibold truncate-text" style="color: var(--accent-amber);">{{honorData.highestDivName}}<span class="text-[10px] font-normal text-tertiary"> {{honorData.highestDivClass}}·{{hisMaxSegmentLevel}}分</span></p>
+            <p class="text-[10px] text-tertiary">次数：{{honorData.highestDivTimes}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-5">
+        <p class="text-xs text-secondary mb-3 no-wrap">地铁印记 · 共{{diteTotal}}个</p>
+        <div class="grid grid-cols-5 gap-1.5 mb-3">
+          <div class="card-alt rounded-lg p-1.5 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.xmbIcon}}" alt="{{honorData.xmbName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[9px] text-secondary truncate-text w-full">{{honorData.xmbName}}</p>
+            <p class="text-[10px] font-semibold no-wrap">{{honorData.xmbTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-1.5 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.zmbIcon}}" alt="{{honorData.zmbName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[9px] text-secondary truncate-text w-full">{{honorData.zmbName}}</p>
+            <p class="text-[10px] font-semibold no-wrap">{{honorData.zmbTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-1.5 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.dmbIcon}}" alt="{{honorData.dmbName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[9px] text-secondary truncate-text w-full">{{honorData.dmbName}}</p>
+            <p class="text-[10px] font-semibold no-wrap">{{honorData.dmbTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-1.5 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.cfzyIcon}}" alt="{{honorData.cfzyName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[9px] text-secondary truncate-text w-full">{{honorData.cfzyName}}</p>
+            <p class="text-[10px] font-semibold no-wrap">{{honorData.cfzyTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-1.5 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.dtdhIcon}}" alt="{{honorData.dtdhName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[9px] text-secondary truncate-text w-full">{{honorData.dtdhName}}</p>
+            <p class="text-[10px] font-semibold no-wrap">{{honorData.dtdhTimes}}次</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card-alt rounded-xl p-3 flex flex-col items-center">
+            <div class="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center mb-1.5">
+              <img src="{{honorData.highestIncomeUrl}}" alt="{{honorData.highestIncomeName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-sm font-semibold no-wrap">{{honorData.highestIncomeName}}</p>
+            <p class="text-[9px] text-tertiary no-wrap mb-1">最高财富</p>
+            <div class="pt-2 border-t w-full text-center" style="border-color: var(--border-color);">
+              <p class="text-[9px] text-secondary no-wrap mb-0.5">历史最高 · {{honorData.highestIncomeTimes}}次</p>
+              <p class="text-xs font-semibold no-wrap" style="color: var(--accent-amber);">{{honorData.highestIncomeSeason}}-{{honorData.highestIncomeValue}}</p>
+            </div>
+          </div>
+
+          <div class="card-alt rounded-xl p-3 flex flex-col items-center">
+            <div class="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center mb-1.5">
+              <img src="{{huntingDivIcon}}" alt="{{huntingDivName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-sm font-semibold no-wrap">{{huntingDivName}}</p>
+            <p class="text-[9px] text-tertiary no-wrap mb-1">地铁逃生</p>
+            <div class="pt-2 border-t w-full text-center" style="border-color: var(--border-color);">
+              <p class="text-[9px] text-secondary no-wrap mb-0.5">历史最高积分</p>
+              <p class="text-xs font-semibold no-wrap" style="color: var(--accent-emerald);">{{huntingDivSeason}}狩猎积分:{{huntingDivValue}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-5">
+        <p class="text-xs text-secondary mb-3 no-wrap">古墓印记 · 共{{gumuTotal}}个</p>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.jsyhIcon}}" alt="{{honorData.jsyhName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary no-wrap">{{honorData.jsyhName}}</p>
+            <p class="text-xs font-semibold no-wrap">{{honorData.jsyhTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.fkdgIcon}}" alt="{{honorData.fkdgName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary no-wrap">{{honorData.fkdgName}}</p>
+            <p class="text-xs font-semibold no-wrap">{{honorData.fkdgTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.jbpIcon}}" alt="{{honorData.jbpName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary no-wrap">{{honorData.jbpName}}</p>
+            <p class="text-xs font-semibold no-wrap">{{honorData.jbpTimes}}次</p>
+          </div>
+          <div class="card-alt rounded-lg p-2 text-center imprint-cell">
+            <div class="w-20 h-20 mb-1.5 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="{{honorData.csxlIcon}}" alt="{{honorData.csxlName}}" class="w-full h-full object-contain" />
+            </div>
+            <p class="text-[10px] text-secondary no-wrap">{{honorData.csxlName}}</p>
+            <p class="text-xs font-semibold no-wrap">{{honorData.csxlTimes}}次</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右列：地铁逃生 + 古墓模式 -->
+    <div class="flex flex-col gap-4">
+      <div class="card rounded-xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">地铁逃生</span>
+          <span class="text-xs text-secondary no-wrap">{{teamExpProgressText}}</span>
         </div>
         <div class="flex items-center gap-4 mb-4">
           <img src="{{teamExpLevelIcon}}" alt="地铁逃生图标" class="w-14 h-14 object-contain"/>
@@ -405,19 +531,32 @@
           </div>
         </div>
       </div>
-      <div class="card rounded-xl p-5 h-full flex flex-col w-full max-w-[550px] justify-self-stretch">
-        <div class="flex items-center justify-between mb-4">
+
+      <div class="card rounded-xl p-5">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <span class="px-3 py-1 text-xs font-medium rounded-full" style="background-color: rgba(245, 158, 11, 0.1); color: var(--accent-amber);">古墓模式</span>
+            <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">古墓模式</span>
           </div>
-          <div class="card-alt rounded-xl p-2 flex items-center gap-3 min-w-0 max-w-[320px]">
-            <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
+          <div class="card-alt rounded-xl p-2 flex items-center gap-3 min-w-0">
+            <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
               <img src="{{tombBestIncomeIcon}}" alt="最高收益成就" class="w-full h-full object-contain" />
             </div>
             <div class="min-w-0">
-              <p class="text-[10px] text-secondary">最高收益成就</p>
+              <p class="text-[10px] text-secondary no-wrap">最高收益成就</p>
               <p class="text-sm font-semibold truncate-text">{{tombBestIncomeName}}</p>
             </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4">
+          <div class="card-alt rounded-lg px-3 py-1.5 flex items-center gap-2">
+            <span class="text-[10px] text-secondary no-wrap">最高战力</span>
+            <span class="text-sm font-bold no-wrap" style="color: var(--accent-sky);">{{tombPower}}</span>
+          </div>
+          <div class="card-alt rounded-lg px-3 py-1.5 flex items-center gap-2">
+            <img src="{{tombProfIcon}}" alt="最高职业" class="w-5 h-5 object-contain" />
+            <span class="text-[10px] text-secondary no-wrap">最高职业</span>
+            <span class="text-xs font-semibold no-wrap">{{tombProfName}}</span>
           </div>
         </div>
 
@@ -432,7 +571,7 @@
         </div>
         <div class="text-center card-alt rounded-lg py-3">
           <p class="text-[10px] text-secondary mb-1">轮回石总收益</p>
-          <p class="text-sm font-semibold" style="color: #5FDFF5;">{{tombStoneIncome}}</p>
+          <p class="text-sm font-semibold" style="color: var(--accent-sky);">{{tombStoneIncome}}</p>
         </div>
       </div>
 
@@ -507,6 +646,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
     
   </div>

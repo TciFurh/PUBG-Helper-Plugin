@@ -49,10 +49,11 @@ export class MarksmanshipSkills extends plugin {
 
     async processWeaponData(e, weaponType) {
         let ID = (e.msg.match(/^#?和平(精英|英精)?主页(\d+)?$/i)?.[2]) || ''
+        const { info } = getUserInfo(e.user_id)
         if (!ID) {
-            const { info } = getUserInfo(e.user_id)
             ID = info.ids?.[info.current] || ''
         }
+        apiService.useCamp(info.camp || null)
         if (!/^\d+$/.test(ID)) {
             await e.reply('请输入正确的用户ID（纯数字），或使用 #绑定和平+ID 先绑定')
             return
