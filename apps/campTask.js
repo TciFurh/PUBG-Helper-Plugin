@@ -46,10 +46,11 @@ function describeView(view, roleName) {
     lines.push(`${ICON[r.status] || '·'} ${r.name}${r.note ? `（${r.note}）` : ''}`)
   }
   if (view.liveness) lines.push(`活跃度 ${view.liveness}${view.gifts.length ? `，已领：${view.gifts.join('、')}` : ''}`)
-  lines.push('── 福利任务（每天 3 条） ──')
+  lines.push('── 福利任务（每天 3 条，可刷新换新） ──')
   for (const r of view.welfare) {
     lines.push(`${ICON[r.status] || '·'} ${r.name}${r.note ? `（${r.note}）` : ''}`)
   }
+  if (view.rounds > 1 || view.welfareActed) lines.push(`🔁 共刷 ${view.rounds} 轮，自动完成 ${view.welfareActed} 次（今日已刷新 ${view.refreshCount} 次）`)
   if (view.rewards.length) lines.push(`🎁 领到：${view.rewards.join('、')}`)
   if (view.likesCleared) lines.push(`🧹 已撤回本次任务点赞 ${view.likesCleared} 次`)
   if (view.refreshCount) lines.push(`🔄 福利任务剩余刷新次数：${view.refreshCount}`)

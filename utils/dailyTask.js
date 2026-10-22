@@ -269,18 +269,13 @@ async function revokeTodayLikes(api, state) {
   return n
 }
 
-/** 剩余未做的福利任务里是否还有「做不了」的（决定要不要刷新） */
-function needsRefresh(welfareRows) {
-  return welfareRows.some((r) => r.status === 'skip' || r.status === 'fail')
-}
-
 /**
  * 跑一遍全部每日任务。
  * @returns {Promise<{score: Array, welfare: Array, gifts: string[], rewards: string[], likesCleared: number, refreshCount: number, liveness: string}>}
  */
 export async function runDailyTasks(api, roleId, { clearLikes = true, allowRefresh = true } = {}) {
   const state = { likedInfo: [], likedMoment: [] }
-  const out = { score: [], welfare: [], gifts: [], rewards: [], likesCleared: 0, refreshCount: 0, liveness: '' }
+  const out = { score: [], welfare: [], gifts: [], rewards: [], likesCleared: 0, refreshCount: 0, liveness: '', rounds: 0, welfareActed: 0 }
 
   // ---- 积分任务 ----
   const score1 = await api.get_score_tasklist(roleId)
@@ -299,23 +294,36 @@ export async function runDailyTasks(api, roleId, { clearLikes = true, allowRefre
   const lv = score2?.data?.liveness || {}
   out.liveness = lv.current != null ? `${lv.current}/${lv.total ?? 100}` : ''
 
-  // ---- 福利任务（做 → 领 → 需要则刷新 → 再做再领一轮） ----
+  // ---- 福利任务（主动刷新循环：做 → 领 → 刷新 → 再做 → 再领） ----
+  // refreshCount 是「已刷新次数」的负数计数（-1、-2…），不是剩余上限；
+  // 能不能刷只有试了才知道：次数用尽时 refreshtask 回 -76504。
+  // 刷出来的新任务里常有「服务端已判定完成、可直接领」的（它知道你今天做过什么），
+  // 所以每轮做完就刷下一轮，直到接口拒绝或达到轮次上限。
+  const MAX_ROUNDS = allowRefresh ? 10 : 1
   let welfare = await api.get_welfare_tasklist(roleId)
-  out.welfare = await actWelfareTasks(api, roleId, state, welfare)
-  welfare = await api.get_welfare_tasklist(roleId)
-  out.rewards.push(...(await claimWelfare(api, roleId, welfare)))
+  let rounds = 0
+  let actedTotal = 0
+  while (welfare && rounds < MAX_ROUNDS) {
+    rounds++
+    const acted = await actWelfareTasks(api, roleId, state, welfare)
+    actedTotal += acted.filter((r) => r.status === 'acted').length
+    out.welfare = acted
 
-  out.refreshCount = Number(welfare?.data?.refreshCount || 0)
-  const leftUndone = (welfare?.data?.tasks || []).some((t) => Number(t.status) === 0)
-  if (allowRefresh && leftUndone && needsRefresh(out.welfare) && out.refreshCount > 0) {
+    welfare = await api.get_welfare_tasklist(roleId)
+    out.rewards.push(...(await claimWelfare(api, roleId, welfare)))
+
     const r = await api.refresh_welfare_task(roleId)
-    if (Number(r?.returnCode) === 0) {
-      out.refreshCount = Number(r?.data?.refreshCount ?? out.refreshCount - 1)
-      out.welfare = out.welfare.concat(await actWelfareTasks(api, roleId, state, r))
+    if (Number(r?.returnCode) !== 0 || !r?.data?.tasks) {
+      // -76504 = 今日刷新次数用尽；不管哪种原因，取一次最终列表兜底后收工
       welfare = await api.get_welfare_tasklist(roleId)
-      out.rewards.push(...(await claimWelfare(api, roleId, welfare)))
+      break
     }
+    welfare = r
+    await sleep(1200)
   }
+  out.rounds = rounds
+  out.welfareActed = actedTotal
+  out.refreshCount = Math.abs(Number(welfare?.data?.refreshCount ?? 0))
 
   if (clearLikes) out.likesCleared = await revokeTodayLikes(api, state)
   return out

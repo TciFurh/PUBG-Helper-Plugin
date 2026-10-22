@@ -42,6 +42,10 @@ class ApiService {
             getrechargerank: '/game/getrechargerank',
             recharge: '/game/recharge',
             getstationhome: '/game/getstationhome',
+            getusercoins: '/user/getusercoins',
+            getvisits: '/user/getvisits',
+            getonlinefriends: '/user/getonlinefriends',
+            leaguelist: '/leagues/leaguelist',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
         this.paramUrl = 'https://ghfast.top/https://raw.githubusercontent.com/A-Kevin1217/resources/master/resources/json/PUBG-Helper-Plugin/parameters.json'
@@ -645,6 +649,28 @@ class ApiService {
     /** 战绩复盘数据（观看复盘任务） */
     async get_replay_data() {
         return this._postForm(this.baseUrl.getpubgreplaydata4, {})
+    }
+
+    /* ================= 营地社交 / 资料（读操作） ================= */
+
+    /** 营地币余额（coins: [{type,num,name}]，福利币/营地装饰碎片…） */
+    async get_user_coins() {
+        return this._postForm(this.main + this.baseUrl.getusercoins, {})
+    }
+
+    /** 访客记录（昵称/角色/段位/最近访问时间） */
+    async get_visits() {
+        return this._postForm(this.main + this.baseUrl.getvisits, {})
+    }
+
+    /** 在线好友（需 roleId） */
+    async get_online_friends(roleId) {
+        return this._postForm(this.main + this.baseUrl.getonlinefriends, { roleId: String(roleId || '') })
+    }
+
+    /** 赛事列表（PEL/PSI 等官方联赛） */
+    async get_league_list() {
+        return this._postForm(this.main + this.baseUrl.leaguelist, {})
     }
 }
 

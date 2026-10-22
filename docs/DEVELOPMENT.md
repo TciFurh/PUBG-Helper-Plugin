@@ -171,15 +171,29 @@ const isSuper = d.isSuperBody === true
 - 分享任务为什么能「按了就算」：客户端分享服务端收不到回调，服务端只认 `sharecallback` 这个口
 - 撤赞只撤**本次为任务点的**（记录 iInfoId/momentId 再逐个取消），`/user/likerecords` 全量取消会动用户的历史点赞
 
+**刷新机制**（实测 2026-10-23）：
+
+- `refreshCount` 是「已刷新次数」的**负数计数**（-1、-2…），不是剩余上限；刚登录没刷过时是 0
+- 次数用尽时 `refreshtask` 回 **`-76504`**，列表停留在最后一轮
+- 每轮刷新常直接刷出「已完成待领取」的任务（服务端知道你今天做过什么），领一遍就是一轮奖励
+- `runDailyTasks` 的福利任务循环：做 → 领 → 刷新 → 再做 → 再领，直到接口拒绝或 10 轮上限
+
+**新增资料查询接口**（`apps/campSocial.js`，全读操作）：
+
+| 指令 | 接口 | 说明 |
+|---|---|---|
+| `#和平营地币` | `/user/getusercoins` | `coins[]` 带 `name/num`（福利币、营地装饰碎片） |
+| `#和平访客` | `/user/getvisits` | `list[]`：昵称/角色/段位/`offlineTime`/`onlineStatus` |
+| `#和平在线好友` | `/user/getonlinefriends` | 需带 `roleId`；`online` 值 1在线/2游戏中/3离线/4隐身 |
+| `#和平赛事` | `/leagues/leaguelist` | `leagues[]`：name/year/season/leagueType |
+
 **还没自动化、值得做的方向**（来自 apktool 解包的 322 个接口路径，见 `D:/rea/api_paths.txt`）：
 
 - **营地动态/社区**（`/moment/*` 40+ 接口）：热帖聚合、发动态、评论
-- **访客与好友**：`/user/getvisits`（访客记录）、`/user/getonlinefriends`（在线好友）
-- **赛事**：`/leagues/*` 15 个接口（赛程/战队/战绩），可做 PEL 赛程订阅
-- **直播**：`/game/getwatchanchorlist`、`anchorlivedetail`，可做主播开播提醒
 - **UGC 攻略**：`/ugc/list`、`/ugc/getmodsformoment`
-- **营地币**：`/user/getusercoins` 余额；兑换体系在王者营地走 `/operation/lotteryquery`，和平侧未验证
-- **精彩时刻**：`/play/getwonderfulmoments`
+- **精彩时刻**：`/play/getwonderfulmoments`（裸调回 -20011，还差参数，待抓包补）
+- **直播**：`/game/getwatchanchorlist`、`anchorlivedetail`，可做主播开播提醒
+- **赛事详情**：`/leagues/{circleinfo,scheduletheme,teamlist}` 可往下钻赛程与战队
 
 ---
 
