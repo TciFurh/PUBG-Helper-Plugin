@@ -15,6 +15,8 @@ class ApiService {
             getcertusernews: '/game/getcertusernews',
             getmaintabs: '/game/getmaintabs',
             getdepotdetail: '/game/getdepotdetail',
+            getescaperecord: '/play/getescaperecord',
+            userfriends: '/user/friends',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
         }
@@ -321,6 +323,54 @@ class ApiService {
         }
         const postData = querystring.stringify(params)
         const res = await fetch(this.baseUrl.act_dailysigninmonthly, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 地铁逃生战绩（roleId 为游戏角色ID；escapeSeasonId 不传则用返回中的当前赛季） */
+    async get_escaperecord(roleId, escapeSeasonId) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getescaperecord')
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+            ...this.params,
+        }
+        if (escapeSeasonId !== undefined && escapeSeasonId !== null && escapeSeasonId !== '') {
+            params.escapeSeasonId = String(escapeSeasonId)
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getescaperecord, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 好友列表（gameId=20004 和平营地） */
+    async get_user_friends() {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求user/friends')
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            gameId: '20004',
+            sort: '1',
+            apiVersion: '1',
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.userfriends, {
             method: 'POST',
             headers: this.headers,
             body: postData,

@@ -108,7 +108,7 @@ export class QqLogin extends plugin {
         `昵称: ${camp.userName || '-'}`,
         `QQ号: ${camp.uin || session.uin}`,
         `token: ${maskToken(camp.token)}`,
-        '现在可以使用个人凭证功能（#主页 #资产 #和平签到）',
+        '现在可以使用个人凭证功能（#和平主页 #和平资产 #和平签到）',
       ].join('\n'))
     } catch (err) {
       this._session = null

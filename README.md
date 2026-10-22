@@ -57,9 +57,9 @@
 - [x] 扫码登录（QQ / 微信扫码获取 Token，本地增强已实现）
 - [x] 签到（每日签到）
 - [x] 游戏资产（仓库分类查询）
-- [ ] 地铁战利品查询
+- [x] 地铁逃生（赛季战绩/收益/段位查询）
+- [x] 好友排行（好友段位/荣誉排行）
 - [ ] 巅峰榜
-- [ ] 好友排行
 - [ ] 想到啥再做
 
 ## 📦 安装方法
@@ -95,8 +95,12 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 - `#删除和平凭证` - 删除已保存的凭证
 
 ### 资产与签到
-- `#资产` - 查询营地仓库资产（时装/枪械/装备/载具/战备分类）
+- `#和平资产` - 查询营地仓库资产（时装/枪械/装备/载具/战备分类）
 - `#和平签到` - 执行每日签到
+
+### 地铁与排行
+- `#和平地铁` - 查询地铁逃生战绩（场数/KD/单局最高收益/赛季总收益/撤离率/段位），可带赛季号：`#和平地铁15`
+- `#好友排行 <数量>` - 好友段位/荣誉排行（在线优先，默认前10名）
 
 ### 数据查询
 - `#和平主页` 或 `#和平主页<营地ID>` - 查看游戏信息概览
@@ -168,6 +172,8 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 - **扫码登录**：`utils/wxQrLogin.js` 实现微信扫码登录，营地客户端版本号（`cClientVersionCode` / `cClientVersionName`）从 APK 解包取真实值修正，解决"此版本已停用"报错
 - **QQ 扫码登录**（`apps/qqLogin.js` + `utils/qqPageLogin.js`）：QQ 网页授权（m_authorize）+ 营地 `/user/login(qqconnect)` 换凭证，支持 `#设置QQ` 指定账号，扫码成功自动保存凭证
 - **资产与签到**（`apps/assetAndSign.js` + `apps/extractCred.js`）：营地仓库分类资产查询、每日签到；签到修复 roleId 被公共参数覆盖导致 -71005 的问题
+- **地铁逃生查询**（`apps/metro.js` + `resources/metro.html`）：`/play/getescaperecord` 赛季战绩（场数/KD/单局最高收益/赛季总收益/撤离率/淘汰数/幸存者段位），支持 `#和平地铁<赛季>` 查历史赛季
+- **好友排行**（`apps/friendRank.js` + `resources/friendrank.html`）：`/user/friends` 好友列表 + 逐人 `/play/gethonorinfo` 荣誉，按段位星数降序、在线优先，ins 深色卡片排行
 - **凭证提取模块**：配套 LSPosed 模块（com.camp.hook）抓取营地登录凭证直接复制到剪贴板（`openId:gameOpenId:userId:token`），与 `#提交和平` 格式一致，免抓包
 - **指令规范**：登录指令统一为 `#和平QQ登录` / `#和平微信登录`，签到为 `#和平签到`；切换登录方式需带"强制"
 - **主页渲染重构**（`resources/myHomepage.html` + `apps/myHomepage.js`）：
@@ -206,7 +212,7 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
    openId:gameOpenId:userId:token
    ```
 3. 将剪贴板内容发给机器人：`#提交和平 <凭证内容>` 即完成录入
-4. 录入后即可使用 `#和平主页` / `#资产` / `#和平签到` 等个人凭证功能
+4. 录入后即可使用 `#和平主页` / `#和平资产` / `#和平签到` 等个人凭证功能
 
 ### 注意事项
 

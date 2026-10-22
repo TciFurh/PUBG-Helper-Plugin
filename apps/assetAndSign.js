@@ -12,7 +12,7 @@ export class AssetAndSign extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#资产$', fnc: 'showAsset' },
+        { reg: '^#和平资产$', fnc: 'showAsset' },
         { reg: '^#和平签到$', fnc: 'dailySignin' },
       ],
     })
