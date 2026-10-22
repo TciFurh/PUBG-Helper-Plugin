@@ -30,6 +30,23 @@
       padding: 4px 12px;
     }
 
+    /* 赛季档案卡（地铁/古墓） */
+    .profile {
+      background: #121212; border: 1px solid #262626; border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 12px;
+    }
+    .profile .pt { display: flex; align-items: center; gap: 10px; }
+    .profile .pt .pn { font-size: 15px; font-weight: 700; }
+    .profile .pt .pd { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
+    .profile .pt .div {
+      margin-left: auto; font-size: 12px; font-weight: 600; color: #d4d4d4;
+      background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 999px; padding: 3px 12px;
+    }
+    .profile .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 14px; }
+    .profile .grid .g { text-align: center; }
+    .profile .grid .n { font-size: 15px; font-weight: 700; }
+    .profile .grid .l { font-size: 10px; color: #8e8e8e; margin-top: 2px; }
+
     .row {
       display: flex; align-items: center; gap: 14px;
       background: #121212; border: 1px solid #262626; border-radius: 12px;
@@ -49,7 +66,6 @@
     .stat .s { min-width: 42px; }
     .stat .n { font-size: 15px; font-weight: 700; }
     .stat .l { font-size: 10px; color: #8e8e8e; }
-    .stat .n.up { color: #e0e0e0; }
     .rank-pill {
       font-size: 13px; font-weight: 700; color: #ffffff;
       background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 8px;
@@ -76,16 +92,39 @@
     <div class="page-tag">第 {{page}} 页</div>
   </div>
 
+  {{ if profile }}
+  <div class="profile">
+    <div class="pt">
+      <div>
+        <div class="pn">{{profile.seasonName}}{{ if profile.divName }} · {{profile.divName}}{{ /if }}</div>
+        <div class="pd">赛季档案</div>
+      </div>
+      {{ if profile.featLevel }}<div class="div">属性Lv.{{profile.featLevel}}</div>{{ /if }}
+    </div>
+    <div class="grid">
+      {{ each profile.rows as r }}
+      <div class="g"><div class="n">{{r.v}}</div><div class="l">{{r.k}}</div></div>
+      {{ /each }}
+    </div>
+  </div>
+  {{ /if }}
+
   {{ each rows as r }}
   <div class="row">
     <div class="idx">{{r.idx}}</div>
     <img class="mode-icon" src="{{r.modeIcon}}" alt="" />
     <div class="info">
       <div class="m">{{r.modeDesc}}{{ if r.isMvp }}<span class="mvp-tag">MVP</span>{{ /if }}</div>
-      <div class="d">{{r.mapDesc}}{{ if r.liansha }} · 连杀 {{r.liansha}}{{ /if }}</div>
+      <div class="d">{{r.mapDesc}}{{ if r.hardType }} · {{r.hardType}}{{ /if }}{{ if r.liansha }} · 连杀 {{r.liansha}}{{ /if }}</div>
     </div>
 
-    {{ if r.isTdm }}
+    {{ if r.isMetro }}
+    <div class="rank-pill" style="background:#151515;color:#a8a8a8;font-size:12px">{{ if r.resultIcon }}<img src="{{r.resultIcon}}" style="height:16px;vertical-align:-3px" alt="" />{{ /if }} {{r.result || '地铁'}}</div>
+    <div class="stat">
+      <div class="s"><div class="n">{{r.feat}}{{ if r.addFeat }} <span style="color:#c8c8c8;font-size:11px">{{r.addFeat}}</span>{{ /if }}</div><div class="l">属性</div></div>
+      <div class="s"><div class="n">{{r.income}}</div><div class="l">收益</div></div>
+    </div>
+    {{ else if r.isTdm }}
     <div class="rank-pill" style="background:#151515;color:#a8a8a8;font-size:12px">{{ if r.resultIcon }}<img src="{{r.resultIcon}}" style="height:16px;vertical-align:-3px" alt="" />{{ /if }} {{r.result || '团竞'}}</div>
     <div class="stat">
       <div class="s"><div class="n">{{r.kills}}</div><div class="l">淘汰</div></div>

@@ -25,23 +25,19 @@
     .head .sub { font-size: 12px; color: #737373; margin-top: 2px; }
     .head .spacer { flex: 1; }
 
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .tab {
-      background: #121212; border: 1px solid #262626; border-radius: 14px;
-      padding: 18px 16px;
+    .row {
+      display: flex; align-items: center; gap: 12px;
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 13px 16px; margin-bottom: 8px;
     }
-    .tab .tname { font-size: 16px; font-weight: 700; }
-    .tab .tstat { display: flex; gap: 18px; margin-top: 12px; }
-    .tab .tstat .s { min-width: 0; }
-    .tab .tstat .n { font-size: 22px; font-weight: 700; }
-    .tab .tstat .l { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
-    .tab .recent {
-      margin-top: 14px; padding-top: 12px; border-top: 1px solid #262626;
-    }
-    .tab .recent .rt { font-size: 11px; color: #8e8e8e; }
-    .tab .recent .rd { font-size: 13px; font-weight: 600; margin-top: 5px; }
-    .tab .recent .rr { font-size: 12px; color: #a8a8a8; margin-top: 4px; }
-    .tab .recent .rr .up { color: #c4c4c4; font-weight: 600; }
+    .row .name { width: 90px; font-size: 15px; font-weight: 700; }
+    .row .count { font-size: 20px; font-weight: 700; min-width: 40px; text-align: center; }
+    .row .clabel { font-size: 10px; color: #8e8e8e; text-align: center; }
+    .row .desc { flex: 1; min-width: 0; font-size: 12px; color: #a8a8a8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row .desc .t { font-size: 12px; font-weight: 600; color: #c8c8c8; }
+    .row .desc .d { font-size: 11px; color: #737373; margin-top: 2px; }
+    .row.more { border-color: #333; }
+    .row.more .count { color: #e0e0e0; }
 
     .hint { font-size: 12px; color: #737373; margin-top: 16px; text-align: center; }
   </style>
@@ -56,23 +52,20 @@
     <div class="spacer"></div>
   </div>
 
-  <div class="tabs">
-    {{ each tabs as t }}
-    <div class="tab">
-      <div class="tname">{{t.name}}</div>
-      <div class="tstat">
-        <div class="s"><div class="n">{{t.total}}</div><div class="l">对局</div></div>
-        <div class="s"><div class="n">{{t.wins}}</div><div class="l">获胜</div></div>
-      </div>
-      <div class="recent">
-        <div class="rt">最近 · {{t.recentTime}}</div>
-        <div class="rd">{{t.recentDesc}}{{ if t.recentRank }} · {{t.recentRank}}{{ /if }}</div>
-        <div class="rr">淘汰 {{t.recentKills}}{{ if t.recentRating }} · {{t.recentRating}}{{ /if }}{{ if t.recentRatingChange }} <span class="up">{{t.recentRatingChange}}</span>{{ /if }}</div>
-      </div>
+  {{ each tabs as t }}
+  <div class="row {{ if t.hasMore }}more{{ /if }}">
+    <div class="name">{{t.name}}</div>
+    <div>
+      <div class="count">{{t.count}}</div>
+      <div class="clabel">本页</div>
     </div>
-    {{ /each }}
+    <div class="desc">
+      <div class="t">{{t.recentDesc}}</div>
+      <div class="d">最近 · {{t.recentTime}}</div>
+    </div>
   </div>
+  {{ /each }}
 
-  <div class="hint">发送「#和平战绩 排位 / 匹配 / 团竞」查看对应分类全部战绩，可加页码如「#和平战绩 排位 2」</div>
+  <div class="hint">发送「#和平战绩 排位 / 地铁 / 古墓 / 团竞 / 巅峰赛 / 全民赛场 / 绿洲 / 匹配 / 内鬼」查看对应分类，可加页码如「#和平战绩 地铁 2」</div>
 </body>
 </html>

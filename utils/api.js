@@ -19,6 +19,8 @@ class ApiService {
             getrecentbattlelist: '/play/getrecentbattlelist',
             getpubgbattlelist: '/play/getpubgbattlelist',
             getbattlefilters: '/play/getbattlefilters',
+            getescaperecord: '/play/getescaperecord',
+            getlosttombrecord: '/play/getlosttombrecord',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             getpubgplaydetail: 'https://c.gp.qq.com/gp/api/php/getpubgplaydetail.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
@@ -422,6 +424,52 @@ class ApiService {
         }
         const postData = querystring.stringify(params)
         const res = await fetch(this.main + this.baseUrl.getrecentbattlelist, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 地铁逃生赛季档案（不传 escapeSeasonId 返回当前赛季） */
+    async get_escaperecord(roleId, escapeSeasonId = '') {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getescaperecord')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+        }
+        if (escapeSeasonId) params.escapeSeasonId = String(escapeSeasonId)
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getescaperecord, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 古墓迷途赛季档案（不传 losttombSeasonId 返回当前赛季） */
+    async get_losttombrecord(roleId, losttombSeasonId = '') {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getlosttombrecord')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+        }
+        if (losttombSeasonId) params.losttombSeasonId = String(losttombSeasonId)
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getlosttombrecord, {
             method: 'POST',
             headers: this.headers,
             body: postData,
