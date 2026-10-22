@@ -47,38 +47,91 @@
     .profile .grid .n { font-size: 15px; font-weight: 700; }
     .profile .grid .l { font-size: 10px; color: #8e8e8e; margin-top: 2px; }
 
+    /* 列表行 */
     .row {
-      display: flex; align-items: center; gap: 14px;
-      background: #121212; border: 1px solid #262626; border-radius: 12px;
-      padding: 11px 16px; margin-bottom: 8px;
+      position: relative;
+      display: grid;
+      grid-template-columns: 90px 1fr 96px 92px 104px 96px;
+      align-items: center;
+      gap: 10px;
+      background: #101010;
+      border: 1px solid #232323;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
     }
-    .idx { width: 30px; text-align: center; font-size: 13px; color: #8e8e8e; font-weight: 600; }
-    .mode-icon { width: 40px; height: 40px; object-fit: contain; }
-    .info { flex: 1; min-width: 0; }
-    .info .m { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .info .d { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
-    .mvp-tag {
-      font-size: 10px; font-weight: 700; color: #ffffff;
-      background: linear-gradient(135deg, #4a4a4a, #222222);
-      border: 1px solid #3a3a3a; padding: 1px 7px; border-radius: 999px;
+
+    /* 晋级赛角标：贴左上角，营地 UI 同款金色丝带 */
+    .ribbon {
+      position: absolute; top: 0; left: 0;
+      display: flex; align-items: baseline; gap: 3px;
+      font-size: 9px; font-weight: 700; line-height: 1;
+      padding: 3px 9px 3px 10px;
+      border-radius: 12px 0 10px 0;
+      letter-spacing: .5px;
     }
-    .stat { display: flex; gap: 16px; text-align: center; }
-    .stat .s { min-width: 42px; }
-    .stat .n { font-size: 15px; font-weight: 700; }
-    .stat .l { font-size: 10px; color: #8e8e8e; }
-    .rank-pill {
-      font-size: 13px; font-weight: 700; color: #ffffff;
-      background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 8px;
-      padding: 4px 10px; min-width: 46px; text-align: center;
+    .ribbon.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
+    .ribbon.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
+    .ribbon b { font-size: 11px; font-weight: 700; }
+
+    /* 第1列：结果块 or 排名 */
+    .st { text-align: center; }
+    .st .sm { font-size: 9px; letter-spacing: .5px; }
+    .st .bg { font-size: 27px; font-weight: 700; line-height: 1.15; }
+    .st.gold .sm { color: #A9853F; }
+    .st.gold .bg { color: #F5C451; }
+    .st.grey .sm { color: #5E5E5E; }
+    .st.grey .bg { color: #7A7A7A; }
+    .rk { text-align: center; font-size: 27px; font-weight: 700; letter-spacing: -.5px; }
+    .rk.dim { color: #3F3F3F; font-size: 18px; }
+
+    /* 第2列：地图 + 模式 */
+    .info { min-width: 0; }
+    .info .m { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .info .tags { display: flex; align-items: center; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+    .chip {
+      font-size: 9px; font-weight: 600; line-height: 1;
+      padding: 3px 6px; border-radius: 4px;
+      background: #1c1c1c; color: #8E8E8E; border: 1px solid #2a2a2a;
     }
-    .rating { text-align: center; min-width: 58px; }
-    .rating img { height: 24px; object-fit: contain; display: block; margin: 0 auto; }
-    .rating .t { font-size: 11px; color: #a8a8a8; margin-top: 2px; }
-    .time { text-align: right; min-width: 88px; }
-    .time .t { font-size: 12px; color: #8e8e8e; }
-    .time .hint { font-size: 10px; color: #5c5c5c; margin-top: 2px; }
+    .chip.gold { background: rgba(245,196,81,.14); color: #F5C451; border-color: rgba(245,196,81,.34); }
+    .chip.red { background: rgba(232,71,75,.14); color: #E8474B; border-color: rgba(232,71,75,.34); }
+    .chip img { height: 11px; vertical-align: -2px; margin-right: 2px; }
+
+    /* 数值列 */
+    .num { text-align: center; }
+    .num .n { font-size: 16px; font-weight: 700; line-height: 1.2; }
+    .num .l { font-size: 9px; color: #6E6E6E; margin-top: 2px; }
+
+    /* 评分列 */
+    .rate { text-align: center; }
+    .rate img { height: 26px; object-fit: contain; display: block; margin: 0 auto; }
+    .rate .rt { font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .rate .rt.gold { color: #F5C451; }
+    .rate .rt.red { color: #E8474B; }
+    .rate .rt.grey { color: #8E8E8E; }
+    .streak {
+      display: inline-block; margin-top: 4px;
+      font-size: 10px; font-weight: 700; line-height: 1;
+      padding: 3px 8px; border-radius: 5px;
+    }
+    .streak.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
+    .streak.red { background: linear-gradient(120deg, #F08A8C, #C9383C); color: #2A0507; }
+
+    /* 时间列 */
+    .time { text-align: right; }
+    .time .t { font-size: 11px; color: #8E8E8E; }
+    .time .rv {
+      display: inline-block; margin-top: 4px;
+      font-size: 9px; color: #B4B4B4;
+      border: 1px solid #2e2e2e; border-radius: 999px; padding: 1px 7px;
+    }
 
     .foot { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 12px; color: #737373; margin-top: 14px; }
+    .legend { display: flex; gap: 14px; justify-content: center; font-size: 10px; color: #5E5E5E; margin-top: 10px; }
+    .legend i { font-style: normal; }
+    .legend .g { color: #F5C451; }
+    .legend .r { color: #E8474B; }
   </style>
 </head>
 <body>
@@ -111,40 +164,45 @@
 
   {{ each rows as r }}
   <div class="row">
-    <div class="idx">{{r.idx}}</div>
-    <img class="mode-icon" src="{{r.modeIcon}}" alt="" />
-    <div class="info">
-      <div class="m">{{r.modeDesc}}{{ if r.isMvp }}<span class="mvp-tag">MVP</span>{{ /if }}</div>
-      <div class="d">{{r.mapDesc}}{{ if r.hardType }} · {{r.hardType}}{{ /if }}{{ if r.liansha }} · 连杀 {{r.liansha}}{{ /if }}</div>
-    </div>
-
-    {{ if r.isMetro }}
-    <div class="rank-pill" style="background:#151515;color:#a8a8a8;font-size:12px">{{ if r.resultIcon }}<img src="{{r.resultIcon}}" style="height:16px;vertical-align:-3px" alt="" />{{ /if }} {{r.result || '地铁'}}</div>
-    <div class="stat">
-      <div class="s"><div class="n">{{r.feat}}{{ if r.addFeat }} <span style="color:#c8c8c8;font-size:11px">{{r.addFeat}}</span>{{ /if }}</div><div class="l">属性</div></div>
-      <div class="s"><div class="n">{{r.income}}</div><div class="l">收益</div></div>
-    </div>
-    {{ else if r.isTdm }}
-    <div class="rank-pill" style="background:#151515;color:#a8a8a8;font-size:12px">{{ if r.resultIcon }}<img src="{{r.resultIcon}}" style="height:16px;vertical-align:-3px" alt="" />{{ /if }} {{r.result || '团竞'}}</div>
-    <div class="stat">
-      <div class="s"><div class="n">{{r.kills}}</div><div class="l">淘汰</div></div>
-      <div class="s"><div class="n">{{r.assists}}</div><div class="l">助攻</div></div>
-    </div>
-    {{ else }}
-    <div class="rank-pill">{{ if r.teamRank }}{{r.teamRank}}{{ else }}—{{ /if }}</div>
-    <div class="stat">
-      <div class="s"><div class="n">{{r.kills}}</div><div class="l">淘汰</div></div>
-      <div class="s"><div class="n">{{r.damage}}</div><div class="l">伤害</div></div>
-    </div>
+    {{ if r.ribbon }}
+    <div class="ribbon {{r.ribbon.tone}}">{{r.ribbon.small}}<b>{{r.ribbon.big}}</b></div>
     {{ /if }}
 
-    <div class="rating">
-      {{ if r.ratingIcon }}<img src="{{r.ratingIcon}}" alt="" />{{ /if }}
-      <div class="t">{{r.ratingValue}}{{ if r.ratingChange }} <span style="color:#d4d4d4;font-weight:600">{{r.ratingChange}}</span>{{ /if }}</div>
+    {{ if r.status }}
+    <div class="st {{r.status.tone}}">
+      <div class="sm">{{r.status.small}}</div>
+      <div class="bg">{{r.status.big}}</div>
     </div>
+    {{ else if r.rankText }}
+    <div class="rk" style="color:{{r.rankColor || '#FAFAFA'}}">{{r.rankText}}</div>
+    {{ else }}
+    <div class="rk dim">—</div>
+    {{ /if }}
+
+    <div class="info">
+      <div class="m">{{r.mapDesc || r.modeDesc}}</div>
+      <div class="tags">
+        <span class="chip">{{r.modeDesc}}</span>
+        {{ each r.records as rc }}
+        <span class="chip gold">{{rc}}</span>
+        {{ /each }}
+      </div>
+    </div>
+
+    <div class="num"><div class="n">{{r.cols[0].n}}</div><div class="l">{{r.cols[0].l}}</div></div>
+    <div class="num"><div class="n">{{r.cols[1].n}}</div><div class="l">{{r.cols[1].l}}</div></div>
+
+    <div class="rate">
+      {{ if r.ratingIcon }}<img src="{{r.ratingIcon}}" alt="" />{{ /if }}
+      {{ if r.ratingText }}<div class="rt {{r.ratingTone}}">{{r.ratingText}}</div>{{ /if }}
+      {{ if r.streak }}
+      <div class="streak {{r.streak.tone}}">{{r.streak.num}}连击</div>
+      {{ /if }}
+    </div>
+
     <div class="time">
-      <div class="t">{{r.playTime}}</div>
-      <div class="hint">{{ if r.hasDetail }}可查详情{{ else }}—{{ /if }}</div>
+      <div class="t">{{r.time}}</div>
+      {{ if r.canReview }}<span class="rv">可复盘</span>{{ else if r.hasDetail }}<span class="rv">可查详情</span>{{ /if }}
     </div>
   </div>
   {{ /each }}
@@ -152,7 +210,12 @@
   <div class="foot">
     <span>{{ if hasMore }}发送「#和平战绩 {{tabName}} {{nextPage}}」查看下一页{{ else }}已是最后一页{{ /if }}</span>
     <span>·</span>
-    <span>发送「#和平战绩详情 编号」查看单局详情（先 #和平最近战绩 或 #和平战绩）</span>
+    <span>发送「#和平战绩详情 编号」查看单局详情</span>
+  </div>
+  <div class="legend">
+    <i class="g">金</i><i>胜 / 晋级成功 / 正增益</i>
+    <i>灰</i><i>败 / 晋级失败</i>
+    <i class="r">红</i><i>负收益 / 连击中断</i>
   </div>
 </body>
 </html>

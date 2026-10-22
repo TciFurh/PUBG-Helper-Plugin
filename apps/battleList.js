@@ -2,6 +2,8 @@ import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp } from '../utils/storage.js'
 import { setBattleCache } from '../utils/battleCache.js'
+import { fmtWan, resultText } from '../utils/battleFmt.js'
+import { buildListRows, buildMetroProfile, buildTombProfile } from '../utils/battleView.js'
 
 const apiService = new ApiService()
 
@@ -20,25 +22,6 @@ const TABS = [
   { key: 'match', name: '匹配', aliases: ['匹配', '不计分'], tabIndex: 1, type: 'classic' },
   { key: 'mole', name: '内鬼', aliases: ['内鬼', '谁是内鬼'], tabIndex: 8, type: 'classic' },
 ]
-
-function val(v) {
-  if (v && typeof v === 'object') return v.v
-  return v
-}
-
-function fmtTime(ts) {
-  const d = new Date(Number(ts) * 1000)
-  if (isNaN(d.getTime())) return ''
-  const p = (n) => String(n).padStart(2, '0')
-  return `${d.getMonth() + 1}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
-}
-
-function fmtIncome(n) {
-  const v = Number(n)
-  if (isNaN(v) || v <= 0) return '—'
-  if (v >= 10000) return (v / 10000).toFixed(1).replace(/\.0$/, '') + 'w'
-  return String(v)
-}
 
 export class BattleList extends plugin {
   constructor() {
@@ -88,10 +71,13 @@ export class BattleList extends plugin {
         const list = (res.data && res.data.list) || []
         const recent = list[0]
         let extra = ''
-        if (t.type === 'metro' && recent) {
-          extra = `${recent.mapDesc || ''} · 收益 ${fmtIncome(recent.income)}${recent.addFeat ? ' · ' + recent.addFeat : ''}`
-        } else if (recent) {
-          extra = `${recent.mapDesc || ''}${recent.teamRank ? ' · ' + recent.teamRank : ''}`
+        if (recent) {
+          if (t.type === 'metro') {
+            extra = `${recent.mapDesc || ''} · 收益 ${fmtWan(recent.income)}${recent.isMaxIncome === '1' ? ' · 新纪录' : ''}`
+          } else {
+            const rt = resultText(recent.result)
+            extra = `${recent.mapDesc || ''}${rt ? ' · ' + rt : ''}${recent.teamRank ? ' · ' + recent.teamRank : ''}`
+          }
         }
         tabs.push({
           key: t.key,
@@ -133,10 +119,10 @@ export class BattleList extends plugin {
       let profile = null
       if (tab.type === 'metro') {
         const pr = await apiService.get_escaperecord(roleId)
-        if (pr.returnCode === 0 && pr.data) profile = this.buildMetroProfile(pr.data)
+        if (pr.returnCode === 0 && pr.data) profile = buildMetroProfile(pr.data)
       } else if (tab.type === 'tomb') {
         const pr = await apiService.get_losttombrecord(roleId)
-        if (pr.returnCode === 0 && pr.data) profile = this.buildTombProfile(pr.data)
+        if (pr.returnCode === 0 && pr.data) profile = buildTombProfile(pr.data)
       }
 
       const res = await apiService.get_pubgbattlelist(roleId, { page, pageSize: 10, tabIndex: tab.tabIndex })
@@ -150,44 +136,6 @@ export class BattleList extends plugin {
       // 写入共享缓存，供 #和平战绩详情 按编号取 battleId/battleMode
       if (list.length) setBattleCache(e.user_id, roleId, list, 'all')
 
-      const isTdm = tab.type === 'tdm'
-      const isMetro = tab.type === 'metro'
-      const rows = list.map((it, i) => {
-        // 绿洲跑酷等无排名意义的对局：teamRank=#0 不展示
-        const teamRank = it.teamRank && it.teamRank !== '#0' ? it.teamRank : ''
-        return {
-        idx: (page - 1) * 10 + i + 1,
-        modeIcon: it.modeIcon || '',
-        modeDesc: it.modeDesc || tab.name,
-        mapDesc: it.mapDesc || '',
-        isTdm,
-        isMetro,
-        // 经典行
-        teamRank,
-        kills: it.killingCount ?? '—',
-        assists: it.assistCount ?? '—',
-        damage: it.damageAmount ?? '—',
-        // 团竞行
-        liansha: it.lianshaNum || '',
-        lianshaIcon: it.lianshaIcon || '',
-        resultIcon: it.resultIcon || '',
-        result: it.result || '',
-        // 地铁行
-        hardType: it.hardType || '',
-        feat: it.feat || '',
-        addFeat: it.addFeat || '',
-        income: fmtIncome(it.income),
-        // 评级
-        ratingIcon: it.ratingIcon || '',
-        ratingValue: it.ratingValue || '',
-        ratingChange: it.ratingChange || '',
-        isMvp: Number(it.isMvp) === 1,
-        mvpIcon: it.mvpIcon || '',
-        playTime: it.playTime || fmtTime(it.startime),
-        hasDetail: Number(it.hasDetail || 0) === 1,
-        battleId: it.battleId || '',
-      }})
-
       const image = await puppeteer.screenshot('battlelist', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battlelist.html',
         roleName: camp.roleName || camp.nickName || roleId,
@@ -196,58 +144,12 @@ export class BattleList extends plugin {
         nextPage: page + 1,
         hasMore: Number(d.hasMore || 0) === 1,
         profile,
-        rows,
+        rows: buildListRows(list, tab, page),
         sys: { scale: `style=transform:scale(1.4)` },
       })
       e.reply(image)
     } catch (err) {
       e.reply(`❌ ${tab.name}战绩查询失败：` + (err.message || err))
-    }
-  }
-
-  /** 地铁赛季档案 → 展示数据 */
-  buildMetroProfile(d) {
-    const rec = (d.escapeRecord || [])[0] || {}
-    const pro = {}
-    for (const it of rec.pro || []) pro[it.k] = val(it.v)
-    const subPro = {}
-    for (const it of rec.subPro || []) subPro[it.k] = val(it.v)
-    return {
-      seasonName: d.escapeSeasonName || '',
-      seasonId: d.escapeSeasonId || '',
-      divName: rec.divName || '',
-      divIcon: rec.divIcon || '',
-      featLevel: rec.featLevel || '',
-      rows: [
-        { k: '场数', v: pro['场数'] ?? '—' },
-        { k: 'K/D', v: pro['K/D'] ?? '—' },
-        { k: '单局最高收益', v: pro['单局最高收益'] ?? '—' },
-        { k: '赛季总收益', v: pro['赛季总收益'] ?? '—' },
-        { k: '撤离率', v: subPro['撤离率'] ?? '—' },
-        { k: '淘汰玩家', v: subPro['淘汰玩家数'] ?? '—' },
-      ],
-    }
-  }
-
-  /** 古墓赛季档案 → 展示数据 */
-  buildTombProfile(d) {
-    const rec = (d.losttombRecord || [])[0] || {}
-    const pro = {}
-    for (const it of rec.pro || []) pro[it.k] = val(it.v)
-    const subPro = {}
-    for (const it of rec.subPro || []) subPro[it.k] = val(it.v)
-    return {
-      seasonName: d.losttombSeasonName || '',
-      seasonId: d.losttombSeasonId || '',
-      divName: rec.divName || '',
-      divIcon: rec.divIcon || '',
-      rows: [
-        { k: '场数', v: pro['场数'] ?? '—' },
-        { k: '古金币总收益', v: pro['古金币总收益'] ?? '—' },
-        { k: '轮回石总收益', v: pro['轮回石总收益'] ?? '—' },
-        { k: '古金币最高单局', v: subPro['古金币最高单局'] ?? '—' },
-        { k: '轮回石最高单局', v: subPro['轮回石最高单局'] ?? '—' },
-      ],
     }
   }
 }

@@ -52,7 +52,7 @@
   - `#和平最近战绩` - 最近对局列表（可带数量 1-30）
   - `#和平战绩` - 全部战绩总览（排位/地铁/古墓/团竞/巅峰赛/全民赛场/绿洲/匹配/内鬼等10分类统计）
   - `#和平战绩 <分类> [页码]` - 分类全部战绩（地铁/古墓含赛季档案卡），支持全部/排位/计分/地铁/地铁逃生/古墓/古墓迷途/团竞/团队竞技/巅峰/巅峰赛/全民/全民赛场/绿洲/绿洲共创/匹配/不计分/内鬼/谁是内鬼，每页10场，页码1-10
-  - `#和平战绩详情 <编号>` - 单局详情（武器伤害/我的淘汰/淘汰我的人）
+  - `#和平战绩详情 <编号>` - 单局详情（经典：枪械伤害/队伍/淘汰与被淘汰；地铁：本局收益/装备/背包；超体：英雄/插件/徽章/伤害构成；团竞：双方阵容）
 
 - ⚙️ **偏好设置**
   - 设置默认对局展示索引
@@ -111,7 +111,7 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 - `#和平最近战绩` - 查看最近对局列表，默认10局，可带数量参数（1-30），如 `#和平最近战绩5`
 - `#和平战绩` - 查看全部战绩总览（排位/地铁/古墓/团竞/巅峰赛/全民赛场/绿洲/匹配/内鬼等10分类统计）
 - `#和平战绩 <分类> [页码]` - 查看分类全部战绩，支持全部/排位/计分/地铁/地铁逃生/古墓/古墓迷途/团竞/团队竞技/巅峰/巅峰赛/全民/全民赛场/绿洲/绿洲共创/匹配/不计分/内鬼/谁是内鬼，每页10场，页码1-10，如 `#和平战绩 地铁 2`；地铁/古墓列表顶部附带赛季档案卡（场数/收益/撤离率等）
-- `#和平战绩详情 <编号>` - 查看单局战绩详情（先查最近战绩，按编号查看对应对局；包含武器伤害、我的淘汰、淘汰我的人）
+- `#和平战绩详情 <编号>` - 查看单局战绩详情（先查最近战绩，按编号查看对应对局）。按对局类型自动适配：经典显示枪械伤害/队伍/我的淘汰/淘汰我的人/第一名队伍；地铁逃生显示本局收益（含新纪录）、击败玩家/匪徒/怪物、狩猎积分、声望、装备栏与背包；超体显示英雄与等级/插件/称号徽章/伤害与治疗构成；团竞显示双方阵容（淘汰/助攻/战损/连击）
 
 ### 数据查询
 - `#和平主页` 或 `#和平主页<营地ID>` - 查看游戏信息概览
@@ -186,8 +186,21 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 - **凭证提取模块**：配套 LSPosed 模块（com.camp.hook）抓取营地登录凭证直接复制到剪贴板（`openId:gameOpenId:userId:token`），与 `#提交和平` 格式一致，免抓包
 - **指令规范**：登录指令统一为 `#和平QQ登录` / `#和平微信登录`，签到为 `#和平签到`；切换登录方式需带"强制"
 - **周报**（`apps/weeklyReport.js` + `resources/weeklyreport.html`）：`#和平周报` 本周数据汇总，段位积分变化（含 +/- 与前后对比）、场次/胜场/前10/淘汰/阵亡/K·D 六指标卡
-- **全部战绩**（`apps/battleList.js` + `resources/battleoverview.html` / `resources/battlelist.html`）：`#和平战绩` 十分类总览（全部/计分/地铁逃生/古墓迷途/团竞/巅峰赛/全民赛场/绿洲共创/不计分/谁是内鬼，取自 `getpubgbattlelist` tabIndex 分类）；`#和平战绩 <分类> [页码]` 分页列表（每页10场，页码1-10），排位/匹配行显示排名/淘汰/伤害/评级，团竞行显示淘汰/助攻/连杀/胜负/评分，地铁行显示胜负/难度/属性增减/收益，绿洲行显示排名/淘汰/伤害；地铁/古墓列表顶部附带赛季档案卡（`getescaperecord` / `getlosttombrecord`：场数/收益/撤离率等）；走 `getpubgbattlelist`（page/pageSize/tabIndex/gameId=20004 分页），列表写入共享缓存，`#和平战绩详情` 可直接按编号查全部战绩的单局详情
-- **最近战绩与单局详情**（`apps/recentBattle.js` + `resources/recentbattle.html` / `resources/battledetail.html`）：`#和平最近战绩` 全模式最近对局列表（默认10局）；`#和平战绩详情 <编号>` 单局详情（能力数据、武器伤害明细、我的淘汰、淘汰我的人），均走营地 HTTP 接口（`/play/getrecentbattlelist`、`/gp/api/php/getpubgplaydetail.php`）
+- **全部战绩**（`apps/battleList.js` + `utils/battleView.js` + `resources/battleoverview.html` / `resources/battlelist.html`）：`#和平战绩` 十分类总览（全部/计分/地铁逃生/古墓迷途/团竞/巅峰赛/全民赛场/绿洲共创/不计分/谁是内鬼，取自 `getpubgbattlelist` tabIndex 分类）；`#和平战绩 <分类> [页码]` 分页列表（每页10场，页码1-10）。列表统一为「结果/排名 · 模式 · 数值1 · 数值2 · 评分 · 时间」六列，由 `buildRow` 按分类决定每列取什么：
+  - **晋级赛角标**：`promotion`（`taskId/process/target/pass/protect`）→ 左上角金/灰丝带「晋级赛·成功 / 失败 / 保护」，含晋级进度
+  - **排名配色**：取接口 `rankColor`（如 `#D98500` 金橙），`#0` 视为该模式无排名不展示
+  - **经典行**：淘汰 + 伤害、积分 + 积分变化、`ratingIcon` 评级（S+/SSS…）、MVP 标记、`reviewJump` 判定「可复盘」
+  - **地铁行**：左侧 `hardType`（进阶/基础常规）+ 成功/失败，击败数、狩猎积分、收益（`income` 按万聚合、负数标红、`isMaxIncome=1` 标「新纪录」）
+  - **团竞行**：左侧 胜/败，淘汰 + 助攻、积分 + 变化、`lianshaNum` 连击徽章（胜金败红）
+  - 地铁/古墓列表顶部附带赛季档案卡（`getescaperecord` / `getlosttombrecord`：场数/收益/撤离率等）；走 `getpubgbattlelist`（page/pageSize/tabIndex/gameId=20004 分页），列表写入共享缓存，`#和平战绩详情` 可直接按编号查全部战绩的单局详情
+  - 分类判定注意：**地铁一定带 `hardType`，团竞一定带 `result`**，两者互斥，不能只看 `result`（团竞的 `Win` 曾被误判成地铁）
+
+- **最近战绩与单局详情**（`apps/recentBattle.js` + `utils/battleView.js` + `resources/recentbattle.html` / `resources/battledetail.html`）：`#和平最近战绩` 全模式最近对局列表（默认10局）；`#和平战绩详情 <编号>` 单局详情，走营地 HTTP 接口（`/play/getrecentbattlelist`、`/gp/api/php/getpubgplaydetail.php`）。`buildDetailView` 按返回结构归一化，模板只判断「有没有这个区块」，四种形态：
+  - **地铁**（`income` + `hardType` 存在）：本局收益卡（含新纪录/钻石）、总击败/击败玩家/击败匪徒/击败怪物/狩猎积分/声望、装备栏（`equipment.list` 为对象，需 `Object.values`；按 `quality` 101~108 上色，带配件与词条）、背包（`bag` / `safebag`，含价值、数量、品质分布）
+  - **超体**（`isSuperBody`）：`heroInfo` 英雄卡 + `heroLevel` / `heroRating`、`heroPlugins` + `craftPlugins` 插件、`achievement` 称号徽章、`analysis` 伤害（基础/增伤/技能）与治疗（基础/技能/插件）构成条
+  - **团竞**（`viewType=vsteam`，`dataList[0].data` 为 `[{list},{list}]` 双方）：双阵营阵容，成员数值取自 `infoList` 的 淘汰/助攻/战损/连击
+  - **经典**：`ability` 数值、`equipment` 枪械伤害与命中部位、`team` 队伍、`kills`/`killer`/`top5`
+  - 成员数值列不写死字段名，直接按 `infoList` 的 key 顺序取（经典是伤害/救援，团竞是战损/连击）
 - **主页渲染重构**（`resources/myHomepage.html` + `apps/myHomepage.js`）：
   - ins 深色风格，黑白灰三色主题（仅"游戏在线"状态用绿色背景）
   - 三列卡片布局：个人资料 / 印记成就 / 模式数据
