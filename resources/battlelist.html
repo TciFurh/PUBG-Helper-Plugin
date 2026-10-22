@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全部战绩</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1080px;
+      zoom: 2.0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #000000;
+      color: #fafafa;
+      padding: 26px 28px;
+    }
+    .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .head .logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #1a1a1a; border: 1px solid #262626;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .head .title { font-size: 20px; font-weight: 700; }
+    .head .sub { font-size: 11px; color: #737373; margin-top: 2px; }
+    .head .spacer { flex: 1; }
+    .head .page-tag {
+      font-size: 12px; font-weight: 600; color: #d4d4d4;
+      background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 999px;
+      padding: 4px 12px;
+    }
+
+    .row {
+      display: flex; align-items: center; gap: 14px;
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 11px 16px; margin-bottom: 8px;
+    }
+    .idx { width: 30px; text-align: center; font-size: 13px; color: #8e8e8e; font-weight: 600; }
+    .mode-icon { width: 40px; height: 40px; object-fit: contain; }
+    .info { flex: 1; min-width: 0; }
+    .info .m { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .info .d { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
+    .mvp-tag {
+      font-size: 10px; font-weight: 700; color: #ffffff;
+      background: linear-gradient(135deg, #4a4a4a, #222222);
+      border: 1px solid #3a3a3a; padding: 1px 7px; border-radius: 999px;
+    }
+    .stat { display: flex; gap: 16px; text-align: center; }
+    .stat .s { min-width: 42px; }
+    .stat .n { font-size: 15px; font-weight: 700; }
+    .stat .l { font-size: 10px; color: #8e8e8e; }
+    .stat .n.up { color: #e0e0e0; }
+    .rank-pill {
+      font-size: 13px; font-weight: 700; color: #ffffff;
+      background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 8px;
+      padding: 4px 10px; min-width: 46px; text-align: center;
+    }
+    .rating { text-align: center; min-width: 58px; }
+    .rating img { height: 24px; object-fit: contain; display: block; margin: 0 auto; }
+    .rating .t { font-size: 11px; color: #a8a8a8; margin-top: 2px; }
+    .time { text-align: right; min-width: 88px; }
+    .time .t { font-size: 12px; color: #8e8e8e; }
+    .time .hint { font-size: 10px; color: #5c5c5c; margin-top: 2px; }
+
+    .foot { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 12px; color: #737373; margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">▦</div>
+    <div>
+      <div class="title">全部战绩 · {{tabName}}</div>
+      <div class="sub">BATTLE LIST · {{roleName}}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="page-tag">第 {{page}} 页</div>
+  </div>
+
+  {{ each rows as r }}
+  <div class="row">
+    <div class="idx">{{r.idx}}</div>
+    <img class="mode-icon" src="{{r.modeIcon}}" alt="" />
+    <div class="info">
+      <div class="m">{{r.modeDesc}}{{ if r.isMvp }}<span class="mvp-tag">MVP</span>{{ /if }}</div>
+      <div class="d">{{r.mapDesc}}{{ if r.liansha }} · 连杀 {{r.liansha}}{{ /if }}</div>
+    </div>
+
+    {{ if r.isTdm }}
+    <div class="rank-pill" style="background:#151515;color:#a8a8a8;font-size:12px">{{ if r.resultIcon }}<img src="{{r.resultIcon}}" style="height:16px;vertical-align:-3px" alt="" />{{ /if }} {{r.result || '团竞'}}</div>
+    <div class="stat">
+      <div class="s"><div class="n">{{r.kills}}</div><div class="l">淘汰</div></div>
+      <div class="s"><div class="n">{{r.assists}}</div><div class="l">助攻</div></div>
+    </div>
+    {{ else }}
+    <div class="rank-pill">{{ if r.teamRank }}{{r.teamRank}}{{ else }}—{{ /if }}</div>
+    <div class="stat">
+      <div class="s"><div class="n">{{r.kills}}</div><div class="l">淘汰</div></div>
+      <div class="s"><div class="n">{{r.damage}}</div><div class="l">伤害</div></div>
+    </div>
+    {{ /if }}
+
+    <div class="rating">
+      {{ if r.ratingIcon }}<img src="{{r.ratingIcon}}" alt="" />{{ /if }}
+      <div class="t">{{r.ratingValue}}{{ if r.ratingChange }} <span style="color:#d4d4d4;font-weight:600">{{r.ratingChange}}</span>{{ /if }}</div>
+    </div>
+    <div class="time">
+      <div class="t">{{r.playTime}}</div>
+      <div class="hint">{{ if r.hasDetail }}可查详情{{ else }}—{{ /if }}</div>
+    </div>
+  </div>
+  {{ /each }}
+
+  <div class="foot">
+    <span>{{ if hasMore }}发送「#和平战绩 {{tabName}} {{nextPage}}」查看下一页{{ else }}已是最后一页{{ /if }}</span>
+    <span>·</span>
+    <span>发送「#和平战绩详情 编号」查看单局详情（先 #和平最近战绩 或 #和平战绩）</span>
+  </div>
+</body>
+</html>

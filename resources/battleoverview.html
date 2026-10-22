@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>战绩总览</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 900px;
+      zoom: 2.0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #000000;
+      color: #fafafa;
+      padding: 28px 30px;
+    }
+    .head { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .head .logo {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #1a1a1a; border: 1px solid #262626;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .head .title { font-size: 22px; font-weight: 700; }
+    .head .sub { font-size: 12px; color: #737373; margin-top: 2px; }
+    .head .spacer { flex: 1; }
+
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .tab {
+      background: #121212; border: 1px solid #262626; border-radius: 14px;
+      padding: 18px 16px;
+    }
+    .tab .tname { font-size: 16px; font-weight: 700; }
+    .tab .tstat { display: flex; gap: 18px; margin-top: 12px; }
+    .tab .tstat .s { min-width: 0; }
+    .tab .tstat .n { font-size: 22px; font-weight: 700; }
+    .tab .tstat .l { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
+    .tab .recent {
+      margin-top: 14px; padding-top: 12px; border-top: 1px solid #262626;
+    }
+    .tab .recent .rt { font-size: 11px; color: #8e8e8e; }
+    .tab .recent .rd { font-size: 13px; font-weight: 600; margin-top: 5px; }
+    .tab .recent .rr { font-size: 12px; color: #a8a8a8; margin-top: 4px; }
+    .tab .recent .rr .up { color: #c4c4c4; font-weight: 600; }
+
+    .hint { font-size: 12px; color: #737373; margin-top: 16px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">▦</div>
+    <div>
+      <div class="title">战绩总览</div>
+      <div class="sub">BATTLE OVERVIEW · {{roleName}}</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="tabs">
+    {{ each tabs as t }}
+    <div class="tab">
+      <div class="tname">{{t.name}}</div>
+      <div class="tstat">
+        <div class="s"><div class="n">{{t.total}}</div><div class="l">对局</div></div>
+        <div class="s"><div class="n">{{t.wins}}</div><div class="l">获胜</div></div>
+      </div>
+      <div class="recent">
+        <div class="rt">最近 · {{t.recentTime}}</div>
+        <div class="rd">{{t.recentDesc}}{{ if t.recentRank }} · {{t.recentRank}}{{ /if }}</div>
+        <div class="rr">淘汰 {{t.recentKills}}{{ if t.recentRating }} · {{t.recentRating}}{{ /if }}{{ if t.recentRatingChange }} <span class="up">{{t.recentRatingChange}}</span>{{ /if }}</div>
+      </div>
+    </div>
+    {{ /each }}
+  </div>
+
+  <div class="hint">发送「#和平战绩 排位 / 匹配 / 团竞」查看对应分类全部战绩，可加页码如「#和平战绩 排位 2」</div>
+</body>
+</html>

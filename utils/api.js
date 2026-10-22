@@ -17,6 +17,8 @@ class ApiService {
             getdepotdetail: '/game/getdepotdetail',
             getweeklyreport: '/game/getweeklyreport',
             getrecentbattlelist: '/play/getrecentbattlelist',
+            getpubgbattlelist: '/play/getpubgbattlelist',
+            getbattlefilters: '/play/getbattlefilters',
             act_dailysigninmonthly: 'https://c.gp.qq.com/gp/api/php/act_dailysigninmonthly.php',
             getpubgplaydetail: 'https://c.gp.qq.com/gp/api/php/getpubgplaydetail.php',
             //getrecentbattlelist: '/play/getrecentbattlelist'
@@ -346,6 +348,57 @@ class ApiService {
         }
         const postData = querystring.stringify(params)
         const res = await fetch(this.main + this.baseUrl.getweeklyreport, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 战绩分类筛选配置（tabIndex：0计分/1不计分/2团竞） */
+    async get_battlefilters() {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getbattlefilters')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(p.roleId || this.params.roleId || '0'),
+            gameId: '20004',
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getbattlefilters, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
+    /** 全部战绩列表（分页+分类：tabIndex 0计分/1不计分/2团竞，mode/filter 可选筛选） */
+    async get_pubgbattlelist(roleId, { page = 1, pageSize = 10, tabIndex = 0, mode = '', filter = 0 } = {}) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getpubgbattlelist')
+        const params = {
+            ...this.params,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(roleId),
+            page: String(page),
+            pageSize: String(pageSize),
+            tabIndex: String(tabIndex),
+            gameId: '20004',
+        }
+        if (mode) params.mode = String(mode)
+        params.filter = String(filter)
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getpubgbattlelist, {
             method: 'POST',
             headers: this.headers,
             body: postData,

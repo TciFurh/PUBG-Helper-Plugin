@@ -1,11 +1,10 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp, getUserInfo } from '../utils/storage.js'
+import { setBattleCache, getBattleCache } from '../utils/battleCache.js'
 
 const apiService = new ApiService()
 
-// 最近一次对局列表缓存（供「战绩详情」指令取 battleId/battleMode）
-const battleCache = { userId: null, roleId: null, list: [] }
 
 function val(v) {
   if (v && typeof v === 'object') return v.v
@@ -47,9 +46,7 @@ export class RecentBattle extends plugin {
       if (!list.length) return e.reply('最近暂无对局记录')
 
       // 写入缓存供详情指令使用
-      battleCache.userId = e.user_id
-      battleCache.roleId = roleId
-      battleCache.list = list
+      setBattleCache(e.user_id, roleId, list, 'recent')
 
       const rows = list.map((item, i) => ({
         idx: i + 1,
@@ -84,8 +81,9 @@ export class RecentBattle extends plugin {
     const camp = getCamp(e.user_id)
     if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
 
+    const battleCache = getBattleCache()
     if (battleCache.userId !== e.user_id || !battleCache.list.length) {
-      return e.reply('❌ 请先使用 #和平最近战绩 查询后再查看详情')
+      return e.reply('❌ 请先使用 #和平最近战绩 或 #和平战绩 查询后再查看详情')
     }
     const item = battleCache.list[idxArg - 1]
     if (!item || !item.battleId) return e.reply(`❌ 编号 ${idxArg} 不在最近战绩列表中`)

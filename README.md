@@ -40,7 +40,7 @@
   - 地铁逃生数据总览
   - 古墓模式数据总览
   - 荣誉信息查询(最高段位、印记、队友点赞数等)
-  - 本周数据（周报）、最近对局列表、单局战绩详情
+  - 本周数据（周报）、最近对局列表、全部战绩（分类+分页）、单局战绩详情
 
 - 🔫 **枪械熟练度**
   - 查看所有枪械熟练度数据
@@ -65,6 +65,7 @@
 - [x] 游戏资产（仓库分类查询）
 - [x] 周报（本周数据汇总）
 - [x] 最近战绩 + 单局战绩详情
+- [x] 全部战绩（分类+分页）
 - [ ] 想到啥再做
 
 ## 📦 安装方法
@@ -106,6 +107,8 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 ### 战绩数据
 - `#和平周报` - 查看本周数据（场次/胜场/前10/淘汰/阵亡/K·D/段位分变化）
 - `#和平最近战绩` - 查看最近对局列表，默认10局，可带数量参数（1-30），如 `#和平最近战绩5`
+- `#和平战绩` - 查看全部战绩总览（排位/匹配/团竞三分类的场次/获胜/最近对局统计）
+- `#和平战绩 <分类> [页码]` - 查看分类全部战绩，支持排位/匹配/团竞（别名：计分/经典、不计分/创意工坊、团队竞技），每页10场，页码1-10，如 `#和平战绩 排位 2`
 - `#和平战绩详情 <编号>` - 查看单局战绩详情（先查最近战绩，按编号查看对应对局；包含武器伤害、我的淘汰、淘汰我的人）
 
 ### 数据查询
@@ -181,6 +184,7 @@ git clone https://gitee.com/Tloml-Starry/PUBG-Helper-Plugin.git ./plugins/PUBG-H
 - **凭证提取模块**：配套 LSPosed 模块（com.camp.hook）抓取营地登录凭证直接复制到剪贴板（`openId:gameOpenId:userId:token`），与 `#提交和平` 格式一致，免抓包
 - **指令规范**：登录指令统一为 `#和平QQ登录` / `#和平微信登录`，签到为 `#和平签到`；切换登录方式需带"强制"
 - **周报**（`apps/weeklyReport.js` + `resources/weeklyreport.html`）：`#和平周报` 本周数据汇总，段位积分变化（含 +/- 与前后对比）、场次/胜场/前10/淘汰/阵亡/K·D 六指标卡
+- **全部战绩**（`apps/battleList.js` + `resources/battleoverview.html` / `resources/battlelist.html`）：`#和平战绩` 三分类总览（计分/不计分/团竞，取自 `getbattlefilters` 分类配置）；`#和平战绩 <分类> [页码]` 分页列表（每页10场，页码1-10），排位/匹配行显示排名/淘汰/伤害/评级，团竞行显示淘汰/助攻/连杀/胜负/评分；走 `getpubgbattlelist`（page/pageSize/tabIndex/gameId 分页），列表写入共享缓存，`#和平战绩详情` 可直接按编号查全部战绩的单局详情
 - **最近战绩与单局详情**（`apps/recentBattle.js` + `resources/recentbattle.html` / `resources/battledetail.html`）：`#和平最近战绩` 全模式最近对局列表（默认10局）；`#和平战绩详情 <编号>` 单局详情（能力数据、武器伤害明细、我的淘汰、淘汰我的人），均走营地 HTTP 接口（`/play/getrecentbattlelist`、`/gp/api/php/getpubgplaydetail.php`）
 - **主页渲染重构**（`resources/myHomepage.html` + `apps/myHomepage.js`）：
   - ins 深色风格，黑白灰三色主题（仅"游戏在线"状态用绿色背景）
