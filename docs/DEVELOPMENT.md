@@ -178,6 +178,20 @@ const isSuper = d.isSuperBody === true
 - 每轮刷新常直接刷出「已完成待领取」的任务（服务端知道你今天做过什么），领一遍就是一轮奖励
 - `runDailyTasks` 的福利任务循环：做 → 领 → 刷新 → 再做 → 再领，直到接口拒绝或 10 轮上限
 
+**游戏手册 · 每周任务**（`runWeeklyTasks`，`#和平周任务`）：
+
+| 接口 | 用途 |
+|---|---|
+| `/game/getseasonpasstask` | 手册 8 周任务（**必须带有效 roleId，传 0 回 -20011**） |
+| `/game/claimseasonpasspoints` | 领手册积分——**默认绝不调用**（用户要求只做不领） |
+
+- 结构：`data.weekList[] { weekNo, isOpen, taskList[] { id,title,desc,progress,maxProgress,status,point } }`
+- status：0=未完成 → 做动作 → 1=完成待领 →（App 手动领）→ 2=已领
+- 可自动做的：分享战绩/资讯/资产/复盘（sharecallback）、浏览资讯 5 分钟（埋点）、查看热榜（gethotrank）、
+  观看复盘（getpubgreplaydata4）、开启 4 个对局工具（id 0-4 里凑满 4 个，id=3 可能是加速器）
+- 做不了的：登录类（日常使用累计）、小组件、企微绑定、找搭子/地铁图鉴/壁纸库（暂无接口）
+- 动作完成后**再拉一次列表**回填最新进度（分享/浏览类计数是服务端异步确认的）
+
 **新增资料查询接口**（`apps/campSocial.js`，全读操作）：
 
 | 指令 | 接口 | 说明 |

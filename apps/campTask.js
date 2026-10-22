@@ -16,7 +16,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { ApiService } from '../utils/api.js'
-import { runDailyTasks } from '../utils/dailyTask.js'
+import { runDailyTasks, runWeeklyTasks } from '../utils/dailyTask.js'
 import { getCamp } from '../utils/storage.js'
 
 const CFG_FILE = path.resolve('./data/PUBG-Helper-Plugin/TaskConfig.json')
@@ -37,7 +37,7 @@ function saveCfg(cfg) {
 }
 
 /** 状态值 → 展示符号 */
-const ICON = { done: '✅', acted: '🆕', skip: '⏭', fail: '❌' }
+const ICON = { done: '✅', acted: '🆕', skip: '⏭', fail: '❌', waitClaim: '🎁' }
 
 function describeView(view, roleName) {
   const lines = [`📋 ${roleName} · 营地任务`]
@@ -78,6 +78,39 @@ async function statusText(api, roleId, roleName) {
   return lines.join('\n')
 }
 
+/** 游戏手册周任务结果 → 文案（只做不领） */
+function describeWeekly(view, roleName) {
+  const lines = [`📘 ${roleName} · 游戏手册周任务（season ${view.seasonID}）`]
+  for (const w of view.weeks) {
+    lines.push(`── 第 ${w.weekNo} 周 ──`)
+    for (const r of w.rows) {
+      lines.push(`${ICON[r.status] || '·'} ${r.title}（${r.progress}）${r.note ? ` ${r.note}` : ''}`)
+    }
+  }
+  if (view.waitClaim.length) {
+    lines.push(`🎁 已完成待领积分 ${view.waitClaim.length} 项：${view.waitClaim.join('、')}`)
+    lines.push('（按你的要求没有自动领取，去营地 App 手册页手动领）')
+  }
+  if (view.skipped.length) lines.push(`⏭ 无法自动完成：${view.skipped.join('、')}`)
+  if (view.acted) lines.push(`🆕 本次自动完成 ${view.acted} 项`)
+  return lines.join('\n')
+}
+
+/** 手册周任务只读状态 */
+async function weeklyStatusText(api, roleName, roleId) {
+  const res = await api.get_season_pass_task(roleId)
+  const data = res?.data || {}
+  const lines = [`📘 ${roleName} · 手册周任务状态（season ${data.seasonID || '?'}）`]
+  for (const w of (data.weekList || []).filter((x) => Number(x.isOpen) === 1)) {
+    lines.push(`── 第 ${w.weekNo} 周 ──`)
+    for (const t of w.taskList || []) {
+      const st = Number(t.status)
+      lines.push(`${st === 0 ? '⬜' : st === 1 ? '🎁' : '✅'} ${t.title}（${t.progress}/${t.maxProgress}）${st === 1 ? ' 待领积分' : ''}`)
+    }
+  }
+  return lines.join('\n')
+}
+
 export class CampTask extends plugin {
   constructor() {
     super({
@@ -88,6 +121,8 @@ export class CampTask extends plugin {
       rule: [
         { reg: '^#和平任务$', fnc: 'doTasks' },
         { reg: '^#和平任务状态$', fnc: 'taskStatus' },
+        { reg: '^#和平周任务$', fnc: 'doWeeklyTasks' },
+        { reg: '^#和平周任务状态$', fnc: 'weeklyStatus' },
         { reg: '^#(开启|打开|启用)和平自动任务$', fnc: 'enableAuto' },
         { reg: '^#(关闭|关掉|停用)和平自动任务$', fnc: 'disableAuto' },
       ],
@@ -144,6 +179,37 @@ export class CampTask extends plugin {
     }
   }
 
+  /** `#和平周任务`：游戏手册每周任务，只做不领 */
+  async doWeeklyTasks(e) {
+    const ctx = this.#context(e)
+    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (this.running) return e.reply('⏳ 任务正在跑，稍等一下再试')
+    this.running = true
+    await e.reply('⏳ 正在自动完成游戏手册每周任务（只做不领）...')
+    try {
+      const roleId = await ctx.api.get_self_role_id()
+      if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
+      const view = await runWeeklyTasks(ctx.api, roleId)
+      await e.reply(describeWeekly(view, ctx.camp.roleName || ctx.camp.nickName || roleId))
+    } catch (err) {
+      await e.reply('❌ 周任务执行失败：' + (err.message || err))
+    } finally {
+      this.running = false
+    }
+  }
+
+  /** `#和平周任务状态`：手册任务只读 */
+  async weeklyStatus(e) {
+    const ctx = this.#context(e)
+    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    try {
+      const roleId = await ctx.api.get_self_role_id()
+      e.reply(await weeklyStatusText(ctx.api, ctx.camp.roleName || ctx.camp.nickName || roleId, roleId))
+    } catch (err) {
+      e.reply('❌ 状态查询失败：' + (err.message || err))
+    }
+  }
+
   async enableAuto(e) {
     const cfg = loadCfg()
     cfg.autoTask = true
@@ -175,12 +241,21 @@ export class CampTask extends plugin {
       for (const camp of camps) {
         const api = new ApiService()
         api.useCamp(camp)
+        const who = camp.roleName || camp.nickName || camp.userId
         try {
           const roleId = await api.get_self_role_id()
           const view = await runDailyTasks(api, roleId)
-          blocks.push(describeView(view, camp.roleName || camp.nickName || camp.userId))
+          let text = describeView(view, who)
+          // 手册周任务跟着一起做（只做不领）
+          try {
+            const wv = await runWeeklyTasks(api, roleId)
+            text += '\n\n' + describeWeekly(wv, who)
+          } catch (err) {
+            text += `\n⚠️ 手册周任务执行失败：${err.message || err}`
+          }
+          blocks.push(text)
         } catch (err) {
-          blocks.push(`⚠️ ${camp.roleName || camp.userId} 任务执行失败：${err.message || err}`)
+          blocks.push(`⚠️ ${who} 任务执行失败：${err.message || err}`)
         }
         await new Promise((r) => setTimeout(r, 1500))
       }

@@ -42,6 +42,8 @@ class ApiService {
             getrechargerank: '/game/getrechargerank',
             recharge: '/game/recharge',
             getstationhome: '/game/getstationhome',
+            getseasonpasstask: '/game/getseasonpasstask',
+            claimseasonpasspoints: '/game/claimseasonpasspoints',
             getusercoins: '/user/getusercoins',
             getvisits: '/user/getvisits',
             getonlinefriends: '/user/getonlinefriends',
@@ -649,6 +651,16 @@ class ApiService {
     /** 战绩复盘数据（观看复盘任务） */
     async get_replay_data() {
         return this._postForm(this.baseUrl.getpubgreplaydata4, {})
+    }
+
+    /** 游戏手册（赛季手册）每周任务列表（8 周，status 0未完成/1完成待领/2已领；roleId 必传，传 0 会回 -20011） */
+    async get_season_pass_task(roleId) {
+        return this._postForm(this.main + this.baseUrl.getseasonpasstask, { roleId: String(roleId || '') })
+    }
+
+    /** 领取手册积分（默认不调用：#和平周任务 只做不领） */
+    async claim_season_pass_points(roleId) {
+        return this._postForm(this.main + this.baseUrl.claimseasonpasspoints, { roleId: String(roleId || '') })
     }
 
     /* ================= 营地社交 / 资料（读操作） ================= */

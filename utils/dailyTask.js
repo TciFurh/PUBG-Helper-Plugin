@@ -142,8 +142,16 @@ const ACTIONS = {
   async tool1(ctx) {
     return ACTIONS.tool(ctx, 1, 4)
   },
-  async tool4(ctx) {
-    return ACTIONS.tool(ctx, 4, 0)
+  /** 手册「开启4个对局工具」：任务不限具体哪几个（id=4 的也算），凑满 4 个即可 */
+  async tool4({ api }) {
+    let okCount = 0
+    for (const id of [0, 1, 2, 3, 4]) {
+      const r = await ok(api, await api.change_game_tool(id, '1'))
+      if (r) okCount++
+      if (okCount >= 4) return { ok: true, note: '工具已打开，可在 App 里关闭' }
+      await sleep(400)
+    }
+    return { ok: false, note: `只开启 ${okCount}/4` }
   },
   /** 充能资讯 1 次 */
   async recharge({ api }) {
@@ -151,6 +159,10 @@ const ACTIONS = {
     const first = (rank?.data?.list || []).find((x) => x.iInfoId)
     if (!first) return { ok: false, note: '充能榜无可充能资讯' }
     return ok(api, await api.recharge_info(first.iInfoId, '1')) ? { ok: true } : { ok: false, note: '充能失败' }
+  },
+  /** 查看热门榜单（查看榜单类任务） */
+  async hotRank({ api }) {
+    return ok(api, await api.get_hot_rank()) ? { ok: true } : { ok: false, note: '热榜拉取失败' }
   },
 }
 
@@ -326,5 +338,111 @@ export async function runDailyTasks(api, roleId, { clearLikes = true, allowRefre
   out.refreshCount = Math.abs(Number(welfare?.data?.refreshCount ?? 0))
 
   if (clearLikes) out.likesCleared = await revokeTodayLikes(api, state)
+  return out
+}
+
+/* ============ 游戏手册 · 每周任务（只做不领） ============
+ * 接口：/game/getseasonpasstask（formal.api，表单 + 通用凭证即可，2026-10-23 实测通过）
+ * 结构：data.weekList[] { weekNo, isOpen, taskList[] { id,title,desc,progress,maxProgress,status,point } }
+ * status：0=未完成 1=已完成待领 2=已领。
+ * ⚠️ 用户要求：只推进任务，绝不调 /game/claimseasonpasspoints 领积分。
+ */
+
+/** 手册周任务的动作映射（按任务 id，历史赛季会复用同一批 id） */
+const WEEKLY_ACTIONS = {
+  34: (c) => ACTIONS.shareInfo(c),
+  55: (c) => repeat(c, 3, ACTIONS.shareMatch),
+  103: (c) => repeat(c, 3, ACTIONS.shareMatch),
+  59: (c) => repeat(c, 3, ACTIONS.shareInfo),
+  63: (c) => ACTIONS.shareAssets(c),
+  67: (c) => ACTIONS.shareReplay(c),
+  35: (c) => ACTIONS.shareWeekly(c),
+  62: (c) => ACTIONS.report(30, c),
+  1010: (c) => ACTIONS.report(30, c),
+  81: (c) => ACTIONS.hotRank(c),
+  65: (c) => ACTIONS.replay(c),
+  73: (c) => ACTIONS.replay(c),
+  66: (c) => ACTIONS.tool4(c),
+  1012: (c) => ACTIONS.likeInfo(c),
+  1013: (c) => ACTIONS.likeMoment(c),
+}
+
+/** 手册周任务里已知无法自动完成的 */
+const WEEKLY_CANNOT = {
+  53: '登录靠日常使用累计',
+  61: '登录靠日常使用累计',
+  69: '登录靠日常使用累计',
+  109: '需要真机使用小组件',
+  104: '需要真实绑定企微助手',
+  101: '需查看好友排行页（暂无对应接口）',
+  106: '需浏览找搭子页（暂无对应接口）',
+  71: '需浏览地铁战利品页（暂无对应接口）',
+  111: '需浏览地铁变卖物图鉴（暂无对应接口）',
+  72: '需浏览壁纸库（暂无对应接口）',
+}
+
+/** 把单次动作重复 N 次（分享类任务是计数口，跑满次数即进度走满） */
+async function repeat(ctx, n, action) {
+  let okCount = 0
+  for (let i = 0; i < n; i++) {
+    const r = await action(ctx)
+    if (r.ok) okCount++
+    await sleep(700)
+  }
+  return okCount === n ? { ok: true } : { ok: false, note: `成功 ${okCount}/${n}` }
+}
+
+/**
+ * 游戏手册每周任务：只做动作，不领取手册积分。
+ * @returns {Promise<{seasonID: string, weeks: Array, acted: number, waitClaim: string[], skipped: string[]}>}
+ */
+export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
+  const state = { likedInfo: [], likedMoment: [] }
+  const res = await api.get_season_pass_task(roleId)
+  const data = res?.data || {}
+  const out = { seasonID: String(data.seasonID || ''), weeks: [], acted: 0, waitClaim: [], skipped: [] }
+
+  for (const w of (data.weekList || []).slice(0, maxWeeks)) {
+    if (Number(w.isOpen) !== 1) continue
+    const rows = []
+    for (const t of w.taskList || []) {
+      const id = Number(t.id)
+      const st = Number(t.status)
+      const row = { id, title: t.title || `任务${id}`, progress: `${t.progress}/${t.maxProgress}`, status: 'done', note: '' }
+      if (st === 1) {
+        row.status = 'waitClaim'
+        row.note = '已完成，手册积分待手动领取'
+        out.waitClaim.push(t.title)
+        rows.push(row)
+        continue
+      }
+      if (st === 2) {
+        rows.push(row)
+        continue
+      }
+      const fn = WEEKLY_ACTIONS[id]
+      if (!fn) {
+        row.status = 'skip'
+        row.note = WEEKLY_CANNOT[id] || '暂不支持自动完成'
+        out.skipped.push(t.title)
+        rows.push(row)
+        continue
+      }
+      const r = await fn({ api, roleId, state })
+      row.status = r.ok ? 'acted' : 'fail'
+      row.note = r.note || ''
+      if (r.ok) out.acted++
+      rows.push(row)
+      await sleep(700)
+    }
+    out.weeks.push({ weekNo: w.weekNo, rows })
+  }
+  // 结束后再拉一次，把最新进度回填到行上（分享/浏览类计数是服务端异步确认的）
+  const after = await api.get_season_pass_task(roleId)
+  const progressById = new Map()
+  for (const w of after?.data?.weekList || []) {
+    for (const t of w.taskList || []) progressById.set(Number(t.id), `${t.progress}/${t.maxProgress} ${Number(t.status) === 2 ? '已领' : Number(t.status) === 1 ? '待领' : ''}`.trim())
+  }
+  for (const w of out.weeks) for (const r of w.rows) if (progressById.has(r.id)) r.progress = progressById.get(r.id)
   return out
 }
