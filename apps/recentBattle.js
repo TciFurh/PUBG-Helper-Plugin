@@ -110,7 +110,7 @@ export class RecentBattle extends plugin {
         return { label: it.k || '', num: sup ? `${num} ${sup}` : num }
       })
 
-      // 武器伤害：equipment.data.list = [{list:[weapon]}]
+      // 武器伤害：equipment.data.list = [{list:[weapon]}]，含命中部位分布
       const eqGroups = (d.dataList || []).find((x) => x.type === 'equipment')?.data?.list || []
       const weapons = []
       for (const g of eqGroups) {
@@ -121,20 +121,68 @@ export class RecentBattle extends plugin {
             damage: w.totaldamage ?? '—',
             hitRate: w.hitRate ?? '—',
             critRate: w.critRate ?? '—',
+            parts: [
+              { k: '头部', v: w.headRate ?? '0.0' },
+              { k: '躯干', v: w.bodyRate ?? '0.0' },
+              { k: '手部', v: w.handRate ?? '0.0' },
+              { k: '四肢', v: w.limbRate ?? '0.0' },
+              { k: '脚部', v: w.footRate ?? '0.0' },
+            ],
           })
           if (weapons.length >= 3) break
         }
         if (weapons.length >= 3) break
       }
 
-      // 我的淘汰
+      // 我的队伍：team.data.list = [成员]，infoList 为 [[{k,v:{v,bi}},...],...]
+      const teamList = (d.dataList || []).find((x) => x.type === 'team')?.data?.list || []
+      const team = teamList.map((m) => {
+        const info = {}
+        for (const group of m.infoList || []) {
+          for (const it of group) info[it.k] = it.v
+        }
+        return {
+          name: m.roleName || '',
+          avatar: m.roleIcon || '',
+          survivalTime: m.survivalTime || '',
+          isMvp: String(m.ismvp) === '1',
+          mvpIcon: m.mvpIcon || '',
+          evalText: val(info['评价']) ?? '—',
+          evalIcon: (info['评价'] && info['评价'].bi) || '',
+          kills: val(info['淘汰']) ?? '—',
+          assists: val(info['助攻']) ?? '—',
+          damage: val(info['伤害']) ?? '—',
+          rescue: val(info['救援']) ?? '—',
+        }
+      })
+      // 本人数据（用于 result-bar 补充 淘汰/助攻/伤害/救援）
+      const selfStat = team.find((m) => m.name === (camp.roleName || camp.nickName)) || team[0] || null
+
+      // 我的淘汰：kills.data.list，含武器伤害明细 damageStats.list
       const killsList = (d.dataList || []).find((x) => x.type === 'kills')?.data?.list || []
-      const kills = killsList.slice(0, 6).map((k) => ({
-        name: k.roleName || '未知玩家',
-        avatar: k.roleIcon || '',
-        desc: k.killDesc || '',
-        weapon: (k.damageStats?.list?.[0] && k.damageStats.list[0].itemName) || '',
-      }))
+      const kills = killsList.slice(0, 6).map((k) => {
+        const statList = (k.damageStats && k.damageStats.list) || []
+        const statWeapons = statList.slice(0, 3).map((sw) => {
+          const parts = []
+          for (const code in sw.partDamages || {}) parts.push(sw.partDamages[code])
+          const partTotal = parts.reduce((s, n) => s + Number(n || 0), 0)
+          return {
+            name: sw.itemName || '',
+            icon: sw.itemIcon || '',
+            damage: sw.healthDamage ?? '—',
+            distance: sw.hitDistance ?? '—',
+            vest: sw.vestDamage ?? 0,
+            partTotal,
+          }
+        })
+        return {
+          name: k.roleName || '未知玩家',
+          avatar: k.roleIcon || '',
+          desc: k.killDesc || '',
+          div: k.divName || '',
+          statWeapons,
+        }
+      })
 
       // 淘汰我的人
       const killerList = (d.dataList || []).find((x) => x.type === 'killer')?.data?.list || []
@@ -144,6 +192,28 @@ export class RecentBattle extends plugin {
         desc: k.killDesc || '',
         div: k.divName || '',
       }))
+
+      // 第一名队伍：top5.data.list = [每队{list:[成员]}...]，取第一名（下标0）
+      const top5List = (d.dataList || []).find((x) => x.type === 'top5')?.data?.list || []
+      const top1 = top5List[0]?.list || []
+      const top1Players = top1.slice(0, 4).map((m) => {
+        const info = {}
+        for (const group of m.infoList || []) {
+          for (const it of group) info[it.k] = it.v
+        }
+        return {
+          name: m.roleName || '',
+          avatar: m.roleIcon || '',
+          survivalTime: m.survivalTime || '',
+          isMvp: String(m.ismvp) === '1',
+          mvpIcon: m.mvpIcon || '',
+          evalIcon: (info['评价'] && info['评价'].bi) || '',
+          evalText: val(info['评价']) ?? '—',
+          kills: val(info['淘汰']) ?? '—',
+          assists: val(info['助攻']) ?? '—',
+          damage: val(info['伤害']) ?? '—',
+        }
+      })
 
       const image = await puppeteer.screenshot('battledetail', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battledetail.html',
@@ -159,11 +229,17 @@ export class RecentBattle extends plugin {
         survivalProc: d.survivalProc ?? '—',
         gradeIcon: d.ratingIcon || d.rankIcon || '',
         isMvp: Number(d.isMvp) === 1,
+        selfKills: selfStat ? selfStat.kills : '—',
+        selfAssists: selfStat ? selfStat.assists : '—',
+        selfDamage: selfStat ? selfStat.damage : '—',
+        selfRescue: selfStat ? selfStat.rescue : '—',
         fights,
         weapons,
+        team,
         kills,
         killTotal: killsList.length,
         killer,
+        top1Players,
         updateTime: new Date().toLocaleString('zh-CN', { hour12: false }),
         sys: { scale: `style=transform:scale(1.4)` },
       })

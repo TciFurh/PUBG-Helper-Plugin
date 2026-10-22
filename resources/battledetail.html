@@ -46,6 +46,10 @@
     .div-info { min-width: 0; flex: 1; }
     .div-info .d { font-size: 15px; font-weight: 600; }
     .div-info .s { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
+    .self-stats { display: flex; gap: 14px; margin-top: 8px; }
+    .self-stats .ss { text-align: center; min-width: 40px; }
+    .self-stats .ss .n { font-size: 15px; font-weight: 700; }
+    .self-stats .ss .l { font-size: 11px; color: #8e8e8e; }
     .surv { text-align: center; min-width: 100px; }
     .surv .s { font-size: 17px; font-weight: 700; }
     .surv .l { font-size: 12px; color: #8e8e8e; }
@@ -71,27 +75,64 @@
     .sec-title { font-size: 14px; font-weight: 700; color: #a8a8a8; margin: 16px 0 10px; display: flex; align-items: center; gap: 8px; }
     .sec-title .bar { width: 4px; height: 14px; background: #fafafa; border-radius: 2px; }
 
+    /* 武器卡 */
     .weapons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .weapon {
       background: #121212; border: 1px solid #262626; border-radius: 12px;
-      padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
     }
-    .weapon img { width: 42px; height: 42px; object-fit: contain; }
+    .weapon .top { display: flex; align-items: center; gap: 10px; }
+    .weapon img { width: 36px; height: 36px; object-fit: contain; }
     .weapon .wn { font-size: 14px; font-weight: 600; }
-    .weapon .wd { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
+    .weapon .wd { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
     .weapon .ws { margin-left: auto; text-align: right; }
-    .weapon .ws .n { font-size: 17px; font-weight: 700; }
+    .weapon .ws .n { font-size: 16px; font-weight: 700; }
     .weapon .ws .l { font-size: 11px; color: #8e8e8e; }
+    .weapon .parts {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 10px;
+      border-top: 1px solid #262626; padding-top: 8px;
+    }
+    .weapon .parts .p { text-align: center; }
+    .weapon .parts .p .n { font-size: 12px; font-weight: 600; }
+    .weapon .parts .p .l { font-size: 10px; color: #8e8e8e; margin-top: 1px; }
 
-    .killer-row {
+    /* 队伍行 */
+    .team-row {
       display: flex; align-items: center; gap: 12px;
       background: #121212; border: 1px solid #262626; border-radius: 12px;
       padding: 12px 16px; margin-bottom: 8px;
     }
+    .team-row img.avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+    .team-row .tn { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .team-row .ts { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
+    .team-row .mvp-tag { font-size: 10px; padding: 1px 7px; }
+    .team-row .stats { display: flex; gap: 12px; margin-left: auto; text-align: center; }
+    .team-row .stats .s { min-width: 38px; }
+    .team-row .stats .n { font-size: 14px; font-weight: 700; }
+    .team-row .stats .l { font-size: 10px; color: #8e8e8e; }
+    .team-row .eval { text-align: center; min-width: 46px; }
+    .team-row .eval img { height: 22px; object-fit: contain; }
+    .team-row .eval .t { font-size: 11px; color: #a8a8a8; margin-top: 1px; }
+
+    /* 淘汰行 */
+    .killer-row {
+      background: #121212; border: 1px solid #262626; border-radius: 12px;
+      padding: 12px 16px; margin-bottom: 8px;
+    }
+    .killer-row .main { display: flex; align-items: center; gap: 12px; }
     .killer-row img.avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
     .killer-row .kn { font-size: 14px; font-weight: 600; }
     .killer-row .kd { font-size: 12px; color: #8e8e8e; margin-top: 2px; }
     .killer-row .kdiv { font-size: 12px; color: #a8a8a8; white-space: nowrap; }
+    .killer-row .stat-weapons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .killer-row .stat-w {
+      display: flex; align-items: center; gap: 6px;
+      background: #1c1c1c; border: 1px solid #2a2a2a; border-radius: 8px;
+      padding: 5px 10px; font-size: 11px; color: #d4d4d4;
+    }
+    .killer-row .stat-w img { width: 18px; height: 18px; object-fit: contain; }
+    .killer-row .stat-w .hl { color: #fafafa; font-weight: 600; }
+    .killer-row .stat-w .dim { color: #8e8e8e; }
 
     .foot { font-size: 12px; color: #737373; margin-top: 14px; text-align: center; }
   </style>
@@ -123,6 +164,12 @@
     <div class="div-info">
       <div class="d">{{divName}}</div>
       <div class="s">巅峰战力 {{peakCombat}}</div>
+      <div class="self-stats">
+        <div class="ss"><div class="n">{{selfKills}}</div><div class="l">淘汰</div></div>
+        <div class="ss"><div class="n">{{selfAssists}}</div><div class="l">助攻</div></div>
+        <div class="ss"><div class="n">{{selfDamage}}</div><div class="l">伤害</div></div>
+        <div class="ss"><div class="n">{{selfRescue}}</div><div class="l">救援</div></div>
+      </div>
     </div>
     <div class="surv">
       <div class="s">{{survivalTime}}</div>
@@ -141,31 +188,73 @@
   </div>
 
   {{ if weapons.length }}
-  <div class="sec-title"><div class="bar"></div>武器伤害</div>
+  <div class="sec-title"><div class="bar"></div>本局枪械</div>
   <div class="weapons">
     {{ each weapons as w }}
     <div class="weapon">
-      <img src="{{w.icon}}" alt="" />
-      <div>
-        <div class="wn">{{w.name}}</div>
-        <div class="wd">命中率 {{w.hitRate}}% · 爆头率 {{w.critRate}}%</div>
+      <div class="top">
+        <img src="{{w.icon}}" alt="" />
+        <div>
+          <div class="wn">{{w.name}}</div>
+          <div class="wd">命中率 {{w.hitRate}}% · 爆头率 {{w.critRate}}%</div>
+        </div>
+        <div class="ws"><div class="n">{{w.damage}}</div><div class="l">伤害</div></div>
       </div>
-      <div class="ws"><div class="n">{{w.damage}}</div><div class="l">伤害</div></div>
+      <div class="parts">
+        {{ each w.parts as p }}
+        <div class="p"><div class="n">{{p.v}}%</div><div class="l">{{p.k}}</div></div>
+        {{ /each }}
+      </div>
     </div>
     {{ /each }}
   </div>
+  {{ /if }}
+
+  {{ if team.length }}
+  <div class="sec-title"><div class="bar"></div>我的队伍</div>
+  {{ each team as m }}
+  <div class="team-row">
+    <img class="avatar" src="{{m.avatar}}" alt="" />
+    <div style="flex:1;min-width:0">
+      <div class="tn">{{m.name}}{{ if m.isMvp }}<span class="mvp-tag">MVP</span>{{ /if }}</div>
+      <div class="ts">{{m.survivalTime}} 参赛</div>
+    </div>
+    <div class="eval">
+      {{ if m.evalIcon }}<img src="{{m.evalIcon}}" alt="" />{{ /if }}
+      <div class="t">{{m.evalText}}</div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="n">{{m.kills}}</div><div class="l">淘汰</div></div>
+      <div class="s"><div class="n">{{m.assists}}</div><div class="l">助攻</div></div>
+      <div class="s"><div class="n">{{m.damage}}</div><div class="l">伤害</div></div>
+      <div class="s"><div class="n">{{m.rescue}}</div><div class="l">救援</div></div>
+    </div>
+  </div>
+  {{ /each }}
   {{ /if }}
 
   {{ if kills.length }}
   <div class="sec-title"><div class="bar"></div>我的淘汰（{{killTotal}}）</div>
   {{ each kills as k }}
   <div class="killer-row">
-    <img class="avatar" src="{{k.avatar}}" alt="" />
-    <div style="flex:1;min-width:0">
-      <div class="kn">{{k.name}}</div>
-      <div class="kd">{{k.desc}}</div>
+    <div class="main">
+      <img class="avatar" src="{{k.avatar}}" alt="" />
+      <div style="flex:1;min-width:0">
+        <div class="kn">{{k.name}}</div>
+        <div class="kd">{{k.desc}}</div>
+      </div>
+      <div class="kdiv">{{k.div}}</div>
     </div>
-    <div class="kdiv">{{k.weapon}}</div>
+    {{ if k.statWeapons.length }}
+    <div class="stat-weapons">
+      {{ each k.statWeapons as sw }}
+      <div class="stat-w">
+        <img src="{{sw.icon}}" alt="" />
+        <span><span class="hl">{{sw.damage}}</span> 伤害{{ if sw.distance !== '—' }} · {{sw.distance}}米{{ /if }}{{ if sw.vest }} · 护甲{{sw.vest}}{{ /if }}{{ if sw.partTotal }} · 部位{{sw.partTotal}}{{ /if }}</span>
+      </div>
+      {{ /each }}
+    </div>
+    {{ /if }}
   </div>
   {{ /each }}
   {{ /if }}
@@ -174,12 +263,36 @@
   <div class="sec-title"><div class="bar"></div>淘汰我的人</div>
   {{ each killer as k }}
   <div class="killer-row">
-    <img class="avatar" src="{{k.avatar}}" alt="" />
-    <div style="flex:1;min-width:0">
-      <div class="kn">{{k.name}}</div>
-      <div class="kd">{{k.desc}}</div>
+    <div class="main">
+      <img class="avatar" src="{{k.avatar}}" alt="" />
+      <div style="flex:1;min-width:0">
+        <div class="kn">{{k.name}}</div>
+        <div class="kd">{{k.desc}}</div>
+      </div>
+      <div class="kdiv">{{k.div}}</div>
     </div>
-    <div class="kdiv">{{k.div}}</div>
+  </div>
+  {{ /each }}
+  {{ /if }}
+
+  {{ if top1Players.length }}
+  <div class="sec-title"><div class="bar"></div>第一名队伍</div>
+  {{ each top1Players as m }}
+  <div class="team-row">
+    <img class="avatar" src="{{m.avatar}}" alt="" />
+    <div style="flex:1;min-width:0">
+      <div class="tn">{{m.name}}{{ if m.isMvp }}<span class="mvp-tag">MVP</span>{{ /if }}</div>
+      <div class="ts">{{m.survivalTime}} 参赛</div>
+    </div>
+    <div class="eval">
+      {{ if m.evalIcon }}<img src="{{m.evalIcon}}" alt="" />{{ /if }}
+      <div class="t">{{m.evalText}}</div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="n">{{m.kills}}</div><div class="l">淘汰</div></div>
+      <div class="s"><div class="n">{{m.assists}}</div><div class="l">助攻</div></div>
+      <div class="s"><div class="n">{{m.damage}}</div><div class="l">伤害</div></div>
+    </div>
   </div>
   {{ /each }}
   {{ /if }}
