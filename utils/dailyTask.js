@@ -368,6 +368,37 @@ async function browseNews(ctx) {
   return repeat(ctx, need, (c) => ACTIONS.report(30, c))
 }
 
+/**
+ * 「在 App 里看某页面」类任务：照抄 App 内 DataReportManager 的真实参数上报停留时长。
+ * App 里的调用形如 reportModuleLogData(page, eventId, actionType, moduleId, subModuleId, seq)，
+ * 停留类统一是 eventId=100001（停留时长）、actionType=1，一批 12 条 × reportInterval=5 秒 = 1 分钟。
+ * 页面/模块号来自反编译（smali）里的常量，见 docs/DEVELOPMENT.md 的「页面埋点速查」。
+ */
+const PAGE_STAY_TEMPLATES = {
+  112: { page: 101044, moduleId: 1, subModuleId: 27 }, // 放映中心（实测：一轮 1 分钟，3 轮满）
+  71: { page: 104055, moduleId: 4, subModuleId: 27 },  // 地铁战利品页（按 App 参数复刻，未验证）
+  111: { page: 104065, moduleId: 4, subModuleId: 27 }, // 地铁变卖物图鉴（同上）
+}
+
+async function pageStay(ctx) {
+  const tpl = PAGE_STAY_TEMPLATES[Number(ctx.task?.id)]
+  if (!tpl) return { ok: false, note: '缺该页面的埋点参数' }
+  const need = Math.max(1, Number(ctx.task?.maxProgress || 1) - Number(ctx.task?.progress || 0))
+  return repeat(ctx, need, async (c) => {
+    const batch = Array.from({ length: 12 }, () => ({
+      page: tpl.page,
+      eventId: 100001,
+      actionType: 1,
+      moduleId: tpl.moduleId,
+      subModuleId: tpl.subModuleId,
+      reportInterval: 5,
+    }))
+    const r = await ok(c.api, await c.api.batch_module_report(batch))
+    await sleep(1200)
+    return r ? { ok: true } : { ok: false, note: '埋点上报失败' }
+  })
+}
+
 const WEEKLY_ACTIONS = {
   34: (c) => ACTIONS.shareInfo(c),
   55: (c) => repeat(c, 3, ACTIONS.shareMatch),
@@ -383,6 +414,9 @@ const WEEKLY_ACTIONS = {
   65: (c) => ACTIONS.replay(c),
   73: (c) => ACTIONS.replay(c),
   93: (c) => ACTIONS.replay(c),   // 查看战绩复盘：累计 3 天，一天只能 +1，交给每日定时任务慢慢涨
+  112: pageStay,   // 放映中心 3 分钟
+  71: pageStay,    // 地铁战利品页
+  111: pageStay,   // 地铁变卖物图鉴
   66: (c) => ACTIONS.tool4(c),
   1012: (c) => ACTIONS.likeInfo(c),
   1013: (c) => ACTIONS.likeMoment(c),
@@ -395,13 +429,10 @@ const WEEKLY_CANNOT = {
   69: '登录和平营地，靠日常使用累计',
   109: '需真机使用小组件（有 widgetslogreport 口，缺请求格式）',
   104: '需真实绑定企微助手',
-  101: '需在 App 点开好友排行榜（客户端埋点，无对应接口）',
-  106: '需在 App 点开找搭子首页（客户端埋点，无对应接口）',
-  71: '需在 App 点开地铁战利品页（客户端埋点，无对应接口）',
-  111: '需在 App 点开地铁变卖物图鉴（客户端埋点，无对应接口）',
-  72: '需在 App 打开壁纸库 H5（客户端埋点，无对应接口）',
-  112: '需在 App 看放映中心 3 分钟（客户端埋点，无对应接口）',
-  76: '需在 App 点开绿洲专区页（客户端埋点，无对应接口）',
+  101: '需在 App 点开好友排行榜（未找到该页埋点参数）',
+  106: '需在 App 点开找搭子首页（未找到该页埋点参数）',
+  72: '需在 App 打开壁纸库 H5（H5 埋点，无对应接口）',
+  76: '需在 App 点开绿洲专区页（试过 115004/115001 全部事件组合，进度不动）',
 }
 
 /** 把单次动作重复 N 次（分享类任务是计数口，跑满次数即进度走满） */

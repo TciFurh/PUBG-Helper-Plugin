@@ -203,6 +203,22 @@ const isSuper = d.isSuperBody === true
   这几个页面的 id 拿不到；用现有 3 套埋点模板（资讯/看直播/PEL）轮流投，112（放映中心）和 76（绿洲专区）都不动
 - 动作完成后**再拉一次列表**回填最新进度（分享/浏览类计数是服务端异步确认的）
 
+**页面埋点速查**（反编译 `com.tencent.gamehelper.statistics.DataReportManager` + 各页面调用点）
+
+App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subModuleId, seq, ext...)`，
+「停留时长」统一 `eventId=100001`、`actionType=1`，一批 12 条 × `reportInterval=5` 秒 = 1 分钟：
+
+| 页面 | page | moduleId | subModuleId | 说明 |
+|---|---|---|---|---|
+| 资讯详情 | 101004 | 1 | 27 | 实证：投一批 +1 分钟，5 批满（`#和平周任务` 的浏览资讯靠它） |
+| 放映中心 | 101044 | 1 | 27 | **实证有效**：3 批把「观看放映中心3分钟」从 0/3 推到 3/3 |
+| 地铁战利品页 | 104055 | 4 | 27 | 按 `SubwayAssetsActivity` 参数复刻，未验证（该周任务当时已完成） |
+| 地铁变卖物图鉴 | 104065 | 4 | 27 | 按 `SubwaySellActivity` 参数复刻（另有点击事件 200388 / action 2 / 4 / 33） |
+| 直播页 | 109002 | 9 | 1 | 观看直播任务（eventId 10901001） |
+| 绿洲专区 | 115004 | 15 | 33 | 点击事件 200160 / action 2 / 15 / 33；**实测各类组合都不推进 76 号任务**，需抓包 |
+
+`actionType`：1=停留/进入、2=点击、3=曝光、4=结果、5=PV。`PAGE_ID_*` 常量在 `DataReportManager` 里能查到全量。
+
 **新增资料查询接口**（`apps/campSocial.js`，全读操作）：
 
 | 指令 | 接口 | 说明 |
