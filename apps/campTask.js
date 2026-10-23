@@ -15,6 +15,7 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { runDailyTasks, runWeeklyTasks } from '../utils/dailyTask.js'
 import { getCamp } from '../utils/storage.js'
@@ -111,6 +112,69 @@ async function weeklyStatusText(api, roleName, roleId) {
   return lines.join('\n')
 }
 
+/** 图片卡里的状态符号（比 emoji 在不同字体下更稳） */
+const CHIP = { done: '✓', acted: '＋', skip: '—', fail: '✕', waitClaim: '🎁' }
+
+/** 每日任务 → 模板数据 */
+export function dailyRenderData(view, roleName, roleId) {
+  const pack = (rows) => (rows || []).map((r) => ({
+    name: r.name,
+    note: r.note || '',
+    status: r.status,
+    icon: CHIP[r.status] || '·',
+  }))
+  const score = pack(view.score)
+  const welfare = pack(view.welfare)
+  const doneCount = (rows) => rows.filter((r) => ['done', 'acted', 'waitClaim'].includes(r.status)).length
+  const rewards = view.rewards || []
+  return {
+    roleName,
+    roleId,
+    date: new Date().toLocaleDateString('zh-CN'),
+    score,
+    welfare,
+    scoreDone: doneCount(score),
+    scoreTotal: score.length,
+    welfareDone: doneCount(welfare),
+    welfareTotal: welfare.length,
+    rewardCount: rewards.length,
+    rewards,
+    rewardsText: rewards.join('、'),
+    liveness: view.liveness ?? '-',
+    rounds: view.rounds || 1,
+    welfareActed: view.welfareActed || 0,
+    refreshCount: view.refreshCount || 0,
+    likesCleared: view.likesCleared || 0,
+  }
+}
+
+/** 手册周任务 → 模板数据 */
+export function weeklyRenderData(view, roleName, roleId) {
+  const weeks = (view.weeks || []).map((w) => {
+    const rows = (w.rows || []).map((r) => ({ ...r, icon: CHIP[r.status] || '·' }))
+    const done = rows.filter((r) => ['done', 'waitClaim'].includes(r.status)).length
+    return {
+      no: w.weekNo,
+      rows,
+      done,
+      total: rows.length,
+      percent: rows.length ? Math.round((done / rows.length) * 100) : 0,
+    }
+  })
+  return {
+    roleName,
+    roleId,
+    season: view.seasonID || '?',
+    weeks,
+    total: weeks.reduce((n, w) => n + w.total, 0),
+    acted: view.acted || 0,
+    waitCount: (view.waitClaim || []).length,
+    waitNames: (view.waitClaim || []).join('、'),
+    skipCount: (view.skipped || []).length,
+    skipNames: (view.skipped || []).join('、'),
+  }
+}
+
 export class CampTask extends plugin {
   constructor() {
     super({
@@ -159,7 +223,15 @@ export class CampTask extends plugin {
       if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
 
       const view = await runDailyTasks(ctx.api, roleId)
-      await e.reply(describeView(view, ctx.camp.roleName || ctx.camp.nickName || roleId))
+      const roleName = ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId
+      try {
+        const image = await puppeteer.screenshot('dailyTasks', {
+          tplFile: 'plugins/PUBG-Helper-Plugin/resources/dailyTasks.html',
+          ...dailyRenderData(view, roleName, roleId),
+        })
+        if (image) return await e.reply(image)
+      } catch { /* 渲染失败回文本 */ }
+      await e.reply(describeView(view, roleName))
     } catch (err) {
       await e.reply('❌ 任务执行失败：' + (err.message || err))
     } finally {
@@ -173,7 +245,7 @@ export class CampTask extends plugin {
     if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
     try {
       const roleId = await ctx.api.get_self_role_id()
-      e.reply(await statusText(ctx.api, roleId, ctx.camp.roleName || ctx.camp.nickName || roleId))
+      e.reply(await statusText(ctx.api, roleId, ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId))
     } catch (err) {
       e.reply('❌ 状态查询失败：' + (err.message || err))
     }
@@ -190,7 +262,15 @@ export class CampTask extends plugin {
       const roleId = await ctx.api.get_self_role_id()
       if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
       const view = await runWeeklyTasks(ctx.api, roleId)
-      await e.reply(describeWeekly(view, ctx.camp.roleName || ctx.camp.nickName || roleId))
+      const roleName = ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId
+      try {
+        const image = await puppeteer.screenshot('weekly', {
+          tplFile: 'plugins/PUBG-Helper-Plugin/resources/weekly.html',
+          ...weeklyRenderData(view, roleName, roleId),
+        })
+        if (image) return await e.reply(image)
+      } catch { /* 渲染失败回文本 */ }
+      await e.reply(describeWeekly(view, roleName))
     } catch (err) {
       await e.reply('❌ 周任务执行失败：' + (err.message || err))
     } finally {
@@ -204,7 +284,7 @@ export class CampTask extends plugin {
     if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
     try {
       const roleId = await ctx.api.get_self_role_id()
-      e.reply(await weeklyStatusText(ctx.api, ctx.camp.roleName || ctx.camp.nickName || roleId, roleId))
+      e.reply(await weeklyStatusText(ctx.api, ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId, roleId))
     } catch (err) {
       e.reply('❌ 状态查询失败：' + (err.message || err))
     }
@@ -241,7 +321,7 @@ export class CampTask extends plugin {
       for (const camp of camps) {
         const api = new ApiService()
         api.useCamp(camp)
-        const who = camp.roleName || camp.nickName || camp.userId
+        const who = camp.nickname || camp.roleName || camp.userName || camp.userId
         try {
           const roleId = await api.get_self_role_id()
           const view = await runDailyTasks(api, roleId)

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>营地账号</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; zoom: 2.0;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #000; color: #fafafa; padding: 26px 28px;
+  }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
+    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .head .title { font-size: 20px; font-weight: 700; }
+  .head .sub { font-size: 11px; color: #737373; margin-top: 2px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 12px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
+    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
+  }
+
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .acc {
+    display: flex; align-items: center; gap: 14px;
+    background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 16px 18px;
+  }
+  .acc.cur { border-color: #3f3f3f; background: #151515; }
+  .acc .no {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; background: #1c1c1c; border: 1px solid #2a2a2a; color: #a3a3a3;
+  }
+  .acc.cur .no { background: #14351f; border-color: #1e5132; color: #4ade80; }
+  .acc .main { flex: 1; min-width: 0; }
+  .acc .line1 { display: flex; align-items: center; gap: 8px; }
+  .acc .nm { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acc .pf {
+    font-size: 10px; font-weight: 600; color: #a3a3a3; background: #1c1c1c;
+    border: 1px solid #2a2a2a; border-radius: 999px; padding: 2px 8px; flex-shrink: 0;
+  }
+  .acc .cur-tag {
+    font-size: 10px; font-weight: 700; color: #4ade80; background: #14351f;
+    border: 1px solid #1e5132; border-radius: 999px; padding: 2px 8px; flex-shrink: 0;
+  }
+  .acc .line2 { font-size: 11px; color: #8e8e8e; margin-top: 6px; }
+  .acc .line2 b { color: #d4d4d4; font-weight: 600; }
+  .acc .right { text-align: right; flex-shrink: 0; }
+  .acc .right .k { font-size: 10px; color: #737373; }
+  .acc .right .v { font-size: 12px; color: #a3a3a3; margin-top: 3px; font-weight: 600; }
+
+  .foot { margin-top: 14px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
+  .foot .l { font-size: 11.5px; color: #8e8e8e; line-height: 1.9; }
+  .foot .l b { color: #d4d4d4; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">🔐</div>
+    <div>
+      <div class="title">营地账号</div>
+      <div class="sub">一个 QQ 号可绑多个营地账号 · 扫码会自动绑定对应角色</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tag">共 {{ total }} 个</div>
+  </div>
+
+  <div class="list">
+    {{ each camps c }}
+    <div class="acc {{ if c.isCurrent }}cur{{ /if }}">
+      <div class="no">{{ c.no }}</div>
+      <div class="main">
+        <div class="line1">
+          <span class="nm">{{ c.name }}</span>
+          <span class="pf">{{ c.platform }}</span>
+          {{ if c.isCurrent }}<span class="cur-tag">当前</span>{{ /if }}
+        </div>
+        <div class="line2">
+          角色ID <b>{{ c.roleId }}</b> · token <b>{{ c.tokenTail }}</b>
+        </div>
+      </div>
+      <div class="right">
+        <div class="k">更新于</div>
+        <div class="v">{{ c.updatedAt }}</div>
+      </div>
+    </div>
+    {{ /each }}
+  </div>
+
+  <div class="foot">
+    <div class="l">
+      切换：<b>#切换和平账号 &lt;序号&gt;</b> · 删除：<b>#删除和平账号 &lt;序号&gt;</b><br>
+      新增：<b>#和平微信登录</b> / <b>#和平QQ登录</b> / <b>#提交和平</b>，登录后角色ID 自动绑定<br>
+      显示「未解析」的是老数据，<b>#切换和平账号</b> 一下就会自动补齐角色ID
+    </div>
+  </div>
+</body>
+</html>

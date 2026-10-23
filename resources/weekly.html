@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>手册周任务</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; zoom: 2.0;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #000; color: #fafafa; padding: 26px 28px;
+  }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
+    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .head .title { font-size: 20px; font-weight: 700; }
+  .head .sub { font-size: 11px; color: #737373; margin-top: 2px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 12px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
+    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
+  }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: #121212; border: 1px solid #262626; border-radius: 14px; padding: 14px 16px; }
+  .stat .n { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .stat .l { font-size: 11px; color: #8e8e8e; margin-top: 5px; }
+  .stat.acted .n { color: #4ade80; }
+  .stat.wait .n { color: #fbbf24; }
+  .stat.skip .n { color: #8e8e8e; }
+
+  .week { background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 16px 18px; margin-bottom: 10px; }
+  .week .wt { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .week .wt .wn { font-size: 14px; font-weight: 700; }
+  .week .wt .bar { flex: 1; height: 4px; border-radius: 999px; background: #1f1f1f; overflow: hidden; }
+  .week .wt .bar i { display: block; height: 100%; background: #d4d4d4; border-radius: 999px; }
+  .week .wt .prog { font-size: 11px; color: #8e8e8e; }
+
+  .row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-top: 1px solid #1c1c1c; }
+  .row:first-of-type { border-top: none; }
+  .row .ic {
+    width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+  }
+  .row .body { flex: 1; min-width: 0; }
+  .row .t { font-size: 13px; font-weight: 600; color: #e5e5e5; }
+  .row .n { font-size: 10.5px; color: #737373; margin-top: 3px; line-height: 1.4; }
+  .row .p { font-size: 11px; color: #a3a3a3; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 999px; padding: 3px 10px; flex-shrink: 0; }
+
+  .st-done .ic { background: #14351f; color: #4ade80; }
+  .st-acted .ic { background: #0f2f4a; color: #60a5fa; }
+  .st-waitClaim .ic { background: #3a2c0c; color: #fbbf24; }
+  .st-skip .ic { background: #1c1c1c; color: #737373; }
+  .st-fail .ic { background: #3a1414; color: #f87171; }
+
+  .foot { margin-top: 14px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
+  .foot .l { font-size: 11.5px; color: #8e8e8e; line-height: 1.9; }
+  .foot .l b { color: #d4d4d4; font-weight: 600; }
+  .foot .hl { color: #fbbf24; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">📘</div>
+    <div>
+      <div class="title">游戏手册 · 每周任务</div>
+      <div class="sub">{{ roleName }} · {{ roleId }}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tag">SEASON {{ season }}</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">{{ total }}</div><div class="l">本周任务总数</div></div>
+    <div class="stat acted"><div class="n">{{ acted }}</div><div class="l">本次自动完成</div></div>
+    <div class="stat wait"><div class="n">{{ waitCount }}</div><div class="l">待领积分</div></div>
+    <div class="stat skip"><div class="n">{{ skipCount }}</div><div class="l">需手动</div></div>
+  </div>
+
+  {{ each weeks w }}
+  <div class="week">
+    <div class="wt">
+      <div class="wn">第 {{ w.no }} 周</div>
+      <div class="bar"><i style="width: {{ w.percent }}%"></i></div>
+      <div class="prog">{{ w.done }}/{{ w.total }}</div>
+    </div>
+    {{ each w.rows r }}
+    <div class="row st-{{ r.status }}">
+      <div class="ic">{{ r.icon }}</div>
+      <div class="body">
+        <div class="t">{{ r.title }}</div>
+        {{ if r.note }}<div class="n">{{ r.note }}</div>{{ /if }}
+      </div>
+      <div class="p">{{ r.progress }}</div>
+    </div>
+    {{ /each }}
+  </div>
+  {{ /each }}
+
+  <div class="foot">
+    <div class="l">
+      {{ if waitCount }}<span class="hl">🎁 {{ waitCount }} 项已完成待领积分</span>：{{ waitNames }}<br>按你的要求<b>只做不领</b>，去营地 App 手册页手动领取<br>{{ /if }}
+      {{ if skipCount }}⏭ 需在 App 里手动完成：{{ skipNames }}{{ /if }}
+      {{ if !waitCount && !skipCount }}✅ 本周可自动化的任务都已完成{{ /if }}
+    </div>
+  </div>
+</body>
+</html>

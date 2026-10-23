@@ -7,6 +7,7 @@
  * - `#和平在线好友` —— 游戏好友在线状态
  * - `#和平赛事`     —— 官方赛事列表（PEL/PSI 等）
  */
+import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp } from '../utils/storage.js'
 
@@ -45,11 +46,35 @@ export class CampSocial extends plugin {
     if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
     try {
       const res = await ctx.api.get_user_coins()
-      const coins = res?.data?.coins || []
-      if (!coins.length) return e.reply('暂无营地币数据')
-      const lines = [`💰 ${ctx.camp.roleName || ctx.camp.nickName || ''} 的营地资产`]
-      for (const c of coins) lines.push(`· ${c.name || '未知货币'}：${Number(c.num).toLocaleString('en-US')}`)
-      lines.push('', '福利币来自每日签到与营地任务（#和平任务）')
+      const raw = res?.data?.coins || []
+      if (!raw.length) return e.reply('暂无营地币数据')
+      const roleName = ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || '我'
+      const roleId = ctx.camp.roleId || ''
+      const coins = raw.map((c) => {
+        const num = Number(c.num) || 0
+        const name = c.name || '未知货币'
+        return {
+          name,
+          num,
+          numFmt: num.toLocaleString('en-US'),
+          initial: name.slice(0, 1),
+          main: /福利币/.test(name),
+        }
+      })
+      let image = null
+      try {
+        image = await puppeteer.screenshot('coins', {
+          tplFile: 'plugins/PUBG-Helper-Plugin/resources/coins.html',
+          roleName,
+          roleId,
+          date: new Date().toLocaleDateString('zh-CN'),
+          coins,
+        })
+      } catch { /* 渲染失败回文本 */ }
+      if (image) return e.reply(image)
+      // 兜底：渲染失败回文本
+      const lines = [`💰 ${roleName} 的营地资产`]
+      for (const c of coins) lines.push(`· ${c.name}：${c.numFmt}`)
       e.reply(lines.join('\n'))
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))

@@ -1,3 +1,4 @@
+import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import {
 	getUserInfo, formatIdList,
 	listCamps, formatCampList, switchCamp, removeCampAt, bindRole, switchRole, removeRole,
@@ -93,6 +94,26 @@ export class AccountManager extends plugin {
 		if (!camps.length) {
 			return e.reply('还没有绑定营地账号。\n可用 #和平微信登录 / #和平QQ登录 扫码，或 #提交和平 粘贴凭证，登录后角色ID会自动绑定。')
 		}
+		const platformMap = { wechat: '微信', qq: 'QQ', cookie: '凭证' }
+		const data = {
+			total: camps.length,
+			camps: camps.map((c, i) => ({
+				no: i + 1,
+				name: c.nickname || c.userName || c.userId || '未知账号',
+				platform: platformMap[c.platform] || platformMap[c.loginPlatform] || '未知',
+				roleId: c.roleId || '未解析',
+				tokenTail: maskToken(c.token),
+				updatedAt: new Date(c.updatedAt || Date.now()).toLocaleDateString('zh-CN'),
+				isCurrent: i === info.currentCamp,
+			})),
+		}
+		try {
+			const image = await puppeteer.screenshot('camps', {
+				tplFile: 'plugins/PUBG-Helper-Plugin/resources/camps.html',
+				...data,
+			})
+			if (image) return e.reply(image)
+		} catch { /* 渲染失败回文本 */ }
 		const cur = camps[info.currentCamp] || camps[0]
 		return e.reply([
 			segment.at(userId), '\n',

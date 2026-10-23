@@ -267,6 +267,12 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
 
 以下改动为本仓库相对上游插件的增强：
 
+- **卡片化输出**（2026-10-24）：`#和平任务` / `#和平周任务` / `#和平营地币` / `#和平账号` / `#和平签到` 全部改成图片
+  - 模板：`resources/dailyTasks.html` / `weekly.html` / `coins.html` / `camps.html`，`signin.html` 重写
+  - 数据构造：`apps/campTask.js` 的 `dailyRenderData` / `weeklyRenderData`（已导出，便于预览脚本复用）
+  - 渲染失败一律回落到原来的文本，不会因为出图挂掉整条指令
+  - 预览：`node docs/tools/pubg_card_preview.mjs [weekly camps ...]` → `D:\jiuli\temp_preview\card-*.png`
+  - 签到卡除了状态，还会显示福利币 / 装饰碎片 / 活跃度 / 今日积分任务进度（`get_act_dailysigninmonthly` 成功时只回 `data:true`，所以详情全靠 `get_user_coins` + `get_score_tasklist` 补）
 - **扫码登录**：`utils/wxQrLogin.js` 实现微信扫码登录，营地客户端版本号（`cClientVersionCode` / `cClientVersionName`）从 APK 解包取真实值修正，解决「此版本已停用」报错
 - **QQ 扫码登录**（`apps/qqLogin.js` + `utils/qqPageLogin.js`）：QQ 网页授权（m_authorize）+ 营地 `/user/login(qqconnect)` 换凭证，支持 `#设置QQ` 指定账号，扫码成功自动保存凭证
 - **资产与签到**（`apps/assetAndSign.js` + `apps/extractCred.js`）：营地仓库分类资产查询、每日签到；签到修复 `roleId` 被公共参数覆盖导致 `-71005` 的问题

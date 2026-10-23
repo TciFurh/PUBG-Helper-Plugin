@@ -87,7 +87,7 @@ export class AssetAndSign extends plugin {
               totalCount: section.count,
               pageIndex: i + 1,
               pageTotal: pageList.length,
-              roleName: camp.roleName || camp.nickName || roleId,
+              roleName: camp.nickname || camp.roleName || camp.userName || roleId,
               updated,
             })
             if (image) images.push(image)
@@ -131,27 +131,67 @@ export class AssetAndSign extends plugin {
       const res = await apiService.get_act_dailysigninmonthly(roleId)
       const code = res.returnCode
 
-      let status, color
+      let tone = 'ok'
+      let emoji = '✅'
+      let status = '签到成功'
+      let note = '奖励已入账，明天 00:00 后再来'
       if (code === 0) {
-        status = '✅ 签到成功'
-        color = '#4caf50'
+        // 成功
       } else if (code === -71003) {
-        status = '已签到过（今天无需重复）'
-        color = '#8a8a8a'
+        tone = 'warn'
+        emoji = '📅'
+        status = '今天已经签过到了'
+        note = '每天只能签一次，明天 00:00 刷新'
       } else {
-        status = '签到失败：' + (res.returnMsg || '未知错误')
-        color = '#e53935'
+        tone = 'err'
+        emoji = '⚠️'
+        status = '签到失败'
+        note = res.returnMsg || '未知错误，稍后再试'
       }
 
-      const image = await puppeteer.screenshot('signin', {
-        tplFile: 'plugins/PUBG-Helper-Plugin/resources/signin.html',
-        status,
-        color,
-        roleName: camp.roleName || camp.nickName || roleId,
-        roleId,
-        date: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      // 附加信息：资产 + 活跃度 + 今日任务（任一失败都不影响签到结果展示）
+      const [coinsRes, scoreRes] = await Promise.all([
+        apiService.get_user_coins().catch(() => null),
+        apiService.get_score_tasklist(roleId).catch(() => null),
+      ])
+      const coins = (coinsRes?.data?.coins || []).map((c) => {
+        const num = Number(c.num) || 0
+        const name = c.name || '未知货币'
+        return {
+          name,
+          numFmt: num.toLocaleString('en-US'),
+          initial: name.slice(0, 1),
+          main: /福利币/.test(name),
+        }
       })
-      e.reply(image)
+      const findCoin = (re) => coins.find((c) => re.test(c.name))?.numFmt || '-'
+      const lv = scoreRes?.data?.liveness || {}
+      const liveness = lv.current != null ? `${lv.current}/${lv.total ?? 100}` : '-'
+      const taskList = scoreRes?.data?.taskList || []
+      const taskDone = taskList.filter((t) => Number(t.status) !== 0).length
+      const todayTasks = taskList.length ? `${taskDone}/${taskList.length}` : '-'
+
+      let image = null
+      try {
+        image = await puppeteer.screenshot('signin', {
+          tplFile: 'plugins/PUBG-Helper-Plugin/resources/signin.html',
+          tone,
+          emoji,
+          status,
+          note,
+          roleName: camp.nickname || camp.roleName || camp.userName || roleId,
+          roleId,
+          dateText: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+          fulibi: findCoin(/福利币/),
+          fragment: findCoin(/碎片/),
+          liveness,
+          todayTasks,
+          coins,
+        })
+      } catch { /* 渲染失败回文本 */ }
+      if (image) return e.reply(image)
+      // 兜底纯文本
+      e.reply([status, note, `福利币：${findCoin(/福利币/)}`, `活跃度：${liveness}`].join('\n'))
     } catch (err) {
       e.reply('❌ 签到失败：' + (err.message || err))
     }

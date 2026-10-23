@@ -1,44 +1,121 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
+<title>每日签到</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: #000000;
-    width: 1320px;
-    padding: 40px;
+    width: 1080px; zoom: 2.0;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #000; color: #fafafa; padding: 26px 28px;
   }
-  .card {
-    width: 1240px;
-    background: #121212;
-    border: 1px solid #262626;
-    border-radius: 32px;
-    padding: 44px;
-    text-align: center;
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
+    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 20px;
   }
-  .title { font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: 2px; margin-bottom: 34px; }
-  .status {
-    font-size: 42px;
-    font-weight: 700;
-    color: {{ color }};
-    padding: 30px 40px;
-    border: 1px solid #262626;
-    border-radius: 20px;
-    background: #1a1a1a;
-    margin-bottom: 26px;
+  .head .title { font-size: 20px; font-weight: 700; }
+  .head .sub { font-size: 11px; color: #737373; margin-top: 2px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 12px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
+    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
   }
-  .role { font-size: 24px; color: #b8b8b8; margin-bottom: 10px; }
-  .meta { font-size: 22px; color: #8a8a8a; }
+
+  .banner {
+    border-radius: 18px; padding: 22px 24px; margin-bottom: 14px;
+    background: #121212; border: 1px solid #262626;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .banner.ok { border-color: #1e5132; background: linear-gradient(180deg, #12251a 0%, #121212 100%); }
+  .banner.warn { border-color: #4a3a12; background: linear-gradient(180deg, #241d0d 0%, #121212 100%); }
+  .banner.err { border-color: #4a1a1a; background: linear-gradient(180deg, #250f0f 0%, #121212 100%); }
+  .banner .em { font-size: 34px; }
+  .banner .txt .s { font-size: 22px; font-weight: 700; }
+  .banner.ok .txt .s { color: #4ade80; }
+  .banner.warn .txt .s { color: #fbbf24; }
+  .banner.err .txt .s { color: #f87171; }
+  .banner .txt .d { font-size: 11.5px; color: #8e8e8e; margin-top: 6px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: #121212; border: 1px solid #262626; border-radius: 14px; padding: 14px 16px; }
+  .stat .n { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .stat .l { font-size: 11px; color: #8e8e8e; margin-top: 5px; }
+  .stat.hl .n { color: #fbbf24; }
+  .stat.good .n { color: #4ade80; }
+
+  .sec { background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 16px 18px; }
+  .sec .st { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .sec .st .t { font-size: 14px; font-weight: 700; }
+  .sec .st .c { font-size: 11px; color: #8e8e8e; margin-left: auto; }
+  .sec .st .dot { width: 6px; height: 6px; border-radius: 50%; background: #d4d4d4; }
+
+  .coins { display: flex; flex-wrap: wrap; gap: 10px; }
+  .coin {
+    display: flex; align-items: center; gap: 10px; background: #161616; border: 1px solid #242424;
+    border-radius: 12px; padding: 10px 14px; min-width: 220px;
+  }
+  .coin .b {
+    width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; background: #1f1f1f; border: 1px solid #2c2c2c; color: #d4d4d4;
+  }
+  .coin.main .b { background: #2a2210; border-color: #4a3a12; color: #fbbf24; }
+  .coin .nm { font-size: 10.5px; color: #8e8e8e; }
+  .coin .num { font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .coin.main .num { color: #fbbf24; }
+
+  .foot { margin-top: 12px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
+  .foot .l { font-size: 11.5px; color: #8e8e8e; line-height: 1.9; }
+  .foot .l b { color: #d4d4d4; font-weight: 600; }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="title">每日签到</div>
-  <div class="status">{{ status }}</div>
-  <div class="role">{{ roleName }} · {{ roleId }}</div>
-  <div class="meta">{{ date }}</div>
-</div>
+  <div class="head">
+    <div class="logo">📅</div>
+    <div>
+      <div class="title">每日签到</div>
+      <div class="sub">{{ roleName }} · {{ roleId }}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tag">{{ dateText }}</div>
+  </div>
+
+  <div class="banner {{ tone }}">
+    <div class="em">{{ emoji }}</div>
+    <div class="txt">
+      <div class="s">{{ status }}</div>
+      <div class="d">{{ note }}</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat hl"><div class="n">{{ fulibi }}</div><div class="l">福利币余额</div></div>
+    <div class="stat"><div class="n">{{ fragment }}</div><div class="l">营地装饰碎片</div></div>
+    <div class="stat good"><div class="n">{{ liveness }}</div><div class="l">当前活跃度</div></div>
+    <div class="stat"><div class="n">{{ todayTasks }}</div><div class="l">今日积分任务</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="st"><span class="dot"></span><span class="t">当前资产</span><span class="c">签到奖励直接入账，可在营地兑换商城使用</span></div>
+    <div class="coins">
+      {{ each coins c }}
+      <div class="coin {{ if c.main }}main{{ /if }}">
+        <div class="b">{{ c.initial }}</div>
+        <div>
+          <div class="nm">{{ c.name }}</div>
+          <div class="num">{{ c.numFmt }}</div>
+        </div>
+      </div>
+      {{ /each }}
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="l">
+      📌 签到每天一次，<b>跨天 00:00 刷新</b>；积分任务在 <b>#和平任务</b> 里能自动做完<br>
+      想看完整资产发 <b>#和平营地币</b>，想攒福利币就每天跑一次 <b>#和平任务</b>
+    </div>
+  </div>
 </body>
 </html>
