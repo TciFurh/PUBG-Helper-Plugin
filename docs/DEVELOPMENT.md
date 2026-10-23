@@ -157,6 +157,7 @@ const isSuper = d.isSuperBody === true
 | `formal.api.gp.qq.com/user/addlike` / `moment/like` | 点赞与取消（1=赞 0=取消） |
 | `formal.api.gp.qq.com/play/gametoolchange` | 开关对局工具 |
 | `formal.api.gp.qq.com/game/recharge` | 资讯充能 |
+| `formal.api.gp.qq.com/game/gethotrank` | 营地热榜（「查看热门榜单」任务；`data.list` 100 条，带封面/作者/时长） |
 
 **状态机**（实测 2026-10-23）：
 
@@ -170,6 +171,9 @@ const isSuper = d.isSuperBody === true
 - 王者营地（kohcamp.qq.com）同族接口要求 `gameId` 在 body 和 header 各一份；和平营地不需要
 - 分享任务为什么能「按了就算」：客户端分享服务端收不到回调，服务端只认 `sharecallback` 这个口
 - 撤赞只撤**本次为任务点的**（记录 iInfoId/momentId 再逐个取消），`/user/likerecords` 全量取消会动用户的历史点赞
+- **动作抛异常会中断整轮**：积分/福利/周任务三类循环统一走 `runAction(fn, ctx)` 包裹，
+  异常一律降级成 `{ ok:false, note:'执行异常：…' }`。2026-10-24 修的坑——当时 `hotRank` 调的
+  `api.get_hot_rank()` 根本没实现，TypeError 直接炸掉整轮（含进度回填），外面只看到一句「执行失败」
 
 **刷新机制**（实测 2026-10-23）：
 

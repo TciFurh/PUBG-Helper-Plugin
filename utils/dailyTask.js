@@ -53,6 +53,19 @@ async function ok(api, p) {
   return p && Number(p.returnCode) === 0 ? p : null
 }
 
+/**
+ * 执行单个任务动作：任何异常（接口没实现、网络抖动、字段变了）都收敛成
+ * { ok:false, note }，避免一条任务把整轮任务炸掉、后面的任务和进度回填全丢。
+ */
+async function runAction(fn, ctx) {
+  try {
+    const r = await fn(ctx)
+    return r && typeof r === 'object' ? r : { ok: false, note: '动作无返回' }
+  } catch (err) {
+    return { ok: false, note: '执行异常：' + (err?.message || err) }
+  }
+}
+
 /** 动作实现。都返回 { ok, note }；失败不抛异常，由调用方汇总。 */
 const ACTIONS = {
   async shareInfo({ api }) {
@@ -209,7 +222,7 @@ async function actScoreTasks(api, roleId, state, score) {
       rows.push({ id, name, status: 'skip', note: CANNOT_AUTO[id] || '暂不支持自动完成' })
       continue
     }
-    const r = await fn({ api, roleId, state })
+    const r = await runAction(fn, { api, roleId, state })
     rows.push({ id, name, status: r.ok ? 'acted' : 'fail', note: r.note || '' })
     await sleep(600)
   }
@@ -233,7 +246,7 @@ async function actWelfareTasks(api, roleId, state, welfare) {
       rows.push({ id, index: t.index, name, status: 'skip', note: CANNOT_AUTO[id] || '暂不支持自动完成' })
       continue
     }
-    const r = await fn({ api, roleId, state })
+    const r = await runAction(fn, { api, roleId, state })
     rows.push({ id, index: t.index, name, status: r.ok ? 'acted' : 'fail', note: r.note || '' })
     await sleep(600)
   }
@@ -428,7 +441,7 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
         rows.push(row)
         continue
       }
-      const r = await fn({ api, roleId, state })
+      const r = await runAction(fn, { api, roleId, state })
       row.status = r.ok ? 'acted' : 'fail'
       row.note = r.note || ''
       if (r.ok) out.acted++

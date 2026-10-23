@@ -40,6 +40,7 @@ class ApiService {
             gametoolchange: '/play/gametoolchange',
             sharecallback: '/user/sharecallback',
             getrechargerank: '/game/getrechargerank',
+            gethotrank: '/game/gethotrank',
             recharge: '/game/recharge',
             getstationhome: '/game/getstationhome',
             getseasonpasstask: '/game/getseasonpasstask',
@@ -636,6 +637,11 @@ class ApiService {
     /** 充能排行榜（充能任务从这取可充能的资讯） */
     async get_recharge_rank() {
         return this._postForm(this.main + this.baseUrl.getrechargerank, {})
+    }
+
+    /** 营地热榜（「查看热门榜单」类任务用；返回 result/returnCode/returnMsg + data.list[]） */
+    async get_hot_rank() {
+        return this._postForm(this.main + this.baseUrl.gethotrank, {})
     }
 
     /** 给资讯充能 */
