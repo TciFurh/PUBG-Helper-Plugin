@@ -2,6 +2,7 @@ import { getBot } from 'jiuli'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createWxLoginSession, waitForWxLogin } from '../utils/wxQrLogin.js'
 import { getCamp, saveCamp, maskToken } from '../utils/storage.js'
+import { saveCampAndBind } from '../utils/accounts.js'
 
 export class WxLogin extends plugin {
     constructor() {
@@ -24,10 +25,13 @@ export class WxLogin extends plugin {
         if (this._session && Date.now() < this._session.expiresAt) {
             return e.reply('已有微信扫码会话进行中，请先完成扫码，或发送 #和平微信登录取消')
         }
-        // 已有营地凭证（无论QQ还是微信登录的）必须加强制才能覆盖
+        // 多账号：不同账号扫码会自动追加；扫到同一个账号则更新它的 token，不再强制拦截
         const camp = getCamp(e.user_id)
-        if (camp && !/强制/.test(String(e.msg))) {
-            return e.reply('当前已有营地凭证（token: ' + maskToken(camp.token) + '），覆盖请发送 #和平微信登录强制')
+        if (camp) {
+            await e.reply(
+                `当前已有 ${getCamp(e.user_id) ? '营地账号' : ''}（token: ${maskToken(camp.token)}），` +
+                '若扫的是同一个账号会更新凭证，是另一个账号则自动新增并绑定其角色ID。'
+            )
         }
         try {
             const session = await createWxLoginSession()
@@ -65,12 +69,14 @@ export class WxLogin extends plugin {
                 }
             })
             this._session = null
-            saveCamp(e.user_id, camp)
-            const saved = getCamp(e.user_id)
+            const r = await saveCampAndBind(e.user_id, camp)
+            const saved = r.camp
             await this._notify(e, [
                 '✅ 和平营地微信扫码登录成功',
-                `营地ID: ${saved.userId}`,
+                `营地账号: ${saved.userId}`,
                 `账号: ${camp.userName || camp.nickname || camp.uin || '未知'}`,
+                r.bound ? `已自动绑定角色: ${r.roleId}` : '⚠️ 角色ID没解析出来，可手动 #绑定和平 <ID>',
+                `当前账号数: ${r.total}（#和平账号 查看 / #切换和平账号 切换）`,
                 `token: ${maskToken(saved.token)}`,
                 '现在可以使用个人凭证查询了。'
             ].join('\n'))

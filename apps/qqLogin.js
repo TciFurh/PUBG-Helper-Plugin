@@ -5,6 +5,7 @@ import { getBot } from 'jiuli'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createQQLoginSession, waitForQQLogin } from '../utils/qqPageLogin.js'
 import { getCamp, saveCamp, maskToken, getUserInfo, saveUserInfo } from '../utils/storage.js'
+import { saveCampAndBind } from '../utils/accounts.js'
 
 export class QqLogin extends plugin {
   constructor() {
@@ -44,8 +45,10 @@ export class QqLogin extends plugin {
     }
 
     const camp = getCamp(e.user_id)
-    if (camp && !/强制/.test(String(e.msg))) {
-      return e.reply('当前已有营地凭证（token: ' + maskToken(camp.token) + '），覆盖请发送 #和平QQ登录强制')
+    if (camp) {
+      await e.reply(
+        `当前已有营地账号（token: ${maskToken(camp.token)}），扫同一账号会更新凭证，扫另一个账号会自动新增并绑定其角色ID。`
+      )
     }
 
     const { info } = getUserInfo(e.user_id)
@@ -95,18 +98,23 @@ export class QqLogin extends plugin {
         },
       })
       this._session = null
-      saveCamp(e.user_id, {
+      const r = await saveCampAndBind(e.user_id, {
         openId: camp.openId,
         gameOpenId: camp.gameOpenId,
         userId: camp.userId,
         token: camp.token,
         seasonId: '0',
+        userName: camp.userName,
+        uin: camp.uin || session.uin,
+        platform: 'qq',
       })
       await this._notify(e, [
         '✅ 和平营地 QQ 扫码登录成功',
-        `营地ID: ${camp.userId}`,
+        `营地账号: ${camp.userId}`,
         `昵称: ${camp.userName || '-'}`,
         `QQ号: ${camp.uin || session.uin}`,
+        r.bound ? `已自动绑定角色: ${r.roleId}` : '⚠️ 角色ID没解析出来，可手动 #绑定和平 <ID>',
+        `当前账号数: ${r.total}（#和平账号 查看 / #切换和平账号 切换）`,
         `token: ${maskToken(camp.token)}`,
         '现在可以使用个人凭证功能（#和平主页 #和平资产 #和平签到）',
       ].join('\n'))

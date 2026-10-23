@@ -10,6 +10,7 @@
 - [列表字段](#列表字段)
 - [详情四种结构](#详情四种结构)
 - [踩坑清单](#踩坑清单)
+- [多账号与凭证](#多账号与凭证)
 - [每日任务（福利中心）](#每日任务福利中心)
 - [本地增强记录](#本地增强记录)
 - [开发工具](#开发工具)
@@ -137,6 +138,30 @@ const isSuper = d.isSuperBody === true
 | 收益小数值被转万 | `4128` 显示成 `0.4万` | 绝对值 < 10000 时走 `toLocaleString` 原样显示 |
 | art-template 旧语法 | 每次渲染刷一堆 `Template upgrade` 告警 | 用 4.x 的 `{{ each list item }}`，不写 `as` |
 | `equipment.list` 是对象 | `.map()` 报 not a function | `Array.isArray() ? list : Object.values(list)` |
+
+---
+
+## 多账号与凭证
+
+数据落在 `data/PUBG-Helper-Plugin/UserData.json`，一个 QQ 用户一条：
+
+| 字段 | 说明 |
+|---|---|
+| `ids[]` / `current` | 角色ID列表 / 当前角色下标（老字段，保持兼容） |
+| `camps[]` | 营地账号数组，每个含 `openId/gameOpenId/userId/token/seasonId/nickname/platform/roleId` |
+| `currentCamp` | 当前营地账号下标 |
+| `camp` | **始终等于 `camps[currentCamp]`**，老代码只读这个字段，不用改 |
+
+- 老数据（只有单个 `camp`）在 `normalizeInfo()` 里自动迁移成 `camps[0]`，无痛升级。
+- 同一账号判定：`openId` 相同，或 `userId` 相同 → 覆盖 token，不新增。
+- **自动绑定**：扫码（`wxLogin` / `qqLogin`）和 `#提交和平` 统一走 `utils/accounts.js#saveCampAndBind()`：
+  存凭证 → 用该凭证 `get_self_role_id()` 解析角色 → `bindRole(force=true)` 写进 `ids` 并设为当前。
+  注意 roleId **必须**用凭证自己解析（按 `userId` 搜出来的），不能拿 `#绑定和平` 手填的 id 混用，
+  否则 `getseasonpasstask` 之类会回 **-79330 角色不匹配**。
+- ⚠️ 切换角色时要连带切营地账号（`switchRole`），切换账号时要把角色带过去（`switchCamp`），
+  否则会出现「A 账号的 token 配 B 账号的角色」，查询全挂。老数据里 `camps[i].roleId` 可能为空，
+  `#切换和平账号` 会在切换后懒解析一次补齐。
+- 多账号的展示文案在 `formatCampList()`；`#和平账号` / `#切换和平账号` / `#删除和平账号` 在 `apps/accountManager.js`。
 
 ---
 
