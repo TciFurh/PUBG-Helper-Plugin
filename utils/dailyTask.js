@@ -362,6 +362,12 @@ export async function runDailyTasks(api, roleId, { clearLikes = true, allowRefre
  */
 
 /** 手册周任务的动作映射（按任务 id，历史赛季会复用同一批 id） */
+/** 浏览资讯 N 分钟：一趟埋点算 1 分钟，只补差额（任务已经做了几成就补几趟） */
+async function browseNews(ctx) {
+  const need = Math.max(1, Number(ctx.task?.maxProgress || 5) - Number(ctx.task?.progress || 0))
+  return repeat(ctx, need, (c) => ACTIONS.report(30, c))
+}
+
 const WEEKLY_ACTIONS = {
   34: (c) => ACTIONS.shareInfo(c),
   55: (c) => repeat(c, 3, ACTIONS.shareMatch),
@@ -370,11 +376,13 @@ const WEEKLY_ACTIONS = {
   63: (c) => ACTIONS.shareAssets(c),
   67: (c) => ACTIONS.shareReplay(c),
   35: (c) => ACTIONS.shareWeekly(c),
-  62: (c) => ACTIONS.report(30, c),
+  62: browseNews,   // 浏览资讯 5 分钟
+  74: browseNews,   // 同上（第 6 周同名任务）
   1010: (c) => ACTIONS.report(30, c),
   81: (c) => ACTIONS.hotRank(c),
   65: (c) => ACTIONS.replay(c),
   73: (c) => ACTIONS.replay(c),
+  93: (c) => ACTIONS.replay(c),   // 查看战绩复盘：累计 3 天，一天只能 +1，交给每日定时任务慢慢涨
   66: (c) => ACTIONS.tool4(c),
   1012: (c) => ACTIONS.likeInfo(c),
   1013: (c) => ACTIONS.likeMoment(c),
@@ -382,16 +390,18 @@ const WEEKLY_ACTIONS = {
 
 /** 手册周任务里已知无法自动完成的 */
 const WEEKLY_CANNOT = {
-  53: '登录靠日常使用累计',
-  61: '登录靠日常使用累计',
-  69: '登录靠日常使用累计',
-  109: '需要真机使用小组件',
-  104: '需要真实绑定企微助手',
-  101: '需查看好友排行页（暂无对应接口）',
-  106: '需浏览找搭子页（暂无对应接口）',
-  71: '需浏览地铁战利品页（暂无对应接口）',
-  111: '需浏览地铁变卖物图鉴（暂无对应接口）',
-  72: '需浏览壁纸库（暂无对应接口）',
+  53: '登录和平营地，靠日常使用累计',
+  61: '登录和平营地，靠日常使用累计',
+  69: '登录和平营地，靠日常使用累计',
+  109: '需真机使用小组件（有 widgetslogreport 口，缺请求格式）',
+  104: '需真实绑定企微助手',
+  101: '需在 App 点开好友排行榜（客户端埋点，无对应接口）',
+  106: '需在 App 点开找搭子首页（客户端埋点，无对应接口）',
+  71: '需在 App 点开地铁战利品页（客户端埋点，无对应接口）',
+  111: '需在 App 点开地铁变卖物图鉴（客户端埋点，无对应接口）',
+  72: '需在 App 打开壁纸库 H5（客户端埋点，无对应接口）',
+  112: '需在 App 看放映中心 3 分钟（客户端埋点，无对应接口）',
+  76: '需在 App 点开绿洲专区页（客户端埋点，无对应接口）',
 }
 
 /** 把单次动作重复 N 次（分享类任务是计数口，跑满次数即进度走满） */
@@ -441,7 +451,7 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
         rows.push(row)
         continue
       }
-      const r = await runAction(fn, { api, roleId, state })
+      const r = await runAction(fn, { api, roleId, state, task: t })
       row.status = r.ok ? 'acted' : 'fail'
       row.note = r.note || ''
       if (r.ok) out.acted++

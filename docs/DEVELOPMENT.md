@@ -189,11 +189,18 @@ const isSuper = d.isSuperBody === true
 | `/game/getseasonpasstask` | 手册 8 周任务（**必须带有效 roleId，传 0 回 -20011**） |
 | `/game/claimseasonpasspoints` | 领手册积分——**默认绝不调用**（用户要求只做不领） |
 
-- 结构：`data.weekList[] { weekNo, isOpen, taskList[] { id,title,desc,progress,maxProgress,status,point } }`
+- 结构：`data.weekList[] { weekNo, isOpen, taskList[] { id,title,desc,progress,maxProgress,status,point,jumpParam } }`
 - status：0=未完成 → 做动作 → 1=完成待领 →（App 手动领）→ 2=已领
-- 可自动做的：分享战绩/资讯/资产/复盘（sharecallback）、浏览资讯 5 分钟（埋点）、查看热榜（gethotrank）、
-  观看复盘（getpubgreplaydata4）、开启 4 个对局工具（id 0-4 里凑满 4 个，id=3 可能是加速器）
-- 做不了的：登录类（日常使用累计）、小组件、企微绑定、找搭子/地铁图鉴/壁纸库（暂无接口）
+- **title 全是「浏览页面」这种糊弄话，真正的要求在 `desc`**，`jumpParam` 是 App 里的跳转目标
+  （原生页给 `uri`/`controller`，H5 页给 `https://cdev.gp.qq.com/...` 链接）
+- ⚠️ `roleId` 必须用 `get_self_role_id()` 查出来的**当前营地账号自己的角色**，
+  直接用 `#绑定和平` 存的 id 会回 **-79330 参数错误：角色不匹配**（两者经常不是同一个号）
+- 可自动做的：分享战绩/资讯/资产/复盘（sharecallback）、浏览资讯 5 分钟（埋点，**一趟 report = 1 分钟，5 趟满**）、
+  查看热榜（gethotrank）、观看复盘（getpubgreplaydata4）、开启 4 个对局工具（id 0-4 里凑满 4 个，id=3 可能是加速器）
+- 「查看战绩复盘 累计 3 天」是**按天**算的（id 93）：一天调一次 `getpubgreplaydata4` 就 +1，刷不快，交给每日定时任务慢慢涨
+- 做不了的（实测过，见下）：登录类（日常使用累计）、小组件（`/game/widgetslogreport` 口子在，缺请求格式）、
+  企微绑定、以及所有「在 App 里点开某页面」的任务——那是**客户端埋点**，`batchmodulelogreport` 要 page/module id，
+  这几个页面的 id 拿不到；用现有 3 套埋点模板（资讯/看直播/PEL）轮流投，112（放映中心）和 76（绿洲专区）都不动
 - 动作完成后**再拉一次列表**回填最新进度（分享/浏览类计数是服务端异步确认的）
 
 **新增资料查询接口**（`apps/campSocial.js`，全读操作）：
