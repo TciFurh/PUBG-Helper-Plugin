@@ -1,6 +1,8 @@
 # 和平营地Token获取
 > 用于和平营地自动签到等功能
 
+> 💬 卡住了？直接进群问：**[¹Tloml-Starry 交流群](https://qun.qq.com/universal-share/share?ac=1&authKey=WOMji0R0sR013hTOeVlQjxNPlnNEethq%2Bbur4nu8y9vVMN8RLFZMoXPEShkPfSSR&busi_data=eyJncm91cENvZGUiOiIxMTA2NDAyMTU4IiwidG9rZW4iOiJYOFJOeUxrdU9haVZyQnVWM3lDYVJUd29QU2o2bTAwRDdWUUw4MDRFZXp3M2QyUEFpVDMyTXFFTFlCdy9GWUNZIiwidWluIjoiMzYyMDA2MDgyNiJ9&data=_jAbY2MUJJpEwQZV-E2EEF-a2tR7X5Zgx2yQl2gBpgqZm4DLK3lzevrQzAK5cvhpmo0rplUq7g3xsgKCrpJcHw&svctype=4&tempid=h5_group_info)**（群号 1106402158）
+
 ## 抓包前准备[>这里更详细](https://blog.csdn.net/2503_92066923/article/details/148075143)
 
 1. 软件准备: 虚拟机，MT管理器，JustTrustMe， JustMeplush， JustMeAlreadly， HttpCanary， 和平营地

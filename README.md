@@ -10,6 +10,12 @@
 
 <sub>Yunzai-Bot V3 插件 · 支持 QQ / 微信双通道登录 · 战绩 / 主页 / 资产 / 周报全模式覆盖</sub>
 
+<br>
+
+**[💬 交流群 · ¹Tloml-Starry →](https://qun.qq.com/universal-share/share?ac=1&authKey=WOMji0R0sR013hTOeVlQjxNPlnNEethq%2Bbur4nu8y9vVMN8RLFZMoXPEShkPfSSR&busi_data=eyJncm91cENvZGUiOiIxMTA2NDAyMTU4IiwidG9rZW4iOiJYOFJOeUxrdU9haVZyQnVWM3lDYVJUd29QU2o2bTAwRDdWUUw4MDRFZXp3M2QyUEFpVDMyTXFFTFlCdy9GWUNZIiwidWluIjoiMzYyMDA2MDgyNiJ9&data=_jAbY2MUJJpEwQZV-E2EEF-a2tR7X5Zgx2yQl2gBpgqZm4DLK3lzevrQzAK5cvhpmo0rplUq7g3xsgKCrpJcHw&svctype=4&tempid=h5_group_info)**
+<br>
+<sub>点群名直接进 · 答疑 / 反馈 / 更新通知</sub>
+
 </div>
 
 ---
@@ -23,6 +29,7 @@
 [指令手册](#-指令手册) ·
 [效果预览](#-效果预览) ·
 [常见问题](#-常见问题) ·
+[交流群](#-交流群) ·
 [凭证模块](#-凭证提取模块lsposed) ·
 [开发说明](./docs/DEVELOPMENT.md)
 
@@ -368,6 +375,28 @@ PUBG-Helper-Plugin/
 
 ---
 
+## 💬 交流群
+
+**¹Tloml-Starry** —— 插件答疑、功能许愿、接口失效报错、更新通知都在这儿。
+
+> **[👉 点我进群（¹Tloml-Starry）](https://qun.qq.com/universal-share/share?ac=1&authKey=WOMji0R0sR013hTOeVlQjxNPlnNEethq%2Bbur4nu8y9vVMN8RLFZMoXPEShkPfSSR&busi_data=eyJncm91cENvZGUiOiIxMTA2NDAyMTU4IiwidG9rZW4iOiJYOFJOeUxrdU9haVZyQnVWM3lDYVJUd29QU2o2bTAwRDdWUUw4MDRFZXp3M2QyUEFpVDMyTXFFTFlCdy9GWUNZIiwidWluIjoiMzYyMDA2MDgyNiJ9&data=_jAbY2MUJJpEwQZV-E2EEF-a2tR7X5Zgx2yQl2gBpgqZm4DLK3lzevrQzAK5cvhpmo0rplUq7g3xsgKCrpJcHw&svctype=4&tempid=h5_group_info)**
+
+群号 `1106402158` · 链接点不开就搜群号，或直接扫码
+
+<div align="center">
+  <a href="https://qun.qq.com/universal-share/share?ac=1&authKey=WOMji0R0sR013hTOeVlQjxNPlnNEethq%2Bbur4nu8y9vVMN8RLFZMoXPEShkPfSSR&busi_data=eyJncm91cENvZGUiOiIxMTA2NDAyMTU4IiwidG9rZW4iOiJYOFJOeUxrdU9haVZyQnVWM3lDYVJUd29QU2o2bTAwRDdWUUw4MDRFZXp3M2QyUEFpVDMyTXFFTFlCdy9GWUNZIiwidWluIjoiMzYyMDA2MDgyNiJ9&data=_jAbY2MUJJpEwQZV-E2EEF-a2tR7X5Zgx2yQl2gBpgqZm4DLK3lzevrQzAK5cvhpmo0rplUq7g3xsgKCrpJcHw&svctype=4&tempid=h5_group_info">
+    <img src="./resources/image/qq-group.png" width="180" alt="¹Tloml-Starry 交流群">
+  </a>
+  <br>
+  <sub>微信 / 手机 QQ 扫码进群</sub>
+</div>
+
+- 🆘 **装了跑不起来** → 群里贴日志，比在 Issue 里描述快十倍
+- 💡 **想要新功能** → 群里说一句，好做的我直接加
+- ⚠️ **接口报错 / 凭证失效** → 群里喊一声，通常当天就修
+
+---
+
 ## 🤝 参与贡献
 
 Fork → 新建 `feature_xxx` 分支 → 提交 → 发 Pull Request。
@@ -376,7 +405,7 @@ Fork → 新建 `feature_xxx` 分支 → 提交 → 发 Pull Request。
 
 [@TciFurh](https://github.com/TciFurh) ·
 [加 QQ](https://qm.qq.com/q/h9UHpRmomc) ·
-[进群](https://qm.qq.com/q/b6XzgZ7YLS) ·
+[进群 · ¹Tloml-Starry](https://qun.qq.com/universal-share/share?ac=1&authKey=WOMji0R0sR013hTOeVlQjxNPlnNEethq%2Bbur4nu8y9vVMN8RLFZMoXPEShkPfSSR&busi_data=eyJncm91cENvZGUiOiIxMTA2NDAyMTU4IiwidG9rZW4iOiJYOFJOeUxrdU9haVZyQnVWM3lDYVJUd29QU2o2bTAwRDdWUUw4MDRFZXp3M2QyUEFpVDMyTXFFTFlCdy9GWUNZIiwidWluIjoiMzYyMDA2MDgyNiJ9&data=_jAbY2MUJJpEwQZV-E2EEF-a2tR7X5Zgx2yQl2gBpgqZm4DLK3lzevrQzAK5cvhpmo0rplUq7g3xsgKCrpJcHw&svctype=4&tempid=h5_group_info) ·
 [提 Issue](https://github.com/TciFurh/PUBG-Helper-Plugin/issues)
 
 <div align="center">
