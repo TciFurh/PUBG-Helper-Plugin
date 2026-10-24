@@ -317,6 +317,29 @@ class ApiService {
     }
 
     /** 资产：仓库详情（mainTabId 来自 getmaintabs） */
+    /** 游戏内货币 + 魅力值（/game/getcharmandcoins）
+     *  gold=金币 itemCoin=服饰币 diamond=点券 ironCoin=物资币 ticket=优惠券 luckyCoin/universalScore */
+    async get_charmandcoins(friendRoleId) {
+        const p = await this.get_param()
+        if (!p) throw new Error('获取参数失败，无法请求getcharmandcoins')
+        const params = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(friendRoleId),
+            friendRoleId: String(friendRoleId),
+            ...this.params,
+        }
+        const res = await fetch(this.main + '/game/getcharmandcoins', {
+            method: 'POST',
+            headers: this.headers,
+            body: querystring.stringify(params),
+        })
+        return res.json()
+    }
+
     async get_depotdetail(friendRoleId, mainTabId) {
         const p = await this.get_param()
         if (!p) throw new Error('获取参数失败，无法请求getdepotdetail')

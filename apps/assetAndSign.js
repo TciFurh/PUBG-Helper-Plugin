@@ -6,6 +6,16 @@ import Button from '../utils/button.js'
 
 const apiService = new ApiService()
 
+/** 品质名 → quality 值（物品 quality 字段：4紫 5粉 6红，3蓝 2绿） */
+const QUALITY_NUM = {
+  红: 6, 红色: 6, 红色品质: 6,
+  粉: 5, 粉色: 5, 粉色品质: 5,
+  紫: 4, 紫色: 4, 紫色品质: 4,
+  蓝: 3, 蓝色: 3, 蓝色品质: 3,
+  绿: 2, 绿色: 2, 绿色品质: 2,
+}
+const QUALITY_NAME = { 2: '绿色', 3: '蓝色', 4: '紫色', 5: '粉色', 6: '红色' }
+
 export class AssetAndSign extends plugin {
   constructor() {
     super({
@@ -14,15 +24,17 @@ export class AssetAndSign extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平资产$', fnc: 'showAsset' },
+        { reg: '^#和平资产(\\s*\\S+)?$', fnc: 'showAsset' },
         { reg: '^#和平签到$', fnc: 'dailySignin' },
       ],
     })
   }
 
-  // ---- 资产查询（按分类拆分渲染，每张图清晰不糊） ----
+  // ---- 资产查询：#和平资产 全部 / #和平资产 时装|枪械|装备|战备 / #和平资产 紫|粉|红（品质过滤） ----
   async showAsset(e) {
-    await e.reply('⏳ 正在查询营地仓库资产...')
+    const arg = String(e.msg || '').replace(/^#和平资产\s*/, '').trim()
+    const q = QUALITY_NUM[arg] || 0
+    const catFilter = !q && arg ? arg : ''
     const { info } = getUserInfo(e.user_id)
     const camp = getCamp(e.user_id)
     if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
@@ -32,24 +44,52 @@ export class AssetAndSign extends plugin {
       const roleId = await apiService.get_self_role_id()
       if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
 
-      const tabs = await apiService.get_maintabs(roleId)
-      const tabList = tabs.data || []
-      if (!tabList.length) return e.reply('❌ 仓库分类获取失败：' + (tabs.returnMsg || '未知错误'))
+      // 游戏内货币（点券/服饰币/金币/物资币/优惠券）——失败不阻塞资产查询
+      let currencies = []
+      try {
+        const c = await apiService.get_charmandcoins(roleId)
+        const d = c.data || {}
+        currencies = [
+          { name: '点券', value: Number(d.diamond) || 0 },
+          { name: '服饰币', value: Number(d.itemCoin) || 0 },
+          { name: '金币', value: Number(d.gold) || 0 },
+          { name: '物资币', value: Number(d.ironCoin) || 0 },
+          { name: '优惠券', value: Number(d.ticket) || 0 },
+        ]
+      } catch { }
 
-      // 拉取有资产的分类详情（count>0）
+      const tabs = await apiService.get_maintabs(roleId)
+      let tabList = tabs.data || []
+      if (catFilter) tabList = tabList.filter((t) => String(t.tabName).includes(catFilter))
+      if (!tabList.length) {
+        return e.reply(`❌ 没有匹配「${catFilter}」的分类\n可用分类：时装 / 枪械 / 装备 / 战备 / 载具\n品质过滤：#和平资产 紫 / 粉 / 红`)
+      }
+
       const sections = []
+      let filteredCount = 0
       for (const tab of tabList) {
         const section = { name: tab.tabName, count: tab.count, rareCnt: tab.rareCnt, groups: [] }
         if (tab.count > 0) {
           const detail = await apiService.get_depotdetail(roleId, tab.tabId)
-          const groups = (detail.data && detail.data.items) || []
+          let groups = (detail.data && detail.data.items) || []
+          if (q) {
+            groups = groups
+              .map((g) => ({ ...g, items: (g.items || []).filter((it) => Number(it.quality) === q) }))
+              .filter((g) => g.items && g.items.length)
+            section.count = groups.reduce((n, g) => n + g.items.length, 0)
+            filteredCount += section.count
+            section.rareCnt = q >= 5 ? section.count : 0
+          }
           section.groups = groups.filter((g) => g.items && g.items.length)
         }
         sections.push(section)
         await new Promise((r) => setTimeout(r, 120))
       }
       const hasItems = sections.some((s) => s.groups.length)
-      if (!hasItems) return e.reply('仓库中暂无展示资产')
+      if (!hasItems) {
+        if (q) return e.reply(`没有${QUALITY_NAME[q]}品质的展示资产（过滤条件：${arg}）`)
+        return e.reply('仓库中暂无展示资产')
+      }
 
       // 每个分类单独渲染，物品超过 PER_PAGE 自动分页
       const PER_PAGE = 48
@@ -73,20 +113,23 @@ export class AssetAndSign extends plugin {
           return { section: sec, pages: list }
         })
 
-      // 渲染全部页面，收集图片；一次 e.reply 数组合并为一条消息（多图），避免刷屏
       const updated = new Date().toLocaleString('zh-CN', {
         hour12: false, year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit',
       })
+      const sectionName = q ? `${QUALITY_NAME[q]}品质` : (catFilter || '全部分类')
+      const filterNote = q ? `已按${QUALITY_NAME[q]}品质过滤` : (catFilter ? `已按分类「${catFilter}」过滤` : '')
       const images = []
       for (const { section, pages: pageList } of pages) {
         for (let i = 0; i < pageList.length; i++) {
           try {
             const image = await puppeteer.screenshot('asset', {
               tplFile: 'plugins/PUBG-Helper-Plugin/resources/asset.html',
-              section: { name: section.name, rareCnt: section.rareCnt },
+              section: { name: sectionName, rareCnt: section.rareCnt },
               groups: pageList[i].groups,
-              totalCount: section.count,
+              totalCount: q ? filteredCount : section.count,
+              filterNote,
+              currencies: i === 0 ? currencies : [],
               pageIndex: i + 1,
               pageTotal: pageList.length,
               roleName: camp.nickname || camp.roleName || camp.userName || roleId,
@@ -113,7 +156,12 @@ export class AssetAndSign extends plugin {
           }
         }
       }
-      try { await e.reply(Button.assets()) } catch {}
+      try {
+        await e.reply(segment.button([
+          [{ text: '紫色', callback: '#和平资产 紫色' }, { text: '粉色', callback: '#和平资产 粉色' }, { text: '红色', callback: '#和平资产 红色' }],
+          [{ text: '时装', callback: '#和平资产 时装' }, { text: '枪械', callback: '#和平资产 枪械' }, { text: '全部', callback: '#和平资产' }],
+        ]))
+      } catch { }
     } catch (err) {
       e.reply('❌ 资产查询失败：' + (err.message || err))
     }
