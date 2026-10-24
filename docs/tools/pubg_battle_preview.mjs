@@ -158,7 +158,7 @@ if (ONLY === '' || ONLY === 'recent') {
       isMvp: Number(item.isMvp) === 1,
       gradeIcon: item.ratingIcon || '',
       gradeText: item.ratingValue || '',
-      ribbon: promoMeta(item.promotion, item.result),
+      ribbon: promoMeta(item.promotion),
     })),
   })
 }

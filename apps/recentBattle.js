@@ -56,7 +56,7 @@ export class RecentBattle extends plugin {
         isMvp: Number(item.isMvp) === 1,
         gradeIcon: item.ratingIcon || '',
         gradeText: item.ratingValue || '',
-        ribbon: promoMeta(item.promotion, item.result),
+        ribbon: promoMeta(item.promotion),
       }))
 
       const image = await puppeteer.screenshot('recentbattle', {

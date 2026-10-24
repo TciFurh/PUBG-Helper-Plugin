@@ -56,16 +56,18 @@ function cnNum(n) {
  * 晋级赛角标。
  *
  * 接口 `promotion` 字段：{ taskId, process, target, pass, protect, rank, divId, divName }
- * - `process/target` 是晋级进度（已打几局 / 共几局）
- * - `pass=1` 只出现在「这局打完整场晋级赛成功」的最终局，此时 `divName` 才有值（如「卓越王牌」）
+ * 实测语义（2026-10 排位数据）：
+ * - `pass=1` 只表示「这一局赢了」——中间胜局同样是 pass=1，别拿它当最终局标志
+ * - **`divName`/`divId` 只在打完整场晋级赛的最终局才有值**（如 divName="卓越王牌"），这是最终局判据
  * - `protect=1` 是保护局（输了但抵消一次）
- * - 其余为中间局：结合对局结果 result 判断这局胜负（'Win'/'Landslide' 算赢）
+ * - `result` 字段在列表接口里是 undefined，中间局胜负只能靠 pass/protect 推
  *
  * 配色（按段位，营地 App 同款）：
- * - 绝世 → 红 / 传奇 → 橙 / 卓越王牌 → 紫（最终局，文字「晋级绝世王牌」这类整串）
- * - 普通段位最终局与中间局胜局 → 金色「晋级赛·成功」
- * - 保护局 / 中间局败局 → 灰色
- * - divName 缺失时按 taskId 反推（20001 = 卓越王牌，实测）
+ * - 最终局：绝世 → 红 / 传奇 → 橙 / 卓越王牌 → 紫（文字「晋级绝世王牌」这类整串），
+ *   普通段位 → 金「晋级赛·成功」
+ * - 中间胜局（第一局/第二局赢了）→ 金「晋级赛·成功」
+ * - 保护局 / 中间败局 → 灰
+ * - divName 缺失的最终局按 taskId 反推（20001 = 卓越王牌，实测）
  *
  * 返回值除了角标（small/big/tone），还带 `label`（整串文案，详情页用）和
  * `step`（进度文案，如「卓越第三局 · 3/3」）。
@@ -76,7 +78,7 @@ const PROMO_TIER_TONES = [
   { re: /卓越/, tone: 'purple' },
 ]
 
-export function promoMeta(p, result) {
+export function promoMeta(p) {
   if (!p || !p.taskId) return null
   const passed = String(p.pass) === '1' || Number(p.pass) === 1
   const protect = String(p.protect) === '1' || p.protect === true
@@ -90,12 +92,16 @@ export function promoMeta(p, result) {
   const tierPrefix = tier ? tier.replace(/王牌$/, '') : ''
   const stepText = proc != null && proc > 0 ? `${tierPrefix}第${cnNum(proc)}局` : ''
 
+  // 最终局 = 这局赢了，且（divName 有值 或 进度打满）。中间胜局 pass 同样是 1。
+  const clincher = passed && (!!p.divName || (proc != null && target != null && proc >= target))
+
   let small, big, tone
-  if (passed && hit) {
+  if (clincher && hit) {
     small = '晋级'
     big = tier
     tone = hit.tone
   } else if (passed) {
+    // 中间胜局（第一局/第二局）与普通段位最终局：金色「晋级赛·成功」
     small = '晋级赛'
     big = '成功'
     tone = 'gold'
@@ -103,10 +109,6 @@ export function promoMeta(p, result) {
     small = '晋级赛'
     big = '保护'
     tone = 'grey'
-  } else if (result === 'Win' || result === 'Landslide') {
-    small = '晋级赛'
-    big = '成功'
-    tone = 'gold'
   } else {
     small = '晋级赛'
     big = '失败'
@@ -118,7 +120,7 @@ export function promoMeta(p, result) {
     small,
     big,
     tone,
-    label: passed && hit ? `晋级${tier}` : `${small} · ${big}`,
+    label: clincher && hit ? `晋级${tier}` : `${small} · ${big}`,
     progress,
     percent,
     step,
