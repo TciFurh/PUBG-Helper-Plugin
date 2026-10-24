@@ -153,10 +153,8 @@ class ApiService {
             throw new Error('获取参数失败，无法请求getweaponinfos2')
         }
 
-        this.params.count = '0'
-
         let RoleID = await this.get_getresultbytypev2(friendUserId)
-        this.params.roleId = RoleID.data.user.list[0].roleId
+        // ⚠️ 不要回写 this.params（它是实例级共享状态，污染后同实例后续所有请求都会带上别人的 roleId）
         const params = {
             openId: p.openId,
             gameOpenId: p.gameOpenId,
@@ -164,7 +162,9 @@ class ApiService {
             token: p.token,
             seasonId: p.seasonId,
             friendUserId: String(friendUserId).replace(/[^\x00-\x7F]/g, ''),
-            ...this.params
+            ...this.params,
+            count: '0',
+            roleId: RoleID.data.user.list[0].roleId
         }
 
         const postData = querystring.stringify(params)

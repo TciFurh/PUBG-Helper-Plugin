@@ -46,10 +46,12 @@ export class MyHomepage extends plugin {
     }
 
     async showMyHomepage(e) {
-        let ID = (e.msg.match(/^#?和平(精英|英精)?主页(\d+)?$/i)?.[2]) || ''
+        const arg = (e.msg.match(/^#?和平(精英|英精)?主页(\d+)?$/i)?.[2]) || ''
+        let ID = arg
         const { info } = getUserInfo(e.user_id)
         if (!ID) {
-            ID = info.ids?.[info.current] || ''
+            // rolecard3 的 friendUserId 要的是营地ID（不是角色ID，传角色ID会报「该用户暂无角色」）
+            ID = info.camp?.userId || info.ids?.[info.current] || ''
         }
         apiService.useCamp(info.camp || null)
         if (!/^\d+$/.test(ID)) {
@@ -57,10 +59,18 @@ export class MyHomepage extends plugin {
             return
         }
 
-        const data = await apiService.get_rolecard3(ID)
+        let data = await apiService.get_rolecard3(ID)
+        // 未带参数的自查：如果回落到了角色ID（老数据没存营地ID），报 -30087 时用当前营地账号的营地ID再试一次
+        if (!arg && Number(data.returnCode) === -30087 && info.camp?.userId && String(ID) !== String(info.camp.userId)) {
+            ID = String(info.camp.userId)
+            data = await apiService.get_rolecard3(ID)
+        }
         //logger.mark(JSON.stringify(data, null, 4))
         if (data.returnCode === -30003 && data.returnMsg === '登录态失效，请重新登录') {
             return e.reply('公共查询Token已失效')
+        }
+        if (Number(data.returnCode) !== 0 || !data.data?.roleCard) {
+            return e.reply('❌ 主页查询失败：' + (data.returnMsg || `没有查到 ${ID} 的主页数据`) + '\n提示：#和平主页 需要营地ID（营地APP「我的」页面那串数字）')
         }
         const roleCard = data.data.roleCard
         const { mainRecord = [], escapeRecord = [], losttombRecord = [], vsteamRecord = [] } = roleCard
