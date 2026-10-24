@@ -664,9 +664,15 @@ class ApiService {
         return this._postForm(this.main + this.baseUrl.getseasonpasstask, { roleId: String(roleId || '') })
     }
 
-    /** 领取手册积分（默认不调用：#和平周任务 只做不领） */
-    async claim_season_pass_points(roleId) {
-        return this._postForm(this.main + this.baseUrl.claimseasonpasspoints, { roleId: String(roleId || '') })
+    /** 领取手册任务积分（/game/claimseasonpasspoints）。
+     *  实测请求体 { roleId, seasonID, ids }，ids 为逗号分隔的任务 id；响应 data.allStatus = { 任务id: 2 }
+     *  只能领「完成待领」(status=1) 的任务，领完变 2。 */
+    async claim_season_pass_points(roleId, seasonId, ids) {
+        return this._postForm(this.main + this.baseUrl.claimseasonpasspoints, {
+            roleId: String(roleId || ''),
+            seasonID: String(seasonId ?? ''),
+            ids: String(ids || ''),
+        })
     }
 
     /* ================= 营地社交 / 资料（读操作） ================= */

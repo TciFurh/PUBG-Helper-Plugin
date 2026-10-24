@@ -212,7 +212,8 @@ const isSuper = d.isSuperBody === true
 | 接口 | 用途 |
 |---|---|
 | `/game/getseasonpasstask` | 手册 8 周任务（**必须带有效 roleId，传 0 回 -20011**） |
-| `/game/claimseasonpasspoints` | 领手册积分——**默认绝不调用**（用户要求只做不领） |
+| `/game/claimseasonpasspoints` | 领手册积分。请求体 `{ roleId, seasonID, ids }`：**ids 用「\|」拼接**（逗号报参数异常），空串=一键领取；响应 `data.allStatus={任务id:2}`。实测 2026-10-24 通，status 1→2 |
+| `/game/getseasonpasstask` | 手册周任务列表，顶层 `{ seasonID, weekList[], globalConfig, passType, taskRemind }` |
 
 - 结构：`data.weekList[] { weekNo, isOpen, taskList[] { id,title,desc,progress,maxProgress,status,point,jumpParam } }`
 - status：0=未完成 → 做动作 → 1=完成待领 →（App 手动领）→ 2=已领

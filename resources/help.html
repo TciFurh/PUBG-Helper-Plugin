@@ -5,23 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>和平精英插件帮助</title>
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: #000000;
             min-height: 100vh;
             padding: 20px;
-            position: relative;
             color: #fafafa;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
             background: #121212;
             border: 1px solid #262626;
@@ -32,321 +27,84 @@
         .header {
             background: #1a1a1a;
             border-bottom: 1px solid #262626;
-            color: #fafafa;
-            padding: 40px 30px;
+            padding: 38px 30px;
             text-align: center;
-            position: relative;
         }
 
-        .header h1 { 
-            font-size: 2.8rem; 
-            font-weight: 800; 
-            margin-bottom: 12px; 
-            color: #ffffff;
-        }
-        
-        .header p { 
-            font-size: 1.1rem; 
-            color: #a8a8a8; 
-            font-weight: 400;
-        }
+        .header h1 { font-size: 3rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; }
+        .header p { font-size: 1.25rem; color: #a8a8a8; }
 
-        .content { 
-            padding: 30px; 
-            background: #121212;
-        }
+        .content { padding: 28px; background: #121212; }
 
-        .section {
-            margin-bottom: 24px;
-            background: #161616;
-            border: 1px solid #262626;
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .section:hover {
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-            border-color: #333333;
-        }
-
+        .section { margin-bottom: 22px; background: #161616; border: 1px solid #262626; border-radius: 18px; overflow: hidden; }
         .section-header {
-            padding: 20px 24px;
+            display: flex; align-items: center;
+            padding: 18px 24px;
             background: #1a1a1a;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid #262626;
+            border-bottom: 1px solid #232323;
         }
-
-        .section-header:hover { 
-            background: #212121; 
-        }
-
         .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
+            font-size: 1.6rem; font-weight: 700; color: #ffffff;
+            display: flex; align-items: center;
         }
-
         .section-icon {
-            width: 40px;
-            height: 40px;
-            background: #2a2a2a;
-            border: 1px solid #333333;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 16px;
-            font-size: 1.2rem;
-            filter: grayscale(100%);
+            width: 48px; height: 48px;
+            background: #262626; border: 1px solid #333333; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 16px; font-size: 1.7rem;
         }
 
-        .toggle-icon {
-            font-size: 1.4rem;
-            transition: transform 0.3s ease;
-            color: #8e8e8e;
-        }
+        .section-content { padding: 20px 24px; }
 
-        .section-content {
-            padding: 0 24px;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .section-content.expanded {
-            padding: 24px;
-            max-height: 2000px;
-        }
-
-        .command-grid {
-            display: grid;
-            gap: 16px;
-        }
-
-        .command-grid.cols-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .command-grid.cols-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .command-grid.cols-4 {
-            grid-template-columns: repeat(4, 1fr);
-        }
+        .command-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
         .command-item {
-            background: #1a1a1a;
-            border: 1px solid #262626;
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .command-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            border-color: #3a3a3a;
-            background: #1e1e1e;
+            background: #1a1a1a; border: 1px solid #262626; border-radius: 12px; padding: 16px 18px;
         }
 
         .command {
             font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', monospace;
-            background: #262626;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 12px;
+            background: #262626; color: #ffffff;
+            padding: 8px 14px; border-radius: 8px;
+            font-size: 1.08rem; font-weight: 600;
+            display: inline-block; margin-bottom: 10px;
             border: 1px solid #333333;
         }
 
-        .description {
-            color: #d4d4d4;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
+        .description { color: #d4d4d4; font-size: 1.08rem; line-height: 1.55; }
         .example {
-            background: #141414;
-            border-left: 3px solid #8e8e8e;
-            padding: 12px 16px;
-            margin-top: 12px;
-            border-radius: 0 8px 8px 0;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', monospace;
-            font-size: 0.85rem;
-            color: #a8a8a8;
+            background: #141414; border-left: 3px solid #8e8e8e;
+            padding: 9px 14px; margin-top: 10px; border-radius: 0 8px 8px 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1rem; color: #a8a8a8;
         }
 
         .tip {
-            background: #1a1a1a;
-            border: 1px solid #333333;
-            border-radius: 16px;
-            padding: 24px;
-            margin-top: 24px;
-            position: relative;
-            overflow: hidden;
+            background: #1a1a1a; border: 1px solid #333333; border-radius: 16px;
+            padding: 22px 26px; margin-top: 6px;
         }
+        .tip-title { font-size: 1.3rem; font-weight: 700; color: #fbbf24; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .tip-content { color: #d4d4d4; font-size: 1.12rem; line-height: 1.7; }
+        .tip-content strong { color: #ffffff; }
 
-        .tip::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: #8e8e8e;
-        }
-
-        .tip-title {
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            font-size: 1.1rem;
-        }
-
-        .tip-icon { 
-            margin-right: 12px; 
-            font-size: 1.3rem;
-            filter: grayscale(100%);
-        }
-
-        .tip-content {
-            color: #d4d4d4;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
-        @media (max-width: 768px) {
-            .container { 
-                margin: 10px; 
-                border-radius: 20px;
-            }
-            
-            .header { 
-                padding: 30px 20px; 
-            }
-            
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .content { 
-                padding: 20px; 
-            }
-            
-            .command-grid { 
-                grid-template-columns: 1fr !important; 
-            }
-            
-            .command-grid.cols-2,
-            .command-grid.cols-3,
-            .command-grid.cols-4 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .section-header {
-                padding: 16px 20px;
-            }
-            
-            .section-content.expanded {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .section-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            }
-        }
+        .foot-note { text-align: center; color: #5e5e5e; font-size: 1rem; padding: 18px 0 6px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎮 和平精英插件</h1>
-            <p>功能强大、界面精美的游戏数据查询工具</p>
+            <p>指令菜单 · 发送对应指令即可使用</p>
         </div>
-        
-        <div class="content">
-            <!-- 基础功能 -->
-            <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">
-                        <div class="section-icon">📋</div>
-                        基础功能
-                    </div>
-                    <span class="toggle-icon">▼</span>
-                </div>
-                <div class="section-content">
-                    <div class="command-grid">
-                        <div class="command-item">
-                            <div class="command">#和平帮助</div>
-                            <div class="description">显示插件帮助菜单</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#和平插件帮助</div>
-                            <div class="description">显示详细帮助信息</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 账号管理 -->
+        <div class="content">
+            <!-- 账号与登录 -->
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">
-                        <div class="section-icon">👤</div>
-                        账号管理
-                    </div>
-                    <span class="toggle-icon">▼</span>
+                <div class="section-header">
+                    <div class="section-title"><div class="section-icon">👤</div>账号与登录</div>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
-                        <div class="command-item">
-                            <div class="command">#我的和平ID</div>
-                            <div class="description">查看当前账号与全部角色</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#绑定和平 &lt;ID&gt;</div>
-                            <div class="description">手动绑定角色ID（扫码登录会自动绑定）</div>
-                            <div class="example">示例：#绑定和平 123456789</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#切换和平 &lt;序号&gt;</div>
-                            <div class="description">切换角色（自动带出所属营地账号）</div>
-                            <div class="example">示例：#切换和平 1</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#删除和平 &lt;序号&gt;</div>
-                            <div class="description">删除指定角色</div>
-                            <div class="example">示例：#删除和平 1</div>
-                        </div>
                         <div class="command-item">
                             <div class="command">#和平账号</div>
                             <div class="description">查看已绑定的营地账号（支持多账号）</div>
@@ -354,221 +112,182 @@
                         <div class="command-item">
                             <div class="command">#切换和平账号 &lt;序号&gt;</div>
                             <div class="description">切换营地账号（自动带出对应角色）</div>
-                            <div class="example">示例：#切换和平账号 2</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#删除和平账号 &lt;序号&gt;</div>
                             <div class="description">删除营地账号（连同其角色）</div>
-                            <div class="example">示例：#删除和平账号 2</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#我的和平ID</div>
+                            <div class="description">查看当前账号与全部角色</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#切换和平 &lt;序号&gt;</div>
+                            <div class="description">切换角色（自动带出所属营地账号）</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#绑定和平 &lt;ID&gt;</div>
+                            <div class="description">手动绑定角色ID（扫码登录会自动绑定）</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#和平QQ登录 / #和平微信登录</div>
+                            <div class="description">扫码登录营地，自动绑定对应角色ID</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#和平登录 / #提交和平</div>
+                            <div class="description">抓包教程 / 粘贴凭证登录</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#和平凭证 / #删除和平凭证</div>
+                            <div class="description">查看 / 删除当前登录凭证</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#设置QQ &lt;QQ号&gt;</div>
+                            <div class="description">设置QQ扫码登录用的QQ号</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 数据查询 -->
+            <!-- 战绩 -->
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">
-                        <div class="section-icon">📊</div>
-                        数据查询
-                    </div>
-                    <span class="toggle-icon">▼</span>
+                <div class="section-header">
+                    <div class="section-title"><div class="section-icon">⚔️</div>战绩查询</div>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
                         <div class="command-item">
-                            <div class="command">#和平主页</div>
-                            <div class="description">查看个人主页数据（使用当前绑定账号）</div>
+                            <div class="command">#和平战绩 [分类] [页码]</div>
+                            <div class="description">战绩总览与分类列表（排位/地铁/古墓/团竞等）</div>
+                            <div class="example">#和平战绩 地铁 2</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平主页&lt;营地ID&gt;</div>
-                            <div class="description">查看指定账号的个人主页</div>
-                            <div class="example">示例：#和平主页123456789</div>
+                            <div class="command">#和平战绩详情 &lt;编号&gt;</div>
+                            <div class="description">单局详情（经典/地铁/超体/团竞自动适配）</div>
                         </div>
+                        <div class="command-item">
+                            <div class="command">#和平最近战绩 [数量]</div>
+                            <div class="description">最近对局列表（默认10局，1-30）</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#和平周报</div>
+                            <div class="description">本周数据（场次/胜场/K·D等）</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#和平主页 [营地ID]</div>
+                            <div class="description">个人主页数据（不带ID用当前账号）</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#枪械熟练度 [武器类型]</div>
+                            <div class="description">枪械熟练度数据，可按类型筛选</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资产与签到 -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><div class="section-icon">💰</div>资产与签到</div>
+                </div>
+                <div class="section-content">
+                    <div class="command-grid">
                         <div class="command-item">
                             <div class="command">#和平资产</div>
                             <div class="description">查询营地仓库资产（需登录凭证）</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平签到</div>
-                            <div class="description">执行每日签到（需登录凭证）</div>
+                            <div class="command">#和平营地币</div>
+                            <div class="description">福利币、营地装饰碎片等余额</div>
                         </div>
                         <div class="command-item">
+                            <div class="command">#和平签到</div>
+                            <div class="description">每日签到 + 福利币 / 活跃度详情卡</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务 -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><div class="section-icon">🎯</div>任务</div>
+                </div>
+                <div class="section-content">
+                    <div class="command-grid">
+                        <div class="command-item">
                             <div class="command">#和平任务</div>
-                            <div class="description">自动完成营地每日任务（点赞/分享/浏览/工具）并领取奖励</div>
+                            <div class="description">自动完成营地每日任务并领奖，出结果卡</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平任务状态</div>
-                            <div class="description">查看每日任务完成情况（不做任何动作）</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#开启/关闭和平自动任务</div>
-                            <div class="description">定时自动做任务开关（默认每天 07:40，结果发主人）</div>
+                            <div class="description">查看每日任务完成情况（不做动作）</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平周任务</div>
-                            <div class="description">游戏手册每周任务自动完成（只做不领积分）</div>
+                            <div class="description">手册周任务状态一览（只读），含待领积分编号</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平周任务状态</div>
-                            <div class="description">查看手册周任务进度（不做任何动作）</div>
+                            <div class="command">#完成手册任务</div>
+                            <div class="description">自动完成手册每周任务，结果私信发送</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平营地币</div>
-                            <div class="description">查询福利币、营地装饰碎片等余额</div>
+                            <div class="command">#领取手册奖励 [编号…]</div>
+                            <div class="description">领取手册积分；不带编号=全部领取</div>
+                            <div class="example">#领取手册奖励 62 71</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command">#开启/关闭和平自动任务</div>
+                            <div class="description">定时自动做任务的开关（默认每天 07:40）</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 更多 -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><div class="section-icon">🌐</div>查询与偏好</div>
+                </div>
+                <div class="section-content">
+                    <div class="command-grid">
+                        <div class="command-item">
+                            <div class="command">#和平资讯 [编号]</div>
+                            <div class="description">资讯列表 / 指定编号详情</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平访客</div>
-                            <div class="description">查看最近看过你主页的访客</div>
+                            <div class="description">最近看过你主页的访客</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平在线好友</div>
-                            <div class="description">查看游戏好友在线状态</div>
+                            <div class="description">游戏好友在线状态</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平赛事</div>
-                            <div class="description">查看官方赛事列表（PEL/PSI 等）</div>
+                            <div class="description">官方赛事列表（PEL/PSI 等）</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平周报</div>
-                            <div class="description">查看本周数据（场次/胜场/K·D等）</div>
+                            <div class="command">#查看/设置对局索引</div>
+                            <div class="description">默认对局展示索引（#设置对局索引 0-12）</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#和平最近战绩</div>
-                            <div class="description">查看最近对局列表（可带数量 1-30）</div>
-                            <div class="example">示例：#和平最近战绩10</div>
-                        </div>
-                        <div class="command-item">
-    <div class="command">#和平战绩</div>
-    <div class="description">查看全部战绩总览（排位/地铁/古墓/团竞/巅峰赛/全民赛场/绿洲/匹配/内鬼等10分类统计）</div>
-    <div class="command">#和平战绩 &lt;分类&gt;</div>
-    <div class="description">查看该分类全部战绩，如 #和平战绩 地铁，可加页码 #和平战绩 地铁 2（每页10场）；支持全部/排位/计分/地铁/地铁逃生/古墓/古墓迷途/团竞/团队竞技/巅峰/巅峰赛/全民/全民赛场/绿洲/绿洲共创/匹配/不计分/内鬼/谁是内鬼</div>
-    <div class="example">示例：#和平战绩 地铁 2</div>
-                            <div class="command">#和平战绩详情&lt;编号&gt;</div>
-    <div class="description">查看单局战绩详情（需先查询 #和平最近战绩 或 #和平战绩）；按对局类型自动适配：经典=枪械/队伍/淘汰，地铁=收益/装备/背包，超体=英雄/插件/徽章，团竞=双方阵容</div>
-                            <div class="example">示例：#和平战绩详情1</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#枪械熟练度</div>
-                            <div class="description">查看所有枪械的熟练度数据</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#枪械熟练度 &lt;武器类型&gt;</div>
-                            <div class="description">按类型筛选查看枪械数据</div>
-                            <div class="example">示例：#枪械熟练度 突击步枪</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#和平资讯</div>
-                            <div class="description">查看资讯列表</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#和平资讯&lt;编号&gt;</div>
-                            <div class="description">查看对应编号的资讯详情</div>
-                            <div class="example">示例：#和平资讯5</div>
+                            <div class="command">#和平插件更新 [强制]</div>
+                            <div class="description">更新插件 / 更新日志（仅主人）</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 偏好设置 -->
-            <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">
-                        <div class="section-icon">⚙️</div>
-                        偏好设置
-                    </div>
-                    <span class="toggle-icon">▼</span>
-                </div>
-                <div class="section-content">
-                    <div class="command-grid">
-                        <div class="command-item">
-                            <div class="command">#查看对局索引</div>
-                            <div class="description">查看当前默认对局展示索引</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#设置对局索引 &lt;0-12&gt;</div>
-                            <div class="description">设置默认对局展示索引</div>
-                            <div class="example">示例：#设置对局索引 0</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#对局索引帮助</div>
-                            <div class="description">查看索引与模式对应关系</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 插件更新 -->
-            <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">
-                        <div class="section-icon">🔄</div>
-                        插件更新（仅主人）
-                    </div>
-                    <span class="toggle-icon">▼</span>
-                </div>
-                <div class="section-content">
-                    <div class="command-grid">
-                        <div class="command-item">
-                            <div class="command">#和平插件更新</div>
-                            <div class="description">更新插件到最新版本</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#和平插件强制更新</div>
-                            <div class="description">强制更新插件</div>
-                        </div>
-                        <div class="command-item">
-                            <div class="command">#和平插件更新日志</div>
-                            <div class="description">查看插件更新日志</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 使用提示 -->
             <div class="tip">
-                <div class="tip-title">
-                    <span class="tip-icon">💡</span>
-                    使用提示
-                </div>
+                <div class="tip-title"><span>💡</span>使用提示</div>
                 <div class="tip-content">
-                    请先使用 <strong>#绑定和平&lt;营地ID&gt;</strong> 绑定你的账号，再使用其它查询指令。支持绑定多个账号，可以随时切换使用。
+                    先 <strong>#和平QQ登录</strong> 或 <strong>#和平微信登录</strong> 扫码（自动绑定角色ID），即可使用全部功能；支持多账号随时切换。
                 </div>
             </div>
+
+            <div class="foot-note">#和平帮助 · 图片版菜单　|　#和平帮助文本 · 纯文本版</div>
         </div>
     </div>
-
-    <script>
-        function toggleSection(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.toggle-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                content.classList.add('collapsed');
-                icon.textContent = '▶';
-            } else {
-                content.classList.remove('collapsed');
-                content.classList.add('expanded');
-                icon.textContent = '▼';
-            }
-        }
-
-        // 默认展开所有section并随机设置列数
-        document.addEventListener('DOMContentLoaded', function() {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                const header = section.querySelector('.section-header');
-                toggleSection(header);
-                
-                // 随机设置2-4列布局
-                const commandGrid = section.querySelector('.command-grid');
-                if (commandGrid) {
-                    const randomCols = Math.floor(Math.random() * 3) + 2; // 2, 3, 或 4
-                    commandGrid.classList.add(`cols-${randomCols}`);
-                }
-            });
-        });
-    </script>
 </body>
 </html>

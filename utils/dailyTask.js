@@ -500,3 +500,69 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
   for (const w of out.weeks) for (const r of w.rows) if (progressById.has(r.id)) r.progress = progressById.get(r.id)
   return out
 }
+
+/**
+ * 领取手册周任务积分（status=1「完成待领」→ 2「已领」）。
+ *
+ * 接口 /game/claimseasonpasspoints，请求体 { roleId, seasonID, ids }，
+ * ids 为任务 id 用「|」拼接的串（反编译 WeeklyTaskFragment：append("|").append(getId())，
+ * 逗号分隔会报参数异常）；不传 ids（空串）= App 的「一键领取」。
+ * 响应 data.allStatus = { 任务id: 2 }，按它确认真正领到哪些。
+ *
+ * @param idList 可选，任务 id 数字数组；不传/传 null = 领取全部待领
+ * @returns { seasonID, claimed:[{id,title,point}], total }  total=实际领到的条数
+ */
+export async function claimWeeklyTasks(api, roleId, idList = null) {
+  const res = await api.get_season_pass_task(roleId)
+  if (Number(res?.returnCode) !== 0) throw new Error(`拉取手册任务失败：${res?.returnMsg || res?.returnCode}`)
+  const data = res?.data || {}
+  const seasonID = data.seasonID ?? ''
+  const claimable = []
+  for (const w of data.weekList || []) {
+    for (const t of w.taskList || []) {
+      if (Number(t.status) !== 1) continue
+      if (idList && !idList.includes(Number(t.id))) continue
+      claimable.push(t)
+    }
+  }
+  if (!claimable.length) return { seasonID, claimed: [], total: 0 }
+  const ids = claimable.map((t) => t.id).join('|')
+  const r = await api.claim_season_pass_points(roleId, seasonID, ids)
+  if (Number(r?.returnCode) !== 0) throw new Error(`领取失败：${r?.returnMsg || r?.returnCode}`)
+  const statusMap = r?.data?.allStatus || {}
+  const claimed = claimable
+    .filter((t) => Number(statusMap[t.id]) === 2)
+    .map((t) => ({ id: Number(t.id), title: t.title, point: Number(t.point) || 0 }))
+  return { seasonID, claimed, total: claimed.length }
+}
+
+/**
+ * 手册周任务只读视图（不执行任何动作），形状与 runWeeklyTasks 输出对齐，
+ * 供 #和平周任务 状态卡复用 weeklyRenderData。
+ */
+export async function weeklyTaskView(api, roleId, { maxWeeks = 8 } = {}) {
+  const res = await api.get_season_pass_task(roleId)
+  if (Number(res?.returnCode) !== 0) throw new Error(`拉取手册任务失败：${res?.returnMsg || res?.returnCode}`)
+  const data = res?.data || {}
+  const view = { seasonID: data.seasonID, weeks: [], acted: 0, waitClaim: [], skipped: [] }
+  for (const w of (data.weekList || []).slice(0, maxWeeks)) {
+    if (Number(w.isOpen) !== 1) continue
+    const rows = []
+    for (const t of w.taskList || []) {
+      const st = Number(t.status)
+      const row = {
+        id: Number(t.id),
+        title: t.title,
+        desc: t.desc || '',
+        progress: `${t.progress}/${t.maxProgress}`,
+        status: st === 2 ? 'done' : st === 1 ? 'waitClaim' : 'undone',
+        note: '',
+        ok: st !== 0,
+      }
+      rows.push(row)
+      if (st === 1) view.waitClaim.push(`${t.id} ${t.title}`)
+    }
+    view.weeks.push({ weekNo: w.weekNo, rows })
+  }
+  return view
+}
