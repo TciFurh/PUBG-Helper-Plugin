@@ -46,7 +46,24 @@ export function qualityColor(q) {
   return QUALITY_COLOR[Number(q)] || QUALITY_COLOR[101]
 }
 
-/** 晋级赛角标：成功=金 / 失败=灰 */
+/** 中文序号，晋级赛最多几局，够用 */
+const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+function cnNum(n) {
+  return n >= 0 && n <= 10 ? CN_NUM[n] : String(n)
+}
+
+/**
+ * 晋级赛角标。
+ *
+ * 接口 `promotion` 字段：{ taskId, process, target, pass, protect, rank, divId, divName }
+ * - `process/target` 是晋级进度（已打几局 / 需要几局），每赢一局 +1，保护局不加
+ * - `divName` 只在「这一局刚升上去」时才有值（如「卓越王牌」），其它局靠 taskId 反推：
+ *   20001 = 卓越王牌晋级任务（实测）
+ * - 卓越王牌是紫色角标、文字「晋级卓越王牌」（营地 App 同款），普通王牌是金色「晋级赛·成功」
+ *
+ * 返回值除了角标（small/big/tone），还带 `label`（整串文案，详情页用）和
+ * `step`（进度文案，如「卓越第三局 · 3/3」）。
+ */
 export function promoMeta(p) {
   if (!p || !p.taskId) return null
   const passed = String(p.pass) === '1' || Number(p.pass) === 1
@@ -55,9 +72,24 @@ export function promoMeta(p) {
   const target = p.target != null ? Number(p.target) : null
   const progress = proc != null && target != null ? `${proc}/${target}` : ''
   const percent = proc != null && target ? Math.min(100, Math.round((proc / target) * 100)) : 0
-  if (passed) return { small: '晋级赛', big: '成功', tone: 'gold', progress, percent }
-  if (protect) return { small: '晋级赛', big: '保护', tone: 'grey', progress, percent }
-  return { small: '晋级赛', big: '失败', tone: 'grey', progress, percent }
+
+  const tier = p.divName || (Number(p.taskId) === 20001 ? '卓越王牌' : '')
+  const isTop = /卓越/.test(tier)
+  const tierPrefix = isTop ? '卓越' : ''
+  const stepText = proc != null && proc > 0 ? `${tierPrefix}第${cnNum(proc)}局` : ''
+  const step = stepText
+    ? { text: stepText, progress, tone: passed ? (isTop ? 'purple' : 'gold') : 'grey' }
+    : null
+
+  if (passed) {
+    return isTop
+      ? { small: '晋级', big: '卓越王牌', tone: 'purple', label: '晋级卓越王牌', progress, percent, step }
+      : { small: '晋级赛', big: '成功', tone: 'gold', label: '晋级赛 · 成功', progress, percent, step }
+  }
+  if (protect) {
+    return { small: '晋级赛', big: '保护', tone: 'grey', label: '晋级赛 · 保护', progress, percent, step }
+  }
+  return { small: '晋级赛', big: '失败', tone: 'grey', label: '晋级赛 · 失败', progress, percent, step }
 }
 
 /** 对局结果文案：团竞/地铁共用 result 枚举 */

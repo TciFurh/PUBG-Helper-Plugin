@@ -72,6 +72,7 @@
     }
     .ribbon.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
     .ribbon.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
+    .ribbon.purple { background: linear-gradient(120deg, #E2D5FF, #A97BF5); color: #2A1350; }
     .ribbon b { font-size: 11px; font-weight: 700; }
 
     /* 第1列：结果块 or 排名 */
@@ -95,6 +96,7 @@
       background: #1c1c1c; color: #8E8E8E; border: 1px solid #2a2a2a;
     }
     .chip.gold { background: rgba(245,196,81,.14); color: #F5C451; border-color: rgba(245,196,81,.34); }
+    .chip.purple { background: rgba(169,123,245,.16); color: #C9B0FB; border-color: rgba(169,123,245,.42); }
     .chip.red { background: rgba(232,71,75,.14); color: #E8474B; border-color: rgba(232,71,75,.34); }
     .chip img { height: 11px; vertical-align: -2px; margin-right: 2px; }
 
@@ -186,6 +188,9 @@
         {{ each r.records rc }}
         <span class="chip gold">{{rc}}</span>
         {{ /each }}
+        {{ if r.ribbon && r.ribbon.step }}
+        <span class="chip {{r.ribbon.step.tone}}">{{r.ribbon.step.text}}{{ if r.ribbon.step.progress }} · {{r.ribbon.step.progress}}{{ /if }}</span>
+        {{ /if }}
       </div>
     </div>
 
