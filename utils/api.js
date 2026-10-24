@@ -340,6 +340,71 @@ class ApiService {
         return res.json()
     }
 
+    /** 历史总热力值（/game/getuserabinfos，keys=spark，JSON body）——失败返回 null */
+    async get_user_spark(friendRoleId) {
+        const p = await this.get_param()
+        if (!p) return null
+        const body = {
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            roleId: String(friendRoleId),
+            friendRoleId: String(friendRoleId),
+            keys: ['spark'],
+            targetUserIds: [String(friendRoleId)],
+            cGzip: 1,
+            cGameId: 20004,
+            cCurrentGameId: 20004,
+            gameId: 20004,
+            cChannelId: 6,
+            cClientVersionCode: 2102091536,
+            cClientVersionName: '3.38.3.1625',
+            cDevicePPI: 560,
+            cDeviceScreenHeight: 2800,
+            cDeviceScreenWidth: 1272,
+            cDeviceCPU: 'arm64-v8a$',
+            cDeviceRom: 'ONEPLUS',
+            cDeviceModel: 'PLC110',
+            cDeviceNet: 'WIFI',
+            cDeviceKey: '5fe2149330e76845e69c95ef100014e1a41d',
+            cDeviceId: '5fe2149330e76845e69c95ef100014e1a41d',
+            cDeviceMac: '',
+            cDeviceSP: '',
+            cWifiMac: '',
+            cWifiSsid: '',
+            cDeviceMem: 226133,
+            cSystemVersionCode: 36,
+            cSystemVersionName: '16',
+            cSystem: 'android',
+            pf: 'desktop_m_qq-10000144-android-2002-',
+        }
+        try {
+            const res = await fetch(this.main + '/game/getuserabinfos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'User-Agent': this.headers['User-Agent'],
+                },
+                body: JSON.stringify(body),
+            })
+            const j = await res.json()
+            const seen = JSON.stringify(j)
+            if (!seen || !seen.includes('spark')) return null
+            const m = seen.match(/"spark":\s*(\d{2,})/)
+            if (m) return Number(m[1])
+            const m2 = seen.match(/"spark":\s*{([^}]+)}/)
+            if (m2) {
+                const nums = [...m2[1].matchAll(/"(\w+)":\s*(\d{2,})/g)].map((x) => Number(x[2]))
+                if (nums.length) return Math.max(...nums)
+            }
+            return null
+        } catch {
+            return null
+        }
+    }
+
     async get_depotdetail(friendRoleId, mainTabId) {
         const p = await this.get_param()
         if (!p) throw new Error('获取参数失败，无法请求getdepotdetail')

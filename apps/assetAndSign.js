@@ -44,18 +44,26 @@ export class AssetAndSign extends plugin {
       const roleId = await apiService.get_self_role_id()
       if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
 
-      // 游戏内货币（点券/服饰币/金币/物资币/优惠券）——失败不阻塞资产查询
+      // 游戏内货币（顺序对齐营地 App：点券/荣耀勋章/幸运币/战备积分/物资币/服饰币/金币）
       let currencies = []
+      let collect = null
+      let spark = null
       try {
         const c = await apiService.get_charmandcoins(roleId)
         const d = c.data || {}
         currencies = [
-          { name: '点券', value: Number(d.diamond) || 0 },
-          { name: '服饰币', value: Number(d.itemCoin) || 0 },
+          { name: '点券', value: Number(d.ticket) || 0 },
+          { name: '荣耀勋章', value: Number(d.ironCoin) || 0 },
+          { name: '幸运币', value: Number(d.luckyCoin) || 0 },
+          { name: '战备积分', value: Number(d.universalScore) || 0 },
+          { name: '物资币', value: Number(d.itemCoin) || 0 },
+          { name: '服饰币', value: Number(d.diamond) || 0 },
           { name: '金币', value: Number(d.gold) || 0 },
-          { name: '物资币', value: Number(d.ironCoin) || 0 },
-          { name: '优惠券', value: Number(d.ticket) || 0 },
         ]
+        if (d.collectData && d.collectData.collectName) collect = d.collectData
+      } catch { }
+      try {
+        spark = await apiService.get_user_spark(roleId)
       } catch { }
 
       const tabs = await apiService.get_maintabs(roleId)
@@ -130,6 +138,8 @@ export class AssetAndSign extends plugin {
               totalCount: q ? filteredCount : section.count,
               filterNote,
               currencies: i === 0 ? currencies : [],
+              collect: i === 0 ? collect : null,
+              spark: i === 0 ? spark : null,
               pageIndex: i + 1,
               pageTotal: pageList.length,
               roleName: camp.nickname || camp.roleName || camp.userName || roleId,

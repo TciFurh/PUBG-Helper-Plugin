@@ -12,94 +12,99 @@
   }
   .card {
     width: 1240px;
-    background: #121212;
-    border: 1px solid #262626;
+    background: #101014;
+    border: 1px solid #262632;
     border-radius: 32px;
     padding: 40px 44px;
   }
-  .head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-bottom: 26px;
-    border-bottom: 1px solid #262626;
-    margin-bottom: 26px;
-  }
-  .title { font-size: 36px; font-weight: 700; color: #ffffff; letter-spacing: 2px; }
+  /* ---- 头部：收藏家信息 ---- */
+  .head { display: flex; align-items: center; gap: 22px; padding-bottom: 26px; border-bottom: 1px solid #262632; margin-bottom: 26px; }
+  .collect-icon { width: 88px; height: 88px; border-radius: 20px; object-fit: contain; background: #1a1a22; }
+  .collect-info { display: flex; flex-direction: column; gap: 4px; }
+  .collect-name { font-size: 30px; font-weight: 800; color: #ffffff; }
+  .collect-name .lvl { color: #fbbf24; margin-left: 10px; font-size: 24px; }
+  .collect-score { font-size: 22px; color: #a8a8a8; }
+  .collect-score b { color: #fbbf24; }
+  .spark { margin-left: auto; text-align: center; background: #1a1a22; border: 1px solid #3a2a18; border-radius: 18px; padding: 14px 26px; }
+  .spark .n { font-size: 34px; font-weight: 800; color: #ff9f43; }
+  .spark .l { font-size: 20px; color: #8a8a8a; margin-top: 2px; }
   .sub { font-size: 22px; color: #8a8a8a; }
-  .sec-head {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    padding: 18px 22px;
-    background: #1a1a1a;
-    border: 1px solid #262626;
-    border-radius: 18px;
-    margin-bottom: 20px;
-  }
+  /* ---- 货币 ---- */
+  .coins { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 24px; }
+  .coin { background: #17171d; border: 1px solid #262632; border-radius: 16px; padding: 14px 10px; text-align: center; }
+  .coin-n { font-size: 26px; font-weight: 700; color: #fbbf24; }
+  .coin-l { font-size: 18px; color: #8a8a8a; margin-top: 4px; }
+  /* ---- 分类头 ---- */
+  .sec-head { display: flex; align-items: baseline; gap: 14px; padding: 18px 22px; background: #17171d; border: 1px solid #262632; border-radius: 18px; margin-bottom: 20px; }
   .sec-name { font-size: 26px; font-weight: 700; color: #ffffff; }
   .sec-count { font-size: 22px; color: #8a8a8a; }
   .sec-count b { color: #d4d4d4; }
   .page-note { margin-left: auto; font-size: 22px; color: #8a8a8a; }
-  .groups { display: flex; flex-direction: column; gap: 10px; }
-  .group {
-    background: #181818;
-    border: 1px solid #242424;
-    border-radius: 16px;
-    padding: 14px 20px;
+  .filter-note { display: inline-block; background: #262632; border: 1px solid #3a3a4a; border-radius: 10px; padding: 4px 14px; font-size: 20px; color: #d4d4d4; margin-left: 10px; }
+  /* ---- 物品图块（游戏风格：图上文下，品质渐变底） ---- */
+  .groups { display: flex; flex-direction: column; gap: 14px; }
+  .group { background: #141419; border: 1px solid #22222c; border-radius: 16px; padding: 16px 18px; }
+  .group-name { font-size: 22px; font-weight: 600; color: #b8b8b8; margin-bottom: 14px; }
+  .items { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
+  .tile { border-radius: 14px; overflow: hidden; border: 1px solid #2a2a36; background: #1c1c24; }
+  .tile-img { height: 108px; display: flex; align-items: center; justify-content: center; background: #22222c; }
+  .tile-img img { max-width: 92px; max-height: 96px; object-fit: contain; }
+  .tile-name {
+    font-size: 17px; font-weight: 600; color: #e5e5e5; text-align: center;
+    padding: 6px 8px 7px; line-height: 1.3; height: 58px; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.35); overflow: hidden;
   }
-  .group-name { font-size: 22px; font-weight: 600; color: #b8b8b8; margin-bottom: 12px; }
-  .items { display: flex; flex-wrap: wrap; gap: 12px; }
-  .item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #1f1f1f;
-    border: 1px solid #2a2a2a;
-    border-radius: 14px;
-    padding: 10px 18px 10px 10px;
-  }
-  .item.rare { border-color: #d9d9d9; }
-  .item img { width: 52px; height: 52px; object-fit: contain; }
-  .item-info { display: flex; flex-direction: column; }
-  .item-name { font-size: 22px; font-weight: 600; color: #ffffff; }
-  .item-name .star { color: #d9d9d9; margin-left: 4px; display: none; }
-  .item.rare .item-name .star { display: inline; }
-  .item-count { font-size: 19px; color: #8a8a8a; }
-  /* 品质底色 */
-  .item.q6 { background: rgba(255,64,64,.16); border-color: #ff4d4f; }
-  .item.q6 .item-name { color: #ff8a8a; }
-  .item.q5 { background: rgba(255,102,178,.14); border-color: #ff66b2; }
-  .item.q5 .item-name { color: #ffa8d2; }
-  .item.q4 { background: rgba(168,85,247,.16); border-color: #a855f7; }
-  .item.q4 .item-name { color: #c9a2ff; }
-  .item.q3 { background: rgba(59,130,246,.13); border-color: #3b82f6; }
-  .item.q3 .item-name { color: #93b8ff; }
-  .item.q2 { background: rgba(34,197,94,.12); border-color: #22c55e; }
-  .item.q2 .item-name { color: #86efac; }
-  /* 货币卡 */
-  .coins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
-  .coin { background: #181818; border: 1px solid #262626; border-radius: 16px; padding: 18px 20px; text-align: center; }
-  .coin-n { font-size: 30px; font-weight: 700; color: #fbbf24; }
-  .coin-l { font-size: 20px; color: #8a8a8a; margin-top: 4px; }
-  .filter-note { display: inline-block; background: #262626; border: 1px solid #333; border-radius: 10px; padding: 4px 14px; font-size: 20px; color: #d4d4d4; margin-left: 10px; }
+  .tile-count { font-size: 15px; color: #8a8a8a; text-align: center; padding-bottom: 7px; background: rgba(0,0,0,.35); }
+  /* 品质渐变（对齐游戏内配色） */
+  .tile.q6 .tile-img { background: linear-gradient(160deg, #7e1d1d 0%, #b03a2e 60%, #e74c3c 100%); }
+  .tile.q6 { border-color: #e74c3c; }
+  .tile.q6 .tile-name { color: #ff9f8a; }
+  .tile.q5 .tile-img { background: linear-gradient(160deg, #6b1d6b 0%, #a12380 55%, #e91e8c 100%); }
+  .tile.q5 { border-color: #e91e8c; }
+  .tile.q5 .tile-name { color: #ff9fd0; }
+  .tile.q4 .tile-img { background: linear-gradient(160deg, #2d1b6b 0%, #4a2a9e 55%, #7c3aed 100%); }
+  .tile.q4 { border-color: #7c3aed; }
+  .tile.q4 .tile-name { color: #c4b0ff; }
+  .tile.q3 .tile-img { background: linear-gradient(160deg, #12305e 0%, #1d4f9e 55%, #3b82f6 100%); }
+  .tile.q3 { border-color: #3b82f6; }
+  .tile.q3 .tile-name { color: #a5c4ff; }
+  .tile.q2 .tile-img { background: linear-gradient(160deg, #11402a 0%, #177a4a 55%, #22c55e 100%); }
+  .tile.q2 { border-color: #22c55e; }
+  .tile.q2 .tile-name { color: #86efac; }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="head">
-    <span class="title">资产 · {{ section.name }}{{ if filterNote }}<span class="filter-note">{{ filterNote }}</span>{{ /if }}</span>
-    <span class="sub">{{ roleName }} · {{ updated }}</span>
+    {{ if collect && collect.collectName }}
+    <img class="collect-icon" src="{{ collect.collectIcon }}" />
+    <div class="collect-info">
+      <div class="collect-name">{{ collect.collectName }}<span class="lvl">{{ collect.growthCollectLevel }} 级</span></div>
+      <div class="collect-score">收藏家积分 <b>{{ collect.collectScore }}</b> · {{ roleName }}</div>
+    </div>
+    {{ else }}
+    <div class="collect-info">
+      <div class="collect-name">资产 · {{ section.name }}{{ if filterNote }}<span class="filter-note">{{ filterNote }}</span>{{ /if }}</div>
+      <div class="collect-score">{{ roleName }} · {{ updated }}</div>
+    </div>
+    {{ /if }}
+    {{ if spark }}
+    <div class="spark"><div class="n">{{ spark }}</div><div class="l">历史总热力值</div></div>
+    {{ /if }}
   </div>
-  {{ if pageIndex === 1 && currencies && currencies.length }}
+
+  {{ if currencies && currencies.length }}
   <div class="coins">
     {{ each currencies as c }}
     <div class="coin"><div class="coin-n">{{ c.value }}</div><div class="coin-l">{{ c.name }}</div></div>
     {{ /each }}
   </div>
   {{ /if }}
+
   <div class="sec-head">
-    <span class="sec-count">共 <b>{{ totalCount }}</b> 件 · 稀有 <b>{{ section.rareCnt }}</b></span>
+    <span class="sec-name">{{ section.name }}</span>
+    <span class="sec-count">共 <b>{{ totalCount }}</b> 件{{ if section.rareCnt }} · 稀有 <b>{{ section.rareCnt }}</b>{{ /if }}</span>
+    {{ if filterNote }}<span class="filter-note">{{ filterNote }}</span>{{ /if }}
     <span class="page-note">第 {{ pageIndex }}/{{ pageTotal }} 页</span>
   </div>
   <div class="groups">
@@ -109,12 +114,10 @@
         <div class="group-name">{{ g.tabName }}</div>
         <div class="items">
           {{ each g.items as it }}
-          <div class="item q{{ it.quality }}{{ it.quality >= 5 ? ' rare' : '' }}">
-            <img src="{{ it.imageUrl }}" />
-            <div class="item-info">
-              <div class="item-name">{{ it.itemName }}<span class="star">★</span></div>
-              <div class="item-count">× {{ it.count }}</div>
-            </div>
+          <div class="tile q{{ it.quality }}">
+            <div class="tile-img"><img src="{{ it.imageUrl }}" /></div>
+            <div class="tile-name">{{ it.itemName }}</div>
+            {{ if it.count > 1 }}<div class="tile-count">× {{ it.count }}</div>{{ /if }}
           </div>
           {{ /each }}
         </div>
