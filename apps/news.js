@@ -1,4 +1,6 @@
 import { ApiService } from '../utils/api.js'
+import Button from '../utils/button.js'
+
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 
 const apiService = new ApiService()
@@ -66,7 +68,7 @@ export class News extends plugin {
             listB
         })
 
-        return e.reply(image)
+        return e.reply([image, Button.news(list.length)])
     }
 
     async showNewsDetail(e) {
@@ -95,7 +97,7 @@ export class News extends plugin {
             item
         })
 
-        return e.reply(image)
+        return e.reply([image, Button.news(list.length)])
     }
 }
 

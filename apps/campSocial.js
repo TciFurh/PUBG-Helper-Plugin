@@ -10,6 +10,8 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp } from '../utils/storage.js'
+import Button from '../utils/button.js'
+
 
 /** 好友/访客的 onlineStatus 值 → 文案（营地 App 口径，未知值原样展示） */
 function onlineText(v) {
@@ -43,7 +45,7 @@ export class CampSocial extends plugin {
 
   async coins(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const res = await ctx.api.get_user_coins()
       const raw = res?.data?.coins || []
@@ -71,11 +73,11 @@ export class CampSocial extends plugin {
           coins,
         })
       } catch { /* 渲染失败回文本 */ }
-      if (image) return e.reply(image)
+      if (image) return e.reply([image, Button.coins()])
       // 兜底：渲染失败回文本
       const lines = [`💰 ${roleName} 的营地资产`]
       for (const c of coins) lines.push(`· ${c.name}：${c.numFmt}`)
-      e.reply(lines.join('\n'))
+      e.reply([lines.join('\n'), Button.assets()])
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))
     }
@@ -83,7 +85,7 @@ export class CampSocial extends plugin {
 
   async visits(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const res = await ctx.api.get_visits()
       const list = res?.data?.list || []
@@ -97,7 +99,7 @@ export class CampSocial extends plugin {
         if (Number(v.personalAuth) === 1) seg.push('认证')
         lines.push('· ' + seg.filter(Boolean).join(' · '))
       }
-      e.reply(lines.join('\n'))
+      e.reply([lines.join('\n'), Button.assets()])
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))
     }
@@ -105,7 +107,7 @@ export class CampSocial extends plugin {
 
   async onlineFriends(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const roleId = await ctx.api.get_self_role_id()
       const res = await ctx.api.get_online_friends(roleId)
@@ -121,7 +123,7 @@ export class CampSocial extends plugin {
         else if (f.isLuckyStar) seg.push('幸运星')
         lines.push('· ' + seg.filter(Boolean).join(' · '))
       }
-      e.reply(lines.join('\n'))
+      e.reply([lines.join('\n'), Button.assets()])
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))
     }
@@ -129,7 +131,7 @@ export class CampSocial extends plugin {
 
   async leagues(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const res = await ctx.api.get_league_list()
       const list = res?.data?.leagues || []
@@ -141,7 +143,7 @@ export class CampSocial extends plugin {
         if (l.leagueType) seg.push(l.leagueType)
         lines.push('· ' + seg.filter(Boolean).join(' · '))
       }
-      e.reply(lines.join('\n'))
+      e.reply([lines.join('\n'), Button.assets()])
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))
     }

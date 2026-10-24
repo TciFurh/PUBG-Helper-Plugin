@@ -1,5 +1,7 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
+import Button from '../utils/button.js'
+
 import { getCamp, getUserInfo } from '../utils/storage.js'
 
 const apiService = new ApiService()
@@ -27,7 +29,7 @@ export class WeeklyReport extends plugin {
   async showWeeklyReport(e) {
     await e.reply('⏳ 正在查询本周数据...')
     const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     apiService.useCamp(camp)
     try {
@@ -61,7 +63,7 @@ export class WeeklyReport extends plugin {
         updateTime: fmtTime(row.updateTime),
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply(image)
+      e.reply([image, Button.homepage()])
     } catch (err) {
       e.reply('❌ 周报查询失败：' + (err.message || err))
     }

@@ -1,6 +1,8 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp, getUserInfo } from '../utils/storage.js'
+import Button from '../utils/button.js'
+
 
 const apiService = new ApiService()
 
@@ -23,7 +25,7 @@ export class AssetAndSign extends plugin {
     await e.reply('⏳ 正在查询营地仓库资产...')
     const { info } = getUserInfo(e.user_id)
     const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     apiService.useCamp(camp)
     try {
@@ -111,6 +113,7 @@ export class AssetAndSign extends plugin {
           }
         }
       }
+      try { await e.reply(Button.assets()) } catch {}
     } catch (err) {
       e.reply('❌ 资产查询失败：' + (err.message || err))
     }
@@ -121,7 +124,7 @@ export class AssetAndSign extends plugin {
     await e.reply('⏳ 正在执行每日签到...')
     const { info } = getUserInfo(e.user_id)
     const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     apiService.useCamp(camp)
     try {
@@ -189,7 +192,7 @@ export class AssetAndSign extends plugin {
           coins,
         })
       } catch { /* 渲染失败回文本 */ }
-      if (image) return e.reply(image)
+      if (image) return e.reply([image, Button.signin()])
       // 兜底纯文本
       e.reply([status, note, `福利币：${findCoin(/福利币/)}`, `活跃度：${liveness}`].join('\n'))
     } catch (err) {

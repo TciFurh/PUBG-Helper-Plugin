@@ -6,6 +6,8 @@ import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createQQLoginSession, waitForQQLogin } from '../utils/qqPageLogin.js'
 import { getCamp, saveCamp, maskToken, getUserInfo, saveUserInfo } from '../utils/storage.js'
 import { saveCampAndBind } from '../utils/accounts.js'
+import Button from '../utils/button.js'
+
 
 export class QqLogin extends plugin {
   constructor() {
@@ -117,7 +119,7 @@ export class QqLogin extends plugin {
         `当前账号数: ${r.total}（#和平账号 查看 / #切换和平账号 切换）`,
         `token: ${maskToken(camp.token)}`,
         '现在可以使用个人凭证功能（#和平主页 #和平资产 #和平签到）',
-      ].join('\n'))
+      ].join('\n'), Button.account())
     } catch (err) {
       this._session = null
       const msg = '❌ QQ 登录失败：' + (err?.message || err)

@@ -3,6 +3,8 @@ import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createWxLoginSession, waitForWxLogin } from '../utils/wxQrLogin.js'
 import { getCamp, saveCamp, maskToken } from '../utils/storage.js'
 import { saveCampAndBind } from '../utils/accounts.js'
+import Button from '../utils/button.js'
+
 
 export class WxLogin extends plugin {
     constructor() {
@@ -79,7 +81,7 @@ export class WxLogin extends plugin {
                 `当前账号数: ${r.total}（#和平账号 查看 / #切换和平账号 切换）`,
                 `token: ${maskToken(saved.token)}`,
                 '现在可以使用个人凭证查询了。'
-            ].join('\n'))
+            ].join('\n'), Button.account())
         } catch (err) {
             this._session = null
             await this._notify(e, '❌ 扫码登录失败：' + (err?.message || err))

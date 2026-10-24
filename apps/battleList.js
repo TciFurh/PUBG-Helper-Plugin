@@ -1,6 +1,8 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp } from '../utils/storage.js'
+import Button from '../utils/button.js'
+
 import { setBattleCache } from '../utils/battleCache.js'
 import { fmtWan, resultText } from '../utils/battleFmt.js'
 import { buildListRows, buildMetroProfile, buildTombProfile } from '../utils/battleView.js'
@@ -40,7 +42,7 @@ export class BattleList extends plugin {
   async getRoleId(e) {
     const camp = getCamp(e.user_id)
     if (!camp || !camp.token) {
-      e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+      e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
       return null
     }
     apiService.useCamp(camp)
@@ -95,7 +97,7 @@ export class BattleList extends plugin {
         updateTime: new Date().toLocaleString('zh-CN', { hour12: false }),
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply(image)
+      e.reply([image, Button.overview()])
     } catch (err) {
       e.reply('❌ 战绩统计失败：' + (err.message || err))
     }
@@ -147,7 +149,7 @@ export class BattleList extends plugin {
         rows: buildListRows(list, tab, page),
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply(image)
+      e.reply([image, Button.category(tab, page, hasMore)])
     } catch (err) {
       e.reply(`❌ ${tab.name}战绩查询失败：` + (err.message || err))
     }

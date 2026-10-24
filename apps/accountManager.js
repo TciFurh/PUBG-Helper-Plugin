@@ -1,4 +1,6 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import Button from '../utils/button.js'
+
 import {
 	getUserInfo, formatIdList,
 	listCamps, formatCampList, switchCamp, removeCampAt, bindRole, switchRole, removeRole,
@@ -39,7 +41,7 @@ export class AccountManager extends plugin {
 		const head = camp
 			? `当前营地账号：${camp.nickname || camp.userName || camp.userId}（角色 ${camp.roleId || info.ids[info.current] || '未解析'}）\n共 ${info.ids.length} 个角色：`
 			: `共 ${info.ids.length} 个角色：`
-		return e.reply([segment.at(userId), '\n', head, '\n', formatIdList(info)])
+		return e.reply([segment.at(userId), '\n', head, '\n', formatIdList(info), Button.account()])
 	}
 
 	async bindId(e) {
@@ -112,7 +114,7 @@ export class AccountManager extends plugin {
 				tplFile: 'plugins/PUBG-Helper-Plugin/resources/camps.html',
 				...data,
 			})
-			if (image) return e.reply(image)
+			if (image) return e.reply([image, Button.account()])
 		} catch { /* 渲染失败回文本 */ }
 		const cur = camps[info.currentCamp] || camps[0]
 		return e.reply([

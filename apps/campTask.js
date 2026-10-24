@@ -20,6 +20,8 @@ import { ApiService } from '../utils/api.js'
 import { runDailyTasks, runWeeklyTasks, claimWeeklyTasks, weeklyTaskView } from '../utils/dailyTask.js'
 import { getCamp } from '../utils/storage.js'
 import { getBot } from 'jiuli'
+import Button from '../utils/button.js'
+
 
 const CFG_FILE = path.resolve('./data/PUBG-Helper-Plugin/TaskConfig.json')
 /** 定时默认 07:40（签到默认 07:30，错开 10 分钟） */
@@ -250,7 +252,7 @@ export class CampTask extends plugin {
   /** `#和平任务`：把能做的做一遍 */
   async doTasks(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     if (this.running) return e.reply('⏳ 任务正在跑，稍等一下再试')
     this.running = true
@@ -266,7 +268,7 @@ export class CampTask extends plugin {
           tplFile: 'plugins/PUBG-Helper-Plugin/resources/dailyTasks.html',
           ...dailyRenderData(view, roleName, roleId),
         })
-        if (image) return await e.reply(image)
+        if (image) return await e.reply([image, Button.daily()])
       } catch { /* 渲染失败回文本 */ }
       await e.reply(describeView(view, roleName))
     } catch (err) {
@@ -279,10 +281,10 @@ export class CampTask extends plugin {
   /** `#和平任务状态`：只看不做 */
   async taskStatus(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const roleId = await ctx.api.get_self_role_id()
-      e.reply(await statusText(ctx.api, roleId, ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId))
+      e.reply([await statusText(ctx.api, roleId, ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || roleId), Button.daily()])
     } catch (err) {
       e.reply('❌ 状态查询失败：' + (err.message || err))
     }
@@ -291,7 +293,7 @@ export class CampTask extends plugin {
   /** `#完成手册任务`：自动完成游戏手册每周任务（只做不领），结果私信发给触发者 */
   async doWeeklyTasks(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
     if (this.running) return e.reply('⏳ 任务正在跑，稍等一下再试')
     this.running = true
     await e.reply('⏳ 正在自动完成游戏手册每周任务，完成后私信发你结果...')
@@ -308,12 +310,12 @@ export class CampTask extends plugin {
         })
       } catch { /* 渲染失败回文本 */ }
       const summary = `✅ 手册任务执行完成：自动完成 ${view.acted} 项、待领 ${view.waitClaim.length} 项、需手动 ${view.skipped.length} 项`
-      const sent = await this.#dm(e.user_id, image || describeWeekly(view, roleName))
+      const sent = await this.#dm(e.user_id, [image || describeWeekly(view, roleName), Button.weeklyRun()])
       if (sent) {
-        await e.reply(`${summary}\n📩 结果已私信发送`)
+        await e.reply([`${summary}\n📩 结果已私信发送`, Button.weeklyRun()])
       } else {
         await e.reply(`${summary}（私信发送失败，直接发在这里）`)
-        await e.reply(image || describeWeekly(view, roleName))
+        await e.reply([image || describeWeekly(view, roleName), Button.weeklyRun()])
       }
     } catch (err) {
       await e.reply('❌ 周任务执行失败：' + (err.message || err))
@@ -335,7 +337,7 @@ export class CampTask extends plugin {
   /** `#和平周任务` / `#和平周任务状态`：手册周任务状态卡（只读，不出任何动作） */
   async weeklyStatus(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     try {
       const roleId = await ctx.api.get_self_role_id()
       const view = await weeklyTaskView(ctx.api, roleId)
@@ -345,9 +347,9 @@ export class CampTask extends plugin {
           tplFile: 'plugins/PUBG-Helper-Plugin/resources/weekly.html',
           ...weeklyRenderData(view, roleName, roleId, 'status'),
         })
-        if (image) return e.reply(image)
+        if (image) return e.reply([image, Button.weekly()])
       } catch { /* 渲染失败回文本 */ }
-      e.reply(await weeklyStatusText(ctx.api, roleName, roleId))
+      e.reply([await weeklyStatusText(ctx.api, roleName, roleId), Button.weekly()])
     } catch (err) {
       e.reply('❌ 状态查询失败：' + (err.message || err))
     }
@@ -356,7 +358,7 @@ export class CampTask extends plugin {
   /** `#领取手册奖励 [编号...]`：领取手册任务积分；不带参数=领全部待领 */
   async claimWeekly(e) {
     const ctx = this.#context(e)
-    if (!ctx) return e.reply('❌ 未找到营地登录凭证，请先扫码登录')
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
     const arg = String(e.msg || '').replace(/^#领取手册奖励/, '').trim()
     let idList = null
     if (arg && !/^(全部|all)$/i.test(arg)) {
@@ -376,7 +378,7 @@ export class CampTask extends plugin {
         )
       }
       const pts = r.claimed.reduce((s, c) => s + c.point, 0)
-      e.reply(`🎉 已领取 ${r.total} 项 · 共 ${pts} 积分\n${r.claimed.map((c) => `· ${c.title} #${c.id}（${c.point}分）`).join('\n')}`)
+      e.reply([`🎉 已领取 ${r.total} 项 · 共 ${pts} 积分\n${r.claimed.map((c) => `· ${c.title} #${c.id}（${c.point}分）`).join('\n')}`, Button.claim()])
     } catch (err) {
       e.reply('❌ 领取失败：' + (err.message || err))
     }

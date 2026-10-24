@@ -4,6 +4,8 @@ import { getCamp } from '../utils/storage.js'
 import { setBattleCache, getBattleCache } from '../utils/battleCache.js'
 import { buildDetailView } from '../utils/battleView.js'
 import { promoMeta } from '../utils/battleFmt.js'
+import Button from '../utils/button.js'
+
 
 const apiService = new ApiService()
 
@@ -28,7 +30,7 @@ export class RecentBattle extends plugin {
 
     await e.reply(`⏳ 正在查询最近 ${count} 局战绩...`)
     const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     apiService.useCamp(camp)
     try {
@@ -66,7 +68,7 @@ export class RecentBattle extends plugin {
         rows,
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply(image)
+      e.reply([image, Button.recent(rows.length)])
     } catch (err) {
       e.reply('❌ 最近战绩查询失败：' + (err.message || err))
     }
@@ -76,7 +78,7 @@ export class RecentBattle extends plugin {
   async showBattleDetail(e) {
     const idxArg = Number(e.msg.match(/^#和平战绩详情(\d+)$/)?.[1])
     const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）')
+    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 
     const battleCache = getBattleCache()
     if (battleCache.userId !== e.user_id || !battleCache.list.length) {
@@ -97,7 +99,7 @@ export class RecentBattle extends plugin {
         updateTime: new Date().toLocaleString('zh-CN', { hour12: false }),
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply(image)
+      e.reply([image, Button.battleDetail()])
     } catch (err) {
       e.reply('❌ 战绩详情查询失败：' + (err.message || err))
     }

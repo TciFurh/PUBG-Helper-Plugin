@@ -1,4 +1,6 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import Button from '../utils/button.js'
+
 
 export class Help extends plugin {
     constructor() {
@@ -27,7 +29,7 @@ export class Help extends plugin {
                     scale: `style=transform:scale(1.5)`
                 }
             })
-            e.reply(image)
+            e.reply([image, Button.help()])
         } catch (error) {
             await this.showHelpText(e)
         }
@@ -66,7 +68,7 @@ export class Help extends plugin {
                 '💡 图片版菜单：#和平帮助；新功能见 #和平帮助 里的「任务」分类'
             ].join('\n')
 
-            await e.reply(menu)
+            await e.reply([menu, Button.help()])
         } catch (error) {
             await e.reply('显示帮助菜单失败，请稍后重试')
         }

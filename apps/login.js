@@ -1,5 +1,7 @@
 import { getCamp, saveCamp, deleteCamp, maskToken, getUserInfo, listCamps, formatIdList } from '../utils/storage.js'
 import { saveCampAndBind } from '../utils/accounts.js'
+import Button from '../utils/button.js'
+
 
 export class Login extends plugin {
 	constructor() {
@@ -39,7 +41,7 @@ export class Login extends plugin {
 			'支持多账号：不同账号各提交/扫码一次即可，各自的角色ID会自动绑定',
 			'提交后即可用个人凭证查询(失效自动回落公共查询)'
 		].join('\n')
-		await e.reply(guide)
+		await e.reply([guide, Button.bind()])
 	}
 
 	// 提交凭证

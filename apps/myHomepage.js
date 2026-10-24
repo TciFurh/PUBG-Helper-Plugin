@@ -1,4 +1,6 @@
 import { ApiService } from '../utils/api.js'
+import Button from '../utils/button.js'
+
 import { getUserInfo } from '../utils/storage.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { readFileSync } from 'node:fs'
@@ -243,6 +245,6 @@ export class MyHomepage extends plugin {
             ...tplData
         })
 
-        e.reply(image)
+        e.reply([image, Button.homepage()])
     }
 }
