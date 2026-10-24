@@ -3,6 +3,7 @@ import { ApiService } from '../utils/api.js'
 import { getCamp } from '../utils/storage.js'
 import { setBattleCache, getBattleCache } from '../utils/battleCache.js'
 import { buildDetailView } from '../utils/battleView.js'
+import { promoMeta } from '../utils/battleFmt.js'
 
 const apiService = new ApiService()
 
@@ -55,6 +56,7 @@ export class RecentBattle extends plugin {
         isMvp: Number(item.isMvp) === 1,
         gradeIcon: item.ratingIcon || '',
         gradeText: item.ratingValue || '',
+        ribbon: promoMeta(item.promotion, item.result),
       }))
 
       const image = await puppeteer.screenshot('recentbattle', {

@@ -56,15 +56,27 @@ function cnNum(n) {
  * 晋级赛角标。
  *
  * 接口 `promotion` 字段：{ taskId, process, target, pass, protect, rank, divId, divName }
- * - `process/target` 是晋级进度（已打几局 / 需要几局），每赢一局 +1，保护局不加
- * - `divName` 只在「这一局刚升上去」时才有值（如「卓越王牌」），其它局靠 taskId 反推：
- *   20001 = 卓越王牌晋级任务（实测）
- * - 卓越王牌是紫色角标、文字「晋级卓越王牌」（营地 App 同款），普通王牌是金色「晋级赛·成功」
+ * - `process/target` 是晋级进度（已打几局 / 共几局）
+ * - `pass=1` 只出现在「这局打完整场晋级赛成功」的最终局，此时 `divName` 才有值（如「卓越王牌」）
+ * - `protect=1` 是保护局（输了但抵消一次）
+ * - 其余为中间局：结合对局结果 result 判断这局胜负（'Win'/'Landslide' 算赢）
+ *
+ * 配色（按段位，营地 App 同款）：
+ * - 绝世 → 红 / 传奇 → 橙 / 卓越王牌 → 紫（最终局，文字「晋级绝世王牌」这类整串）
+ * - 普通段位最终局与中间局胜局 → 金色「晋级赛·成功」
+ * - 保护局 / 中间局败局 → 灰色
+ * - divName 缺失时按 taskId 反推（20001 = 卓越王牌，实测）
  *
  * 返回值除了角标（small/big/tone），还带 `label`（整串文案，详情页用）和
  * `step`（进度文案，如「卓越第三局 · 3/3」）。
  */
-export function promoMeta(p) {
+const PROMO_TIER_TONES = [
+  { re: /绝世/, tone: 'red' },
+  { re: /传奇/, tone: 'orange' },
+  { re: /卓越/, tone: 'purple' },
+]
+
+export function promoMeta(p, result) {
   if (!p || !p.taskId) return null
   const passed = String(p.pass) === '1' || Number(p.pass) === 1
   const protect = String(p.protect) === '1' || p.protect === true
@@ -74,22 +86,43 @@ export function promoMeta(p) {
   const percent = proc != null && target ? Math.min(100, Math.round((proc / target) * 100)) : 0
 
   const tier = p.divName || (Number(p.taskId) === 20001 ? '卓越王牌' : '')
-  const isTop = /卓越/.test(tier)
-  const tierPrefix = isTop ? '卓越' : ''
+  const hit = PROMO_TIER_TONES.find((t) => t.re.test(tier))
+  const tierPrefix = tier ? tier.replace(/王牌$/, '') : ''
   const stepText = proc != null && proc > 0 ? `${tierPrefix}第${cnNum(proc)}局` : ''
-  const step = stepText
-    ? { text: stepText, progress, tone: passed ? (isTop ? 'purple' : 'gold') : 'grey' }
-    : null
 
-  if (passed) {
-    return isTop
-      ? { small: '晋级', big: '卓越王牌', tone: 'purple', label: '晋级卓越王牌', progress, percent, step }
-      : { small: '晋级赛', big: '成功', tone: 'gold', label: '晋级赛 · 成功', progress, percent, step }
+  let small, big, tone
+  if (passed && hit) {
+    small = '晋级'
+    big = tier
+    tone = hit.tone
+  } else if (passed) {
+    small = '晋级赛'
+    big = '成功'
+    tone = 'gold'
+  } else if (protect) {
+    small = '晋级赛'
+    big = '保护'
+    tone = 'grey'
+  } else if (result === 'Win' || result === 'Landslide') {
+    small = '晋级赛'
+    big = '成功'
+    tone = 'gold'
+  } else {
+    small = '晋级赛'
+    big = '失败'
+    tone = 'grey'
   }
-  if (protect) {
-    return { small: '晋级赛', big: '保护', tone: 'grey', label: '晋级赛 · 保护', progress, percent, step }
+
+  const step = stepText ? { text: stepText, progress, tone } : null
+  return {
+    small,
+    big,
+    tone,
+    label: passed && hit ? `晋级${tier}` : `${small} · ${big}`,
+    progress,
+    percent,
+    step,
   }
-  return { small: '晋级赛', big: '失败', tone: 'grey', label: '晋级赛 · 失败', progress, percent, step }
 }
 
 /** 对局结果文案：团竞/地铁共用 result 枚举 */

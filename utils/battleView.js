@@ -15,7 +15,7 @@ import { val, fmtNum, fmtWan, qualityColor, promoMeta, resultText, resultTone, r
 export function buildRow(it, tab, idx) {
   const isMetro = tab.type === 'metro' || Number(it.tabIndex) === 5
   const isTdm = Number(it.tabIndex) === 2 || Number(it.mode) === 803
-  const promo = promoMeta(it.promotion)
+  const promo = promoMeta(it.promotion, it.result)
 
   // #0 表示该模式无排名意义（如绿洲跑酷），不展示
   const teamRank = it.teamRank && it.teamRank !== '#0' ? it.teamRank : ''

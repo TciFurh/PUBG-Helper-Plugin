@@ -8,12 +8,12 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      width: 1080px;
+      width: 900px;
       zoom: 2.0;
       font-family: 'Noto Sans SC', sans-serif;
       background: #000000;
       color: #fafafa;
-      padding: 26px 28px;
+      padding: 22px 24px;
     }
     .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
     .head .logo {
@@ -51,14 +51,14 @@
     .row {
       position: relative;
       display: grid;
-      grid-template-columns: 90px 1fr 96px 92px 104px 96px;
+      grid-template-columns: 86px minmax(0, 1fr) 88px 84px 100px 92px;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       background: #101010;
       border: 1px solid #232323;
       border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 8px;
+      padding: 11px 14px;
+      margin-bottom: 7px;
     }
 
     /* 晋级赛角标：贴左上角，营地 UI 同款金色丝带 */
@@ -73,6 +73,8 @@
     .ribbon.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
     .ribbon.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
     .ribbon.purple { background: linear-gradient(120deg, #E2D5FF, #A97BF5); color: #2A1350; }
+    .ribbon.orange { background: linear-gradient(120deg, #FFDDB8, #F5913E); color: #3A1B00; }
+    .ribbon.red { background: linear-gradient(120deg, #FFC9CB, #E8474B); color: #420608; }
     .ribbon b { font-size: 11px; font-weight: 700; }
 
     /* 第1列：结果块 or 排名 */
@@ -97,6 +99,7 @@
     }
     .chip.gold { background: rgba(245,196,81,.14); color: #F5C451; border-color: rgba(245,196,81,.34); }
     .chip.purple { background: rgba(169,123,245,.16); color: #C9B0FB; border-color: rgba(169,123,245,.42); }
+    .chip.orange { background: rgba(245,145,62,.16); color: #F5A551; border-color: rgba(245,145,62,.42); }
     .chip.red { background: rgba(232,71,75,.14); color: #E8474B; border-color: rgba(232,71,75,.34); }
     .chip img { height: 11px; vertical-align: -2px; margin-right: 2px; }
 
@@ -133,6 +136,8 @@
     .legend { display: flex; gap: 14px; justify-content: center; font-size: 10px; color: #5E5E5E; margin-top: 10px; }
     .legend i { font-style: normal; }
     .legend .g { color: #F5C451; }
+    .legend .p { color: #C9B0FB; }
+    .legend .o { color: #F5A551; }
     .legend .r { color: #E8474B; }
   </style>
 </head>
@@ -218,9 +223,11 @@
     <span>发送「#和平战绩详情 编号」查看单局详情</span>
   </div>
   <div class="legend">
-    <i class="g">金</i><i>胜 / 晋级成功 / 正增益</i>
-    <i>灰</i><i>败 / 晋级失败</i>
-    <i class="r">红</i><i>负收益 / 连击中断</i>
+    <i class="g">金</i><i>胜 / 晋级成功</i>
+    <i class="p">紫</i><i>晋级卓越王牌</i>
+    <i class="o">橙</i><i>晋级传奇</i>
+    <i class="r">红</i><i>晋级绝世</i>
+    <i>灰</i><i>败 / 保护 / 晋级失败</i>
   </div>
 </body>
 </html>

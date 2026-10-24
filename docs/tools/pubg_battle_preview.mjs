@@ -31,6 +31,7 @@ const template = require('art-template')
 const load = (p) => import(pathToFileURL(path.join(PLUGIN, p)).href)
 const { ApiService } = await load('utils/api.js')
 const { buildListRows, buildDetailView, buildMetroProfile } = await load('utils/battleView.js')
+const { promoMeta } = await load('utils/battleFmt.js')
 
 const EDGE =
   process.env.EDGE_PATH || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
@@ -135,6 +136,30 @@ for (const tab of ONLY === 'detail' ? [] : TABS) {
     hasMore: Number((res.data || {}).hasMore || 0) === 1,
     profile,
     rows: buildListRows(list, tab, 1),
+  })
+}
+
+// ---- 最近战绩（#和平最近战绩 同款渲染）----
+if (ONLY === '' || ONLY === 'recent') {
+  const res = await api.get_recentbattlelist(roleId, 10)
+  const list = (res.data && res.data.list) || []
+  shoot('recentbattle.html', 'list_recent', {
+    roleName: camp.roleName || roleId,
+    total: list.length,
+    rows: list.map((item, i) => ({
+      idx: i + 1,
+      modeIcon: item.modeIcon || '',
+      modeDesc: item.modeDesc || '',
+      mapDesc: item.mapDesc || '',
+      teamRank: item.teamRank || '',
+      killingCount: item.killingCount ?? '—',
+      damageAmount: item.damageAmount ?? '—',
+      playTime: item.playTime || '',
+      isMvp: Number(item.isMvp) === 1,
+      gradeIcon: item.ratingIcon || '',
+      gradeText: item.ratingValue || '',
+      ribbon: promoMeta(item.promotion, item.result),
+    })),
   })
 }
 
