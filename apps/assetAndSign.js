@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import fetch from 'node-fetch'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { getCamp, getUserInfo } from '../utils/storage.js'
@@ -16,15 +19,43 @@ const QUALITY_NUM = {
 }
 const QUALITY_NAME = { 3: '绿色', 4: '蓝色', 5: '紫色', 6: '粉色', 7: '红色' }
 
-/** 货币图标（内联 SVG，随消息渲染，不依赖外链） */
-const COIN_ICONS = {
-  点券: '<svg width="26" height="26" viewBox="0 0 24 24"><path fill="#4f8ef7" d="M4 5h16a2 2 0 0 1 2 2v2.2a2.8 2.8 0 0 0 0 5.6V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2.2a2.8 2.8 0 0 0 0-5.6V7a2 2 0 0 1 2-2z"/><circle cx="12" cy="12" r="2.6" fill="#0f1730"/></svg>',
-  荣耀勋章: '<svg width="26" height="26" viewBox="0 0 24 24"><path fill="#3b82f6" d="M8 2h8l-2.6 6.5H10.6z"/><circle cx="12" cy="14.5" r="6.5" fill="#93c5fd"/><circle cx="12" cy="14.5" r="4" fill="#1d4ed8"/><path fill="#dbeafe" d="M12 11.5l1 2 2.2.2-1.7 1.5.5 2.2-2-1.2-2 1.2.5-2.2-1.7-1.5 2.2-.2z"/></svg>',
-  幸运币: '<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fbbf24"/><circle cx="12" cy="12" r="6.5" fill="#f59e0b"/><path fill="#b45309" d="M12 8l1.2 2.6 2.8.3-2.1 1.9.6 2.8L12 14.2l-2.5 1.4.6-2.8-2.1-1.9 2.8-.3z"/></svg>',
-  战备积分: '<svg width="26" height="26" viewBox="0 0 24 24"><path fill="#22c55e" d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/><path fill="#bbf7d0" d="M12 6l5 2v3.5c0 3.3-2.1 6.3-5 7.4-2.9-1.1-5-4.1-5-7.4V8z"/></svg>',
-  物资币: '<svg width="26" height="26" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3" fill="#22c55e"/><path fill="#bbf7d0" d="M3 10h18v2H3z" opacity=".5"/><circle cx="12" cy="14.5" r="3" fill="#16a34a"/><path fill="#bbf7d0" d="M11 12.8h2v3.4h-2zM10 13.8h4v1.4h-4z"/></svg>',
-  服饰币: '<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#2dd4bf"/><path fill="#0f766e" d="M8.5 7.5h7L14 11h-4z"/><circle cx="12" cy="14" r="4.5" fill="#5eead4"/><path fill="#0f766e" d="M12 11.6l1 2.1 2.3.2-1.7 1.6.5 2.3-2.1-1.2-2.1 1.2.5-2.3-1.7-1.6 2.3-.2z"/></svg>',
-  金币: '<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#f59e0b"/><circle cx="12" cy="12" r="6.8" fill="#fbbf24"/><path fill="#b45309" d="M11 7.5h2v9h-2zM8 11h8v2H8z"/></svg>',
+/**
+ * 资产图片本地缓存：首次渲染下载一次落盘，之后全部走本地，
+ * 避免每次渲染都从网络拉图片（网络抖动会导致图片加载不出来）。
+ */
+const IMG_CACHE_DIR = path.resolve('./data/PUBG-Helper-Plugin/assetCache')
+
+/** 返回本地缓存的图片 data URI；没有缓存就下载并落盘。失败返回 '' */
+async function localImage(url, key) {
+  if (!url) return ''
+  const file = path.join(IMG_CACHE_DIR, key)
+  try {
+    const buf = fs.readFileSync(file)
+    if (buf.length > 0) return 'data:image/png;base64,' + buf.toString('base64')
+  } catch { }
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return ''
+    const buf = Buffer.from(await res.arrayBuffer())
+    if (!buf.length) return ''
+    try {
+      fs.mkdirSync(IMG_CACHE_DIR, { recursive: true })
+      fs.writeFileSync(file, buf)
+    } catch { }
+    return 'data:image/png;base64,' + buf.toString('base64')
+  } catch {
+    return ''
+  }
+}
+
+/** 批量把物品图本地化（并发 8） */
+async function prefetchItems(items) {
+  const todo = (items || []).filter((it) => it && it.imageUrl && !it.localImg)
+  for (let i = 0; i < todo.length; i += 8) {
+    await Promise.all(todo.slice(i, i + 8).map(async (it) => {
+      it.localImg = await localImage(it.imageUrl, `item_${it.itemId}.png`)
+    }))
+  }
 }
 
 export class AssetAndSign extends plugin {
@@ -35,17 +66,25 @@ export class AssetAndSign extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平资产(\\s*\\S+)?$', fnc: 'showAsset' },
+        { reg: '^#和平资产(\\s+\\S+){0,3}$', fnc: 'showAsset' },
         { reg: '^#和平签到$', fnc: 'dailySignin' },
       ],
     })
   }
 
-  // ---- 资产查询：#和平资产 全部 / #和平资产 时装|枪械|装备|战备 / #和平资产 紫|粉|红（品质过滤） ----
+  // ---- 资产查询 ----
+  // #和平资产                → 分类文本菜单（不出图）
+  // #和平资产 时装           → 时装（默认只显示套装，品质从高到低）
+  // #和平资产 时装 角色      → 指定子分类
+  // #和平资产 紫/粉色        → 品质过滤；#和平资产 时装 粉色 → 组合过滤
   async showAsset(e) {
-    const arg = String(e.msg || '').replace(/^#和平资产\s*/, '').trim()
-    const q = QUALITY_NUM[arg] || 0
-    const catFilter = !q && arg ? arg : ''
+    const argStr = String(e.msg || '').replace(/^#和平资产\s*/, '').trim()
+    const args = argStr ? argStr.split(/\s+/).filter(Boolean) : []
+    const qualityArg = args.find((a) => QUALITY_NUM[a]) || ''
+    const q = qualityArg ? QUALITY_NUM[qualityArg] : 0
+    const rest = args.filter((a) => a !== qualityArg)
+    const catFilter = rest[0] || ''
+    const subFilter = rest[1] || ''
     const { info } = getUserInfo(e.user_id)
     const camp = getCamp(e.user_id)
     if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
@@ -55,7 +94,36 @@ export class AssetAndSign extends plugin {
       const roleId = await apiService.get_self_role_id()
       if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
 
-      // 游戏内货币（顺序对齐营地 App：点券/荣耀勋章/幸运币/战备积分/物资币/服饰币/金币）
+      const tabs = await apiService.get_maintabs(roleId)
+      const tabList = tabs.data || []
+
+      // ---- 无参数：只给分类文本菜单（不生成图片） ----
+      if (!args.length) {
+        const lines = ['🧭 和平资产 · 选择分类（发对应指令查看）', '']
+        for (const t of tabList) {
+          lines.push(`· ${t.tabName}（${t.count} 件${t.rareCnt ? ` · 稀有 ${t.rareCnt}` : ''}）`)
+        }
+        lines.push(
+          '',
+          '用法：',
+          '· #和平资产 时装　（默认只显示套装，品质从高到低）',
+          '· #和平资产 时装 角色　指定子分类',
+          '· #和平资产 时装 粉色　按品质筛选',
+          '· #和平资产 紫色　全分类按品质筛选',
+        )
+        return e.reply([lines.join('\n'), segment.button([
+          [{ text: '时装', callback: '#和平资产 时装' }, { text: '枪械', callback: '#和平资产 枪械' }, { text: '装备', callback: '#和平资产 装备' }],
+          [{ text: '战备', callback: '#和平资产 战备' }, { text: '紫色', callback: '#和平资产 紫色' }, { text: '粉色', callback: '#和平资产 粉色' }],
+        ])])
+      }
+
+      let useTabs = tabList
+      if (catFilter) useTabs = tabList.filter((t) => String(t.tabName).includes(catFilter))
+      if (!useTabs.length) {
+        return e.reply(`❌ 没有匹配「${catFilter}」的分类\n可用分类：${tabList.map((t) => t.tabName).join(' / ')}\n品质过滤：#和平资产 紫 / 粉 / 红`)
+      }
+
+      // ---- 货币 / 收藏家 / 热力值（图片第一张展示） ----
       let currencies = []
       let collect = null
       let spark = null
@@ -63,54 +131,59 @@ export class AssetAndSign extends plugin {
         const c = await apiService.get_charmandcoins(roleId)
         const d = c.data || {}
         currencies = [
-          { name: '点券', value: Number(d.ticket) || 0, icon: COIN_ICONS.点券 },
-          { name: '荣耀勋章', value: Number(d.ironCoin) || 0, icon: COIN_ICONS.荣耀勋章 },
-          { name: '幸运币', value: Number(d.luckyCoin) || 0, icon: COIN_ICONS.幸运币 },
-          { name: '战备积分', value: Number(d.universalScore) || 0, icon: COIN_ICONS.战备积分 },
-          { name: '物资币', value: Number(d.itemCoin) || 0, icon: COIN_ICONS.物资币 },
-          { name: '服饰币', value: Number(d.diamond) || 0, icon: COIN_ICONS.服饰币 },
-          { name: '金币', value: Number(d.gold) || 0, icon: COIN_ICONS.金币 },
+          { name: '点券', value: Number(d.ticket) || 0 },
+          { name: '荣耀勋章', value: Number(d.ironCoin) || 0 },
+          { name: '幸运币', value: Number(d.luckyCoin) || 0 },
+          { name: '战备积分', value: Number(d.universalScore) || 0 },
+          { name: '物资币', value: Number(d.itemCoin) || 0 },
+          { name: '服饰币', value: Number(d.diamond) || 0 },
+          { name: '金币', value: Number(d.gold) || 0 },
         ]
-        if (d.collectData && d.collectData.collectName) collect = d.collectData
-        // 历史总热力值就在同一响应里（totalCharm，实测=App 显示的 74387）
+        if (d.collectData && d.collectData.collectName) {
+          collect = { ...d.collectData }
+          collect.localIcon = await localImage(collect.collectIcon, `collect_${collect.growthCollectLevel || 0}.png`)
+        }
         if (d.totalCharm != null) spark = Number(d.totalCharm) || null
       } catch { }
 
-      const tabs = await apiService.get_maintabs(roleId)
-      let tabList = tabs.data || []
-      if (catFilter) tabList = tabList.filter((t) => String(t.tabName).includes(catFilter))
-      if (!tabList.length) {
-        return e.reply(`❌ 没有匹配「${catFilter}」的分类\n可用分类：时装 / 枪械 / 装备 / 战备 / 载具\n品质过滤：#和平资产 紫 / 粉 / 红`)
-      }
-
       const sections = []
-      let filteredCount = 0
-      for (const tab of tabList) {
+      for (const tab of useTabs) {
         const section = { name: tab.tabName, count: tab.count, rareCnt: tab.rareCnt, groups: [] }
         if (tab.count > 0) {
           const detail = await apiService.get_depotdetail(roleId, tab.tabId)
           let groups = (detail.data && detail.data.items) || []
+          // 默认子分类：时装只显示「套装」；显式指定子分类优先
+          const wantSub = subFilter || (String(tab.tabName) === '时装' ? '套装' : '')
+          if (wantSub) groups = groups.filter((g) => String(g.tabName).includes(wantSub))
           if (q) {
-            groups = groups
-              .map((g) => ({ ...g, items: (g.items || []).filter((it) => Number(it.quality) === q) }))
-              .filter((g) => g.items && g.items.length)
-            section.count = groups.reduce((n, g) => n + g.items.length, 0)
-            filteredCount += section.count
-            section.rareCnt = q >= 5 ? section.count : 0
+            groups = groups.map((g) => ({ ...g, items: (g.items || []).filter((it) => Number(it.quality) === q) }))
           }
-          section.groups = groups.filter((g) => g.items && g.items.length)
+          // 品质从高到低排序（同品质按名称）
+          groups = groups.map((g) => ({
+            ...g,
+            items: (g.items || []).slice().sort((a, b) => (Number(b.quality) || 0) - (Number(a.quality) || 0)
+              || String(a.itemName).localeCompare(String(b.itemName), 'zh')),
+          }))
+          groups = groups.filter((g) => g.items && g.items.length)
+          section.groups = groups
+          if (wantSub || q) {
+            section.count = groups.reduce((n, g) => n + g.items.length, 0)
+            section.rareCnt = groups.reduce((n, g) => n + g.items.filter((it) => Number(it.quality) >= 6).length, 0)
+            if (wantSub && subFilter) section.name = `${tab.tabName}·${wantSub}`
+          }
         }
         sections.push(section)
         await new Promise((r) => setTimeout(r, 120))
       }
       const hasItems = sections.some((s) => s.groups.length)
       if (!hasItems) {
-        if (q) return e.reply(`没有${QUALITY_NAME[q]}品质的展示资产（过滤条件：${arg}）`)
+        if (q) return e.reply(`没有${QUALITY_NAME[q]}品质的展示资产（过滤条件：${argStr}）`)
         return e.reply('仓库中暂无展示资产')
       }
 
-      // 每个分类单独渲染，物品超过 PER_PAGE 自动分页
+      // ---- 分页：每页 48 件，单分类最多渲染 3 页（避免图片过多） ----
       const PER_PAGE = 48
+      const MAX_PAGES = 3
       const pages = sections
         .filter((s) => s.groups.length)
         .map((sec) => {
@@ -119,7 +192,7 @@ export class AssetAndSign extends plugin {
           let curCount = 0
           for (const g of sec.groups) {
             let items = g.items
-            while (items.length) {
+            while (items.length && list.length < MAX_PAGES) {
               const take = Math.min(items.length, PER_PAGE - curCount)
               if (!cur) { cur = { groups: [] }; list.push(cur) }
               cur.groups.push({ tabName: g.tabName, items: items.slice(0, take) })
@@ -135,36 +208,42 @@ export class AssetAndSign extends plugin {
         hour12: false, year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit',
       })
-      const sectionName = q ? `${QUALITY_NAME[q]}品质` : (catFilter || '全部分类')
-      const filterNote = q ? `已按${QUALITY_NAME[q]}品质过滤` : (catFilter ? `已按分类「${catFilter}」过滤` : '')
+      const roleName = camp.nickname || camp.roleName || camp.userName || roleId
+      const sectionName = q ? `${QUALITY_NAME[q]}品质` : (catFilter ? (subFilter ? `${catFilter}·${subFilter}` : catFilter) : '全部分类')
+      const filterNote = [
+        catFilter && !q ? `分类「${catFilter}」` : '',
+        q ? `${QUALITY_NAME[q]}品质` : '',
+        subFilter ? `子分类「${subFilter}」` : '',
+      ].filter(Boolean).join(' · ')
+
       const images = []
       for (const { section, pages: pageList } of pages) {
         for (let i = 0; i < pageList.length; i++) {
+          const pageItems = pageList[i].groups.flatMap((g) => g.items)
+          await prefetchItems(pageItems)   // 图片本地化（已缓存的不再下载）
           try {
-            const image = await puppeteer.screenshot('asset', {
+            const img = await puppeteer.screenshot('asset', {
               tplFile: 'plugins/PUBG-Helper-Plugin/resources/asset.html',
-              section: { name: sectionName, rareCnt: section.rareCnt },
+              section: { name: sectionName, rareCnt: (q || subFilter) ? section.rareCnt : section.rareCnt },
               groups: pageList[i].groups,
-              totalCount: q ? filteredCount : section.count,
+              totalCount: section.count,
               filterNote,
               currencies: i === 0 ? currencies : [],
               collect: i === 0 ? collect : null,
               spark: i === 0 ? spark : null,
               pageIndex: i + 1,
               pageTotal: pageList.length,
-              roleName: camp.nickname || camp.roleName || camp.userName || roleId,
+              roleName,
               updated,
             })
-            if (image) images.push(image)
+            if (img) images.push(img)
           } catch (err) {
             await e.reply('⚠️ ' + section.name + ' 第 ' + (i + 1) + ' 张渲染失败：' + (err.message || err))
           }
         }
       }
-
       if (!images.length) return e.reply('资产查询完成，但没有可展示的图片')
 
-      // 每条消息最多 6 张（markdown 多图合并），发送失败逐张回退
       const BATCH = 6
       for (let i = 0; i < images.length; i += BATCH) {
         const batch = images.slice(i, i + BATCH)
@@ -176,10 +255,13 @@ export class AssetAndSign extends plugin {
           }
         }
       }
+      if (sections.some((s) => s.count > MAX_PAGES * PER_PAGE)) {
+        await e.reply(`📦 该分类共 ${sections.reduce((n, s) => n + s.count, 0)} 件，仅显示前 ${MAX_PAGES * PER_PAGE} 件\n加品质可缩小范围，如「#和平资产 ${catFilter || '时装'} 粉色」`)
+      }
       try {
         await e.reply(segment.button([
-          [{ text: '紫色', callback: '#和平资产 紫色' }, { text: '粉色', callback: '#和平资产 粉色' }, { text: '红色', callback: '#和平资产 红色' }],
-          [{ text: '时装', callback: '#和平资产 时装' }, { text: '枪械', callback: '#和平资产 枪械' }, { text: '全部', callback: '#和平资产' }],
+          [{ text: '紫色', callback: `#和平资产 ${catFilter ? catFilter + ' ' : ''}紫色` }, { text: '粉色', callback: `#和平资产 ${catFilter ? catFilter + ' ' : ''}粉色` }, { text: '红色', callback: `#和平资产 ${catFilter ? catFilter + ' ' : ''}红色` }],
+          [{ text: '返回分类', callback: '#和平资产' }],
         ]))
       } catch { }
     } catch (err) {
