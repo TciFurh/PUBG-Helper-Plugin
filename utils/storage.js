@@ -34,6 +34,25 @@ function normalizeInfo(info) {
 	if (typeof info.currentCamp !== 'number') info.currentCamp = 0
 	if (info.camps.length && !info.camp) info.camp = info.camps[info.currentCamp] || info.camps[0]
 	if (!info.camps.length && info.camp) info.camp = null
+	// 迁移：ids 里存成角色ID的旧数据替换为营地ID（rolecard3/getresultbytypev2 等查询接口都要营地ID）
+	for (const c of info.camps || []) {
+		if (!c?.userId || !c.roleId) continue
+		const rid = String(c.roleId)
+		const uid = String(c.userId)
+		if (rid === uid) continue
+		const ri = info.ids.indexOf(rid)
+		if (ri < 0) continue
+		const ui = info.ids.indexOf(uid)
+		if (ui >= 0) {
+			// 两个都在：去掉角色ID那份，current 修正到营地ID的位置
+			info.ids.splice(ri, 1)
+			if (info.current === ri) info.current = ui > ri ? ui - 1 : ui
+			else if (info.current > ri) info.current--
+		} else {
+			info.ids[ri] = uid
+		}
+	}
+	if (info.current >= info.ids.length) info.current = Math.max(0, info.ids.length - 1)
 	return info
 }
 
@@ -56,7 +75,7 @@ export function saveUserInfo(userId, updater) {
 
 export function formatIdList(info) {
 	return info.ids.map((id, index) => {
-		const owner = (info.camps || []).find((c) => String(c.roleId) === String(id))
+		const owner = (info.camps || []).find((c) => String(c.userId) === String(id) || String(c.roleId) === String(id))
 		const tag = owner ? `（${owner.nickname || owner.userName || owner.userId}）` : ''
 		return `${index === info.current ? '✅' : '☑️'} ${index + 1}. ${id}${tag}`
 	}).join('\n')
@@ -120,11 +139,11 @@ export function switchCamp(qqUserId, index) {
 		if (index < 0 || index >= camps.length) throw new Error('序号无效')
 		cur.currentCamp = index
 		cur.camp = camps[index]
-		// 该账号有对应角色就一起切过去
-		if (camps[index].roleId) {
-			const ri = cur.ids.indexOf(String(camps[index].roleId))
-			if (ri >= 0) cur.current = ri
-		}
+		// 该账号有对应绑定ID就一起切过去（ids 是营地ID，兼容未迁移的 roleId）
+		const want = String(camps[index].userId || '')
+		let ri = want ? cur.ids.indexOf(want) : -1
+		if (ri < 0 && camps[index].roleId) ri = cur.ids.indexOf(String(camps[index].roleId))
+		if (ri >= 0) cur.current = ri
 		return cur
 	})
 	return info.camp
@@ -136,11 +155,11 @@ export function removeCampAt(qqUserId, index) {
 		const camps = cur.camps || []
 		if (index < 0 || index >= camps.length) throw new Error('序号无效')
 		const [removed] = camps.splice(index, 1)
-		const stillUsed = camps.some((c) => String(c.roleId) === String(removed?.roleId))
-		if (removed?.roleId && !stillUsed) {
-			const ri = cur.ids.indexOf(String(removed.roleId))
-			if (ri >= 0) cur.ids.splice(ri, 1)
-		}
+		// 从绑定列表里摘掉这个账号（ids 是营地ID，兼容未迁移的 roleId）
+		const removedId = String(removed?.userId || '')
+		let ri = removedId ? cur.ids.indexOf(removedId) : -1
+		if (ri < 0 && removed?.roleId) ri = cur.ids.indexOf(String(removed.roleId))
+		if (ri >= 0) cur.ids.splice(ri, 1)
 		cur.camps = camps
 		if (!camps.length) {
 			cur.currentCamp = 0
@@ -149,8 +168,10 @@ export function removeCampAt(qqUserId, index) {
 		} else {
 			cur.currentCamp = Math.min(cur.currentCamp, camps.length - 1)
 			cur.camp = camps[cur.currentCamp]
-			// 当前角色跟着当前账号走，避免「账号是A、角色是B」的错配
-			const ri = cur.ids.indexOf(String(cur.camp.roleId))
+			// 当前绑定ID跟着当前账号走，避免「账号是A、ID是B」的错配
+			const want = String(cur.camp.userId || '')
+			let ri = want ? cur.ids.indexOf(want) : -1
+			if (ri < 0 && cur.camp.roleId) ri = cur.ids.indexOf(String(cur.camp.roleId))
 			if (ri >= 0) cur.current = ri
 		}
 		if (cur.current >= cur.ids.length) cur.current = Math.max(0, cur.ids.length - 1)
@@ -172,17 +193,29 @@ export function deleteCamp(qqUserId) {
  * 把一个角色ID绑到当前账号名下，并设为当前角色
  * @param {boolean} force true=自动绑定（覆盖账号已有角色）；false=手动绑定（只在账号还没角色时写入）
  */
-export function bindRole(qqUserId, roleId, { force = true } = {}) {
-	const id = String(roleId)
+/** 把一个营地ID绑到账号名下并设为当前；roleId 只存档到对应营地账号（展示/切换映射用），不进 ids */
+export function bindCampId(qqUserId, campUserId, roleId = '') {
+	const id = String(campUserId)
 	return saveUserInfo(qqUserId, (cur) => {
 		if (!cur.ids.includes(id)) cur.ids.push(id)
 		cur.current = cur.ids.indexOf(id)
 		const camps = cur.camps || []
-		const ci = cur.currentCamp ?? 0
-		if (camps[ci] && (force || !camps[ci].roleId)) {
-			camps[ci].roleId = id
+		const ci = camps.findIndex((c) => String(c.userId) === id)
+		if (ci >= 0) {
+			if (roleId && String(roleId) !== id) camps[ci].roleId = String(roleId)
+			cur.currentCamp = ci
 			cur.camp = camps[ci]
 		}
+		return cur
+	})
+}
+
+/** 记录某营地账号解析出来的角色ID（只存档，不进 ids） */
+export function setCampRoleId(qqUserId, campUserId, roleId) {
+	const id = String(campUserId)
+	return saveUserInfo(qqUserId, (cur) => {
+		const c = (cur.camps || []).find((x) => String(x.userId) === id)
+		if (c && roleId && String(roleId) !== id) c.roleId = String(roleId)
 		return cur
 	})
 }
@@ -194,7 +227,7 @@ export function switchRole(qqUserId, index) {
 		cur.current = index
 		const rid = String(cur.ids[index])
 		const camps = cur.camps || []
-		const ci = camps.findIndex((c) => String(c.roleId) === rid)
+		const ci = camps.findIndex((c) => String(c.userId) === rid || String(c.roleId) === rid)
 		if (ci >= 0) {
 			cur.currentCamp = ci
 			cur.camp = camps[ci]

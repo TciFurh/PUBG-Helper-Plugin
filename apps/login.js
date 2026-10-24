@@ -60,7 +60,7 @@ export class Login extends plugin {
 		const lines = [
 			'✅ 凭证已保存' + (r.isNew ? '' : '（已更新同账号旧凭证）'),
 			`营地账号: ${r.camp.userId}`,
-			r.bound ? `已自动绑定角色: ${r.roleId}` : '⚠️ 角色ID没解析出来，可手动 #绑定和平 <ID>',
+			r.roleId ? `已绑定营地ID: ${r.camp?.userId || ''}（角色ID: ${r.roleId}）` : `已绑定营地ID: ${r.camp?.userId || ''}（角色ID未解析，可 #绑定和平 <营地ID>`,
 			`当前账号数: ${r.total}（#和平账号 查看）`,
 			info.ids.length ? '角色列表:\n' + formatIdList(info) : '',
 			'现在可以使用个人凭证查询了。'

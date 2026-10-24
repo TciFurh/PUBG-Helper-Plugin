@@ -147,7 +147,7 @@ const isSuper = d.isSuperBody === true
 
 | 字段 | 说明 |
 |---|---|
-| `ids[]` / `current` | 角色ID列表 / 当前角色下标（老字段，保持兼容） |
+| `ids[]` / `current` | **营地ID列表** / 当前下标（2026-10-25 起统一为营地ID；旧数据里的角色ID由 normalizeInfo 自动迁移） |
 | `camps[]` | 营地账号数组，每个含 `openId/gameOpenId/userId/token/seasonId/nickname/platform/roleId` |
 | `currentCamp` | 当前营地账号下标 |
 | `camp` | **始终等于 `camps[currentCamp]`**，老代码只读这个字段，不用改 |
@@ -155,9 +155,10 @@ const isSuper = d.isSuperBody === true
 - 老数据（只有单个 `camp`）在 `normalizeInfo()` 里自动迁移成 `camps[0]`，无痛升级。
 - 同一账号判定：`openId` 相同，或 `userId` 相同 → 覆盖 token，不新增。
 - **自动绑定**：扫码（`wxLogin` / `qqLogin`）和 `#提交和平` 统一走 `utils/accounts.js#saveCampAndBind()`：
-  存凭证 → 用该凭证 `get_self_role_id()` 解析角色 → `bindRole(force=true)` 写进 `ids` 并设为当前。
-  注意 roleId **必须**用凭证自己解析（按 `userId` 搜出来的），不能拿 `#绑定和平` 手填的 id 混用，
-  否则 `getseasonpasstask` 之类会回 **-79330 角色不匹配**。
+  存凭证 → `bindCampId()` 把**营地ID**写进 `ids` 并设为当前；角色ID用该凭证 `get_self_role_id()`
+  解析后**只存档**到 `camps[i].roleId`（`#和平账号` 展示 / `getseasonpasstask` 等需要角色ID的接口用）。
+  ⚠️ 两套 ID 别混：rolecard3/getresultbytypev2 要**营地ID**；getseasonpasstask 等要**角色ID**
+  （且必须凭证自己解析的，手填会 -79330）。
 - ⚠️ 切换角色时要连带切营地账号（`switchRole`），切换账号时要把角色带过去（`switchCamp`），
   否则会出现「A 账号的 token 配 B 账号的角色」，查询全挂。老数据里 `camps[i].roleId` 可能为空，
   `#切换和平账号` 会在切换后懒解析一次补齐。

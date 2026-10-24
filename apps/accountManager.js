@@ -3,7 +3,7 @@ import Button from '../utils/button.js'
 
 import {
 	getUserInfo, formatIdList,
-	listCamps, formatCampList, switchCamp, removeCampAt, bindRole, switchRole, removeRole,
+	listCamps, formatCampList, switchCamp, removeCampAt, bindCampId, setCampRoleId, switchRole, removeRole,
 	maskToken,
 } from '../utils/storage.js'
 import { resolveSelfRoleId } from '../utils/accounts.js'
@@ -48,7 +48,7 @@ export class AccountManager extends plugin {
 		const userId = this.#target(e)
 		const id = String(e.msg.replace(/^#绑定和平\s*/, '')).trim()
 		if (!/^\d+$/.test(id)) return e.reply('请输入正确的用户ID（纯数字）')
-		bindRole(userId, id, { force: false })
+		bindCampId(userId, id)
 		const { info } = getUserInfo(userId)
 		return e.reply(['绑定成功，当前角色：', id, '\n', formatIdList(info)])
 	}
@@ -144,7 +144,8 @@ export class AccountManager extends plugin {
 		if (info.camp && !info.camp.roleId) {
 			const rid = await resolveSelfRoleId(info.camp)
 			if (rid) {
-				bindRole(userId, rid)
+				// 角色ID只存档到账号上，不进绑定列表（列表统一是营地ID）
+				setCampRoleId(userId, info.camp.userId, rid)
 				info = getUserInfo(userId).info
 			}
 		}

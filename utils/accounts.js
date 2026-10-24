@@ -1,5 +1,5 @@
 import { ApiService } from './api.js'
-import { saveCamp, bindRole, getCamp, listCamps } from './storage.js'
+import { saveCamp, bindCampId, getCamp, listCamps } from './storage.js'
 
 /**
  * 用某个营地凭证解析它自己的游戏角色ID（营地账号 → 角色）。
@@ -33,12 +33,13 @@ export async function saveCampAndBind(userId, camp) {
 	}
 	const { isNew } = saveCamp(userId, payload)
 	const saved = getCamp(userId) || payload
+	// ids 统一绑营地ID（rolecard3 / getresultbytypev2 等查询接口都要营地ID）；角色ID只解析存档
 	const roleId = saved.roleId || (await resolveSelfRoleId(saved))
-	if (roleId) bindRole(userId, roleId)
+	bindCampId(userId, saved.userId, roleId)
 	return {
 		camp: getCamp(userId),
 		roleId: roleId || '',
-		bound: !!roleId,
+		bound: true,
 		isNew,
 		total: listCamps(userId).length,
 	}
