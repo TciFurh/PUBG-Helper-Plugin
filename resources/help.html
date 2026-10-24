@@ -16,7 +16,7 @@
         }
 
         .container {
-            max-width: 1240px;
+            max-width: 1400px;
             margin: 0 auto;
             background: #121212;
             border: 1px solid #262626;
@@ -27,81 +27,88 @@
         .header {
             background: #1a1a1a;
             border-bottom: 1px solid #262626;
-            padding: 38px 30px;
-            text-align: center;
+            padding: 30px;
+            display: flex; align-items: center; gap: 18px;
         }
+        .header .logo {
+            width: 64px; height: 64px; border-radius: 16px;
+            background: #262626; border: 1px solid #333333;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem;
+        }
+        .header h1 { font-size: 2.2rem; font-weight: 800; color: #ffffff; }
+        .header p { font-size: 1.05rem; color: #a8a8a8; margin-top: 4px; }
 
-        .header h1 { font-size: 3rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; }
-        .header p { font-size: 1.25rem; color: #a8a8a8; }
+        .content { padding: 22px; background: #121212; }
 
-        .content { padding: 28px; background: #121212; }
-
-        .section { margin-bottom: 22px; background: #161616; border: 1px solid #262626; border-radius: 18px; overflow: hidden; }
+        .section { margin-bottom: 18px; background: #161616; border: 1px solid #262626; border-radius: 16px; overflow: hidden; }
         .section-header {
-            display: flex; align-items: center;
-            padding: 18px 24px;
+            display: flex; align-items: baseline; gap: 14px;
+            padding: 14px 20px;
             background: #1a1a1a;
             border-bottom: 1px solid #232323;
         }
-        .section-title {
-            font-size: 1.6rem; font-weight: 700; color: #ffffff;
-            display: flex; align-items: center;
+        .section-chip {
+            font-size: 0.95rem; font-weight: 700; color: #fafafa;
+            background: #2e2e2e; border: 1px solid #3a3a3a;
+            border-radius: 6px; padding: 3px 10px; flex-shrink: 0;
         }
-        .section-icon {
-            width: 48px; height: 48px;
-            background: #262626; border: 1px solid #333333; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 16px; font-size: 1.7rem;
-        }
+        .section-title { font-size: 1.35rem; font-weight: 700; color: #ffffff; }
+        .section-desc { font-size: 0.95rem; color: #8e8e8e; }
 
-        .section-content { padding: 20px 24px; }
+        .section-content { padding: 14px 16px; }
 
-        .command-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .command-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
         .command-item {
-            background: #1a1a1a; border: 1px solid #262626; border-radius: 12px; padding: 16px 18px;
+            background: #1a1a1a; border: 1px solid #262626; border-radius: 12px; padding: 13px 14px;
         }
 
         .command {
             font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', monospace;
             background: #262626; color: #ffffff;
-            padding: 8px 14px; border-radius: 8px;
-            font-size: 1.08rem; font-weight: 600;
-            display: inline-block; margin-bottom: 10px;
+            padding: 6px 11px; border-radius: 7px;
+            font-size: 0.98rem; font-weight: 600;
+            display: inline-block; margin-bottom: 8px;
             border: 1px solid #333333;
         }
 
-        .description { color: #d4d4d4; font-size: 1.08rem; line-height: 1.55; }
+        .description { color: #c9c9c9; font-size: 0.95rem; line-height: 1.5; }
         .example {
-            background: #141414; border-left: 3px solid #8e8e8e;
-            padding: 9px 14px; margin-top: 10px; border-radius: 0 8px 8px 0;
+            margin-top: 8px;
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 1rem; color: #a8a8a8;
+            font-size: 0.85rem; color: #737373;
         }
+        .example::before { content: '示例　'; color: #5e5e5e; }
 
         .tip {
-            background: #1a1a1a; border: 1px solid #333333; border-radius: 16px;
-            padding: 22px 26px; margin-top: 6px;
+            background: #1a1a1a; border: 1px solid #333333; border-radius: 14px;
+            padding: 16px 20px; margin-top: 4px;
+            display: flex; align-items: center; gap: 12px;
         }
-        .tip-title { font-size: 1.3rem; font-weight: 700; color: #fbbf24; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .tip-content { color: #d4d4d4; font-size: 1.12rem; line-height: 1.7; }
+        .tip-title { font-size: 1.1rem; font-weight: 700; color: #fbbf24; flex-shrink: 0; }
+        .tip-content { color: #c9c9c9; font-size: 1rem; line-height: 1.6; }
         .tip-content strong { color: #ffffff; }
 
-        .foot-note { text-align: center; color: #5e5e5e; font-size: 1rem; padding: 18px 0 6px; }
+        .foot-note { text-align: center; color: #5e5e5e; font-size: 0.9rem; padding: 14px 0 4px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎮 和平精英插件</h1>
-            <p>指令菜单 · 发送对应指令即可使用</p>
+            <div class="logo">🎮</div>
+            <div>
+                <h1>和平精英插件</h1>
+                <p>指令菜单 · 共 6 组 36 条指令 · 发送对应指令即可使用</p>
+            </div>
         </div>
 
         <div class="content">
             <!-- 账号与登录 -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title"><div class="section-icon">👤</div>账号与登录</div>
+                    <span class="section-chip">账号</span>
+                    <span class="section-title">账号与登录</span>
+                    <span class="section-desc">登录后自动绑定角色ID，支持多账号</span>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
@@ -110,11 +117,11 @@
                             <div class="description">查看已绑定的营地账号（支持多账号）</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#切换和平账号 &lt;序号&gt;</div>
-                            <div class="description">切换营地账号（自动带出对应角色）</div>
+                            <div class="command">#切换和平账号 &lt;n&gt;</div>
+                            <div class="description">切换营地账号，自动带出对应角色</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#删除和平账号 &lt;序号&gt;</div>
+                            <div class="command">#删除和平账号 &lt;n&gt;</div>
                             <div class="description">删除营地账号（连同其角色）</div>
                         </div>
                         <div class="command-item">
@@ -122,8 +129,8 @@
                             <div class="description">查看当前账号与全部角色</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#切换和平 &lt;序号&gt;</div>
-                            <div class="description">切换角色（自动带出所属营地账号）</div>
+                            <div class="command">#切换和平 &lt;n&gt;</div>
+                            <div class="description">切换角色，自动带出所属营地账号</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#绑定和平 &lt;ID&gt;</div>
@@ -152,7 +159,9 @@
             <!-- 战绩 -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title"><div class="section-icon">⚔️</div>战绩查询</div>
+                    <span class="section-chip">战绩</span>
+                    <span class="section-title">战绩查询</span>
+                    <span class="section-desc">总览 / 分类列表 / 单局详情 / 主页</span>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
@@ -163,7 +172,7 @@
                         </div>
                         <div class="command-item">
                             <div class="command">#和平战绩详情 &lt;编号&gt;</div>
-                            <div class="description">单局详情（经典/地铁/超体/团竞自动适配）</div>
+                            <div class="description">单局详情，经典/地铁/超体/团竞自动适配</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#和平最近战绩 [数量]</div>
@@ -175,20 +184,21 @@
                         </div>
                         <div class="command-item">
                             <div class="command">#和平主页 [营地ID]</div>
-                            <div class="description">个人主页数据（不带ID用当前账号）</div>
+                            <div class="description">个人主页数据，不带ID用当前账号</div>
                         </div>
                         <div class="command-item">
-                            <div class="command">#枪械熟练度 [武器类型]</div>
+                            <div class="command">#枪械熟练度 [类型]</div>
                             <div class="description">枪械熟练度数据，可按类型筛选</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 资产与签到 -->
+            <!-- 资产 -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title"><div class="section-icon">💰</div>资产与签到</div>
+                    <span class="section-chip">资产</span>
+                    <span class="section-title">资产与签到</span>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
@@ -211,7 +221,9 @@
             <!-- 任务 -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title"><div class="section-icon">🎯</div>任务</div>
+                    <span class="section-chip">任务</span>
+                    <span class="section-title">任务</span>
+                    <span class="section-desc">每日任务 / 手册周任务 / 领奖</span>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
@@ -225,7 +237,7 @@
                         </div>
                         <div class="command-item">
                             <div class="command">#和平周任务</div>
-                            <div class="description">手册周任务状态一览（只读），含待领积分编号</div>
+                            <div class="description">手册周任务状态一览（只读），待领积分带编号</div>
                         </div>
                         <div class="command-item">
                             <div class="command">#完成手册任务</div>
@@ -233,7 +245,7 @@
                         </div>
                         <div class="command-item">
                             <div class="command">#领取手册奖励 [编号…]</div>
-                            <div class="description">领取手册积分；不带编号=全部领取</div>
+                            <div class="description">领手册积分，不带编号=全部领取</div>
                             <div class="example">#领取手册奖励 62 71</div>
                         </div>
                         <div class="command-item">
@@ -247,7 +259,8 @@
             <!-- 更多 -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title"><div class="section-icon">🌐</div>查询与偏好</div>
+                    <span class="section-chip">更多</span>
+                    <span class="section-title">查询与偏好</span>
                 </div>
                 <div class="section-content">
                     <div class="command-grid">
@@ -280,9 +293,9 @@
             </div>
 
             <div class="tip">
-                <div class="tip-title"><span>💡</span>使用提示</div>
+                <div class="tip-title">💡 提示</div>
                 <div class="tip-content">
-                    先 <strong>#和平QQ登录</strong> 或 <strong>#和平微信登录</strong> 扫码（自动绑定角色ID），即可使用全部功能；支持多账号随时切换。
+                    先 <strong>#和平QQ登录</strong> 或 <strong>#和平微信登录</strong> 扫码（自动绑定角色ID）即可使用全部功能；支持多账号随时切换。
                 </div>
             </div>
 
