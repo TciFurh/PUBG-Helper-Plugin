@@ -18,7 +18,7 @@ import path from 'node:path'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { runDailyTasks, runWeeklyTasks, claimWeeklyTasks, weeklyTaskView } from '../utils/dailyTask.js'
-import { getCamp } from '../utils/storage.js'
+import { requireCamp } from '../utils/storage.js'
 import { getBot } from 'jiuli'
 import Button from '../utils/button.js'
 
@@ -220,14 +220,14 @@ export class CampTask extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平任务$', fnc: 'doTasks' },
-        { reg: '^#和平任务状态$', fnc: 'taskStatus' },
-        { reg: '^#和平周任务$', fnc: 'weeklyStatus' },
-        { reg: '^#和平周任务状态$', fnc: 'weeklyStatus' },
-        { reg: '^#完成手册任务$', fnc: 'doWeeklyTasks' },
-        { reg: '^#领取手册奖励', fnc: 'claimWeekly' },
-        { reg: '^#(开启|打开|启用)和平自动任务$', fnc: 'enableAuto' },
-        { reg: '^#(关闭|关掉|停用)和平自动任务$', fnc: 'disableAuto' },
+        { reg: '^#?和平任务$', fnc: 'doTasks' },
+        { reg: '^#?和平任务状态$', fnc: 'taskStatus' },
+        { reg: '^#?和平周任务$', fnc: 'weeklyStatus' },
+        { reg: '^#?和平周任务状态$', fnc: 'weeklyStatus' },
+        { reg: '^#?完成手册任务$', fnc: 'doWeeklyTasks' },
+        { reg: '^#?领取手册奖励', fnc: 'claimWeekly' },
+        { reg: '^#?(开启|打开|启用)和平自动任务$', fnc: 'enableAuto' },
+        { reg: '^#?(关闭|关掉|停用)和平自动任务$', fnc: 'disableAuto' },
       ],
     })
     /** 定时自动跑（配置关掉就不注册 cron） */
@@ -242,8 +242,8 @@ export class CampTask extends plugin {
   }
 
   #context(e) {
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return null
+    const camp = requireCamp(e)
+    if (!camp) return null
     const api = new ApiService()
     api.useCamp(camp)
     return { camp, api }

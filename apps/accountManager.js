@@ -16,13 +16,13 @@ export class AccountManager extends plugin {
 			event: 'message',
 			priority: 1,
 			rule: [
-				{ reg: '^#我的和平ID$', fnc: 'myIds' },
-				{ reg: '^#绑定和平\\s*(.*)$', fnc: 'bindId' },
-				{ reg: '^#切换和平\\s*(\\d+)$', fnc: 'switchId' },
-				{ reg: '^#删除和平\\s*(\\d+)$', fnc: 'deleteId' },
-				{ reg: '^#和平账号$', fnc: 'myCamps' },
-				{ reg: '^#切换和平账号\\s*(\\d+)$', fnc: 'switchAccount' },
-				{ reg: '^#删除和平账号\\s*(\\d+)$', fnc: 'deleteAccount' },
+				{ reg: '^#?我的和平ID$', fnc: 'myIds' },
+				{ reg: '^#?绑定和平\\s*(.*)$', fnc: 'bindId' },
+				{ reg: '^#?切换和平\\s*(\\d+)$', fnc: 'switchId' },
+				{ reg: '^#?删除和平\\s*(\\d+)$', fnc: 'deleteId' },
+				{ reg: '^#?和平账号$', fnc: 'myCamps' },
+				{ reg: '^#?切换和平账号\\s*(\\d+)$', fnc: 'switchAccount' },
+				{ reg: '^#?删除和平账号\\s*(\\d+)$', fnc: 'deleteAccount' },
 			]
 		})
 	}

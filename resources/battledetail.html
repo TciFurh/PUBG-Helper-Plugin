@@ -19,10 +19,10 @@
     .head .logo {
       width: 42px; height: 42px; border-radius: 10px;
       background: #1a1a1a; border: 1px solid #262626;
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
     }
-    .head .title { font-size: 21px; font-weight: 700; }
-    .head .sub { font-size: 11px; color: #737373; margin-top: 2px; }
+    .head .title { font-size: 29px; font-weight: 700; }
+    .head .sub { font-size: 15px; color: #737373; margin-top: 2px; }
     .head .spacer { flex: 1; }
 
     .card { background: #101010; border: 1px solid #232323; border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; }
@@ -30,29 +30,29 @@
     /* 顶部对局条 */
     .map-bar { display: flex; align-items: center; gap: 12px; }
     .map-bar .mi { width: 42px; height: 42px; object-fit: contain; }
-    .map-bar .mn { font-size: 16px; font-weight: 700; }
-    .map-bar .ms { font-size: 11px; color: #8e8e8e; margin-top: 2px; }
+    .map-bar .mn { font-size: 21px; font-weight: 700; }
+    .map-bar .ms { font-size: 15px; color: #8e8e8e; margin-top: 2px; }
     .map-bar .trail { margin-left: auto; display: flex; align-items: center; gap: 12px; }
     .map-bar .honors { display: flex; align-items: center; gap: 6px; }
     .map-bar .honors img { height: 22px; object-fit: contain; }
     .map-bar .right { text-align: right; }
-    .map-bar .t { font-size: 12px; color: #8e8e8e; }
+    .map-bar .t { font-size: 16px; color: #8e8e8e; }
     .res-chip {
       display: inline-block; margin-top: 4px;
-      font-size: 11px; font-weight: 700; line-height: 1; padding: 4px 10px; border-radius: 999px;
+      font-size: 15px; font-weight: 700; line-height: 1; padding: 4px 10px; border-radius: 999px;
     }
     .res-chip.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
     .res-chip.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
 
     /* 晋级赛 */
     .promo { display: flex; align-items: center; gap: 12px; }
-    .promo .tag { font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 999px; line-height: 1; }
+    .promo .tag { font-size: 16px; font-weight: 700; padding: 3px 12px; border-radius: 999px; line-height: 1; }
     .promo .tag.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
     .promo .tag.grey { background: linear-gradient(120deg, #4A4A4A, #2C2C2C); color: #B4B4B4; }
     .promo .tag.purple { background: linear-gradient(120deg, #E2D5FF, #A97BF5); color: #2A1350; }
     .promo .tag.orange { background: linear-gradient(120deg, #FFDDB8, #F5913E); color: #3A1B00; }
     .promo .tag.red { background: linear-gradient(120deg, #FFC9CB, #E8474B); color: #420608; }
-    .promo .it { font-size: 12px; color: #a8a8a8; }
+    .promo .it { font-size: 16px; color: #a8a8a8; }
     .promo .bar-wrap { flex: 1; height: 5px; background: #232323; border-radius: 999px; overflow: hidden; }
     /* span 默认 inline，不加 block 高度不生效，进度条会整条看不见 */
     .promo .bar-fill { display: block; height: 100%; background: linear-gradient(90deg, #8A6A25, #F5C451); }
@@ -61,31 +61,31 @@
     .promo .bar-fill.red { background: linear-gradient(90deg, #8A2024, #F57A7D); }
 
     /* 收益卡（地铁） */
-    .income .lbl { font-size: 11px; color: #8e8e8e; }
+    .income .lbl { font-size: 15px; color: #8e8e8e; }
     .income .top { display: flex; align-items: flex-end; gap: 10px; margin-top: 4px; }
-    .income .big { font-size: 30px; font-weight: 700; color: #F5C451; line-height: 1.1; letter-spacing: -.5px; }
-    .income .rec { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: rgba(245,196,81,.16); color: #F5C451; border: 1px solid rgba(245,196,81,.36); }
+    .income .big { font-size: 35px; font-weight: 700; color: #F5C451; line-height: 1.1; letter-spacing: -.5px; }
+    .income .rec { font-size: 14px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: rgba(245,196,81,.16); color: #F5C451; border: 1px solid rgba(245,196,81,.36); }
     .income .subs { display: flex; gap: 22px; margin-top: 10px; }
-    .income .subs .s .n { font-size: 14px; font-weight: 700; }
-    .income .subs .s .k { font-size: 10px; color: #8e8e8e; margin-top: 1px; }
+    .income .subs .s .n { font-size: 19px; font-weight: 700; }
+    .income .subs .s .k { font-size: 14px; color: #8e8e8e; margin-top: 1px; }
 
     /* 超体英雄卡 */
     .hero { display: flex; align-items: center; gap: 16px; }
     .hero .pic { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; background: #1a1a1a; border: 1px solid #2a2a2a; }
-    .hero .hm { font-size: 17px; font-weight: 700; }
-    .hero .hs { font-size: 11px; color: #8e8e8e; margin-top: 3px; }
+    .hero .hm { font-size: 23px; font-weight: 700; }
+    .hero .hs { font-size: 15px; color: #8e8e8e; margin-top: 3px; }
     .hero .lvl { display: flex; gap: 8px; margin-top: 7px; }
-    .hero .lvl .b { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: #1c1c1c; border: 1px solid #2a2a2a; color: #d4d4d4; }
+    .hero .lvl .b { font-size: 14px; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: #1c1c1c; border: 1px solid #2a2a2a; color: #d4d4d4; }
     .hero .hr { margin-left: auto; text-align: right; }
-    .hero .hr .n { font-size: 20px; font-weight: 700; color: #F5C451; }
-    .hero .hr .k { font-size: 10px; color: #8e8e8e; }
+    .hero .hr .n { font-size: 28px; font-weight: 700; color: #F5C451; }
+    .hero .hr .k { font-size: 14px; color: #8e8e8e; }
 
     /* 插件 / 徽章 */
     .plugins { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .plugin { display: flex; align-items: center; gap: 7px; background: #161616; border: 1px solid #262626; border-radius: 8px; padding: 6px 10px; }
     .plugin img { width: 22px; height: 22px; object-fit: contain; }
-    .plugin .pn { font-size: 11px; font-weight: 600; }
-    .plugin .pd { font-size: 9px; color: #7A7A7A; margin-top: 1px; max-width: 190px; }
+    .plugin .pn { font-size: 15px; font-weight: 600; }
+    .plugin .pd { font-size: 13px; color: #7A7A7A; margin-top: 1px; max-width: 190px; }
     .badges { display: flex; gap: 8px; flex-wrap: wrap; }
     .badges img { width: 34px; height: 34px; object-fit: contain; }
 
@@ -93,45 +93,45 @@
     .radar { display: flex; align-items: center; justify-content: center; gap: 40px; }
     .radar svg { flex: none; width: 300px; height: 231px; }
     .radar .rlist { flex: none; width: 200px; display: grid; grid-template-columns: 1fr; gap: 9px; }
-    .radar .rl { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a8a8a8; }
+    .radar .rl { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #a8a8a8; }
     .radar .rl i { width: 6px; height: 6px; border-radius: 2px; flex: none; background: #F5C451; }
-    .radar .rl b { margin-left: auto; font-size: 15px; color: #fafafa; }
+    .radar .rl b { margin-left: auto; font-size: 20px; color: #fafafa; }
 
     /* 数值条 */
     .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
     .sbox { background: #101010; border: 1px solid #232323; border-radius: 12px; padding: 12px 6px; text-align: center; }
-    .sbox .n { font-size: 19px; font-weight: 700; line-height: 1.15; }
-    .sbox .n small { font-size: 11px; font-weight: 600; color: #F5C451; margin-left: 2px; }
-    .sbox .l { font-size: 10px; color: #8e8e8e; margin-top: 3px; }
+    .sbox .n { font-size: 25px; font-weight: 700; line-height: 1.15; }
+    .sbox .n small { font-size: 15px; font-weight: 600; color: #F5C451; margin-left: 2px; }
+    .sbox .l { font-size: 14px; color: #8e8e8e; margin-top: 3px; }
 
-    .sec-title { font-size: 13px; font-weight: 700; color: #a8a8a8; margin: 16px 0 9px; display: flex; align-items: center; gap: 8px; }
+    .sec-title { font-size: 18px; font-weight: 700; color: #a8a8a8; margin: 16px 0 9px; display: flex; align-items: center; gap: 8px; }
     .sec-title .bar { width: 3px; height: 13px; background: #F5C451; border-radius: 2px; }
-    .sec-title .cnt { font-size: 11px; color: #6E6E6E; font-weight: 500; }
+    .sec-title .cnt { font-size: 15px; color: #6E6E6E; font-weight: 500; }
 
     /* 伤害/治疗构成 */
     .ana { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .ana .col .t { font-size: 12px; color: #a8a8a8; }
-    .ana .col .t b { color: #fafafa; font-size: 15px; }
+    .ana .col .t { font-size: 16px; color: #a8a8a8; }
+    .ana .col .t b { color: #fafafa; font-size: 20px; }
     .ana .row2 { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .ana .row2 .k { font-size: 10px; color: #8e8e8e; width: 62px; flex: none; }
+    .ana .row2 .k { font-size: 14px; color: #8e8e8e; width: 62px; flex: none; }
     .ana .row2 .track { flex: 1; height: 6px; background: #1c1c1c; border-radius: 999px; overflow: hidden; }
     .ana .row2 .fill { height: 100%; background: linear-gradient(90deg, #6B4E14, #F5C451); border-radius: 999px; }
-    .ana .row2 .v { font-size: 11px; font-weight: 600; width: 46px; text-align: right; color: #d4d4d4; }
+    .ana .row2 .v { font-size: 15px; font-weight: 600; width: 46px; text-align: right; color: #d4d4d4; }
 
     /* 枪械 */
     .weapons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
     .weapon { background: #101010; border: 1px solid #232323; border-radius: 12px; padding: 11px 13px; }
     .weapon .top2 { display: flex; align-items: center; gap: 9px; }
     .weapon img { width: 34px; height: 34px; object-fit: contain; }
-    .weapon .wn { font-size: 13px; font-weight: 600; }
-    .weapon .wd { font-size: 10px; color: #8e8e8e; margin-top: 2px; }
+    .weapon .wn { font-size: 18px; font-weight: 600; }
+    .weapon .wd { font-size: 14px; color: #8e8e8e; margin-top: 2px; }
     .weapon .ws { margin-left: auto; text-align: right; }
-    .weapon .ws .n { font-size: 15px; font-weight: 700; }
-    .weapon .ws .l { font-size: 10px; color: #8e8e8e; }
+    .weapon .ws .n { font-size: 20px; font-weight: 700; }
+    .weapon .ws .l { font-size: 14px; color: #8e8e8e; }
     .weapon .parts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-top: 9px; border-top: 1px solid #232323; padding-top: 7px; }
     .weapon .parts .p { text-align: center; }
-    .weapon .parts .p .n { font-size: 11px; font-weight: 600; }
-    .weapon .parts .p .l { font-size: 9px; color: #8e8e8e; }
+    .weapon .parts .p .n { font-size: 15px; font-weight: 600; }
+    .weapon .parts .p .l { font-size: 13px; color: #8e8e8e; }
 
     /* 地铁装备 */
     .gear { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
@@ -142,22 +142,22 @@
     .gitem .qbar { position: absolute; top: 0; left: 0; width: 100%; height: 3px; }
     .gitem .top2 { display: flex; align-items: center; gap: 8px; }
     .gitem img { width: 42px; height: 42px; object-fit: contain; }
-    .gitem .gn { font-size: 11px; font-weight: 600; line-height: 1.25; }
-    .gitem .gw { font-size: 10px; color: #F5C451; margin-top: 3px; }
+    .gitem .gn { font-size: 15px; font-weight: 600; line-height: 1.25; }
+    .gitem .gw { font-size: 14px; color: #F5C451; margin-top: 3px; }
     .gitem .parts { display: flex; gap: 3px; margin-top: 6px; }
     .gitem .parts img { width: 18px; height: 18px; }
-    .gitem .affix { font-size: 9px; color: #A855F7; margin-top: 5px; }
+    .gitem .affix { font-size: 13px; color: #A855F7; margin-top: 5px; }
 
     /* 背包 */
     .bag { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
     .bitem { background: #131313; border: 1px solid #222222; border-radius: 10px; padding: 8px 6px; text-align: center; position: relative; }
     .bitem .qbar { position: absolute; top: 0; left: 0; width: 100%; height: 2px; border-radius: 10px 10px 0 0; }
     .bitem img { width: 40px; height: 40px; object-fit: contain; }
-    .bitem .bn { font-size: 9px; color: #d4d4d4; margin-top: 3px; line-height: 1.2; height: 22px; overflow: hidden; }
-    .bitem .bw { font-size: 9px; color: #F5C451; margin-top: 2px; }
-    .bitem .bnum { position: absolute; right: 5px; top: 5px; font-size: 9px; color: #8e8e8e; }
+    .bitem .bn { font-size: 13px; color: #d4d4d4; margin-top: 3px; line-height: 1.2; height: 22px; overflow: hidden; }
+    .bitem .bw { font-size: 13px; color: #F5C451; margin-top: 2px; }
+    .bitem .bnum { position: absolute; right: 5px; top: 5px; font-size: 13px; color: #8e8e8e; }
     .bagcounts { display: flex; gap: 10px; margin-top: 10px; }
-    .bagcounts .bc { font-size: 10px; color: #8e8e8e; display: flex; align-items: center; gap: 4px; }
+    .bagcounts .bc { font-size: 14px; color: #8e8e8e; display: flex; align-items: center; gap: 4px; }
     .bagcounts .bc i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
 
     /* 队伍行 */
@@ -168,35 +168,35 @@
     }
     .mrow.self { border-color: #3d3d3d; background: #151515; }
     .mrow img.av { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #1a1a1a; }
-    .mrow .mn { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .mrow .md { font-size: 10px; color: #8e8e8e; margin-top: 2px; }
-    .mrow .mvp { font-size: 9px; font-weight: 700; color: #3A2400; background: linear-gradient(120deg,#FFE0A3,#E7A93E); padding: 1px 6px; border-radius: 999px; }
-    .mrow .me { font-size: 9px; color: #F5C451; border: 1px solid rgba(245,196,81,.4); padding: 1px 6px; border-radius: 999px; }
+    .mrow .mn { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .mrow .md { font-size: 14px; color: #8e8e8e; margin-top: 2px; }
+    .mrow .mvp { font-size: 13px; font-weight: 700; color: #3A2400; background: linear-gradient(120deg,#FFE0A3,#E7A93E); padding: 1px 6px; border-radius: 999px; }
+    .mrow .me { font-size: 13px; color: #F5C451; border: 1px solid rgba(245,196,81,.4); padding: 1px 6px; border-radius: 999px; }
     .mrow .ev { text-align: center; min-width: 44px; }
     .mrow .ev img { height: 20px; object-fit: contain; }
-    .mrow .ev .t { font-size: 10px; color: #a8a8a8; }
+    .mrow .ev .t { font-size: 14px; color: #a8a8a8; }
     .mrow .cols { display: flex; gap: 10px; margin-left: auto; text-align: center; }
     .mrow .cols .c { min-width: 36px; }
-    .mrow .cols .n { font-size: 13px; font-weight: 700; }
-    .mrow .cols .l { font-size: 9px; color: #8e8e8e; }
-    .side-tag { font-size: 11px; font-weight: 700; color: #a8a8a8; margin: 10px 0 6px; }
+    .mrow .cols .n { font-size: 18px; font-weight: 700; }
+    .mrow .cols .l { font-size: 13px; color: #8e8e8e; }
+    .side-tag { font-size: 15px; font-weight: 700; color: #a8a8a8; margin: 10px 0 6px; }
 
     /* 淘汰行 */
     .krow { background: #101010; border: 1px solid #232323; border-radius: 11px; padding: 10px 14px; margin-bottom: 7px; }
     .krow .main { display: flex; align-items: center; gap: 11px; }
     .krow img.av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: #1a1a1a; }
-    .krow .kn { font-size: 13px; font-weight: 600; }
-    .krow .kd { font-size: 10px; color: #8e8e8e; margin-top: 2px; }
-    .krow .kdiv { font-size: 11px; color: #a8a8a8; white-space: nowrap; }
+    .krow .kn { font-size: 18px; font-weight: 600; }
+    .krow .kd { font-size: 14px; color: #8e8e8e; margin-top: 2px; }
+    .krow .kdiv { font-size: 15px; color: #a8a8a8; white-space: nowrap; }
     .krow .sw { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
     .krow .sw .w {
       display: flex; align-items: center; gap: 5px; background: #191919;
-      border: 1px solid #262626; border-radius: 7px; padding: 4px 9px; font-size: 10px; color: #d4d4d4;
+      border: 1px solid #262626; border-radius: 7px; padding: 4px 9px; font-size: 14px; color: #d4d4d4;
     }
     .krow .sw .w img { width: 16px; height: 16px; object-fit: contain; }
     .krow .sw .w b { color: #F5C451; }
 
-    .foot { font-size: 11px; color: #5E5E5E; margin-top: 14px; text-align: center; }
+    .foot { font-size: 15px; color: #5E5E5E; margin-top: 14px; text-align: center; }
   </style>
 </head>
 <body>
@@ -260,7 +260,7 @@
     </div>
     <div class="subs">
       <div class="s"><div class="n">{{income.itemsWorth}}</div><div class="k">物品总价值</div></div>
-      <div class="s"><div class="n">{{income.feat}}{{ if income.addFeat }} <span style="color:#F5C451;font-size:11px">{{income.addFeat}}</span>{{ /if }}</div><div class="k">属性</div></div>
+      <div class="s"><div class="n">{{income.feat}}{{ if income.addFeat }} <span style="color:#F5C451;font-size: 15px">{{income.addFeat}}</span>{{ /if }}</div><div class="k">属性</div></div>
       <div class="s"><div class="n">{{income.survivalTime || '—'}}</div><div class="k">撤离用时</div></div>
     </div>
   </div>
@@ -301,12 +301,12 @@
   {{ if badges.length }}
   <div class="card">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="font-size:11px;color:#8e8e8e;flex:none">称号徽章</div>
+      <div style="font-size: 15px;color:#8e8e8e;flex:none">称号徽章</div>
       <div class="badges">
         {{ each badges b }}
         <div style="display:flex;align-items:center;gap:5px">
           {{ if b.icon }}<img src="{{b.icon}}" alt="" style="width:30px;height:30px;object-fit:contain" />{{ /if }}
-          {{ if b.name }}<span style="font-size:10px;color:#d4d4d4">{{b.name}}</span>{{ /if }}
+          {{ if b.name }}<span style="font-size: 14px;color:#d4d4d4">{{b.name}}</span>{{ /if }}
         </div>
         {{ /each }}
       </div>

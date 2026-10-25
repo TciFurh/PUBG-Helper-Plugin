@@ -1,6 +1,6 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
-import { getCamp } from '../utils/storage.js'
+import { requireCamp } from '../utils/storage.js'
 import Button from '../utils/button.js'
 
 import { setBattleCache } from '../utils/battleCache.js'
@@ -33,18 +33,15 @@ export class BattleList extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平战绩$', fnc: 'showOverview' },
-        { reg: '^#和平战绩\\s+(全部|排位|计分|地铁|地铁逃生|古墓|古墓迷途|团竞|团队竞技|巅峰|巅峰赛|全民|全民赛场|绿洲|绿洲共创|匹配|不计分|内鬼|谁是内鬼)\\s*(\\d+)?$', fnc: 'showCategory' },
+        { reg: '^#?和平战绩$', fnc: 'showOverview' },
+        { reg: '^#?和平战绩\\s+(全部|排位|计分|地铁|地铁逃生|古墓|古墓迷途|团竞|团队竞技|巅峰|巅峰赛|全民|全民赛场|绿洲|绿洲共创|匹配|不计分|内鬼|谁是内鬼)\\s*(\\d+)?$', fnc: 'showCategory' },
       ],
     })
   }
 
   async getRoleId(e) {
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) {
-      e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
-      return null
-    }
+    const camp = requireCamp(e)
+    if (!camp) return null
     apiService.useCamp(camp)
     const roleId = await apiService.get_self_role_id()
     if (!roleId) {
@@ -138,13 +135,14 @@ export class BattleList extends plugin {
       // 写入共享缓存，供 #和平战绩详情 按编号取 battleId/battleMode
       if (list.length) setBattleCache(e.user_id, roleId, list, 'all')
 
+      const hasMore = Number(d.hasMore || 0) === 1
       const image = await puppeteer.screenshot('battlelist', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battlelist.html',
         roleName: camp.roleName || camp.nickName || roleId,
         tabName: tab.name,
         page,
         nextPage: page + 1,
-        hasMore: Number(d.hasMore || 0) === 1,
+        hasMore,
         profile,
         rows: buildListRows(list, tab, page),
         sys: { scale: `style=transform:scale(1.4)` },

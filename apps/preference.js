@@ -15,9 +15,9 @@ export class Preference extends plugin {
 			event: 'message',
 			priority: 1,
 			rule: [
-				{ reg: /^#设置对局(索引)?\s*(-?\d{1,2})$/i, fnc: 'setMainIndex' },
-				{ reg: /^#查看对局(索引)?$/i, fnc: 'getMainIndex' },
-				{ reg: /^#对局索引(帮助|说明)?$/i, fnc: 'help' }
+				{ reg: /^#?设置对局(索引)?\s*(-?\d{1,2})$/i, fnc: 'setMainIndex' },
+				{ reg: /^#?查看对局(索引)?$/i, fnc: 'getMainIndex' },
+				{ reg: /^#?对局索引(帮助|说明)?$/i, fnc: 'help' }
 			]
 		})
 	}

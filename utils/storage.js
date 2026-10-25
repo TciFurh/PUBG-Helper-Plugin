@@ -265,3 +265,18 @@ export function maskToken(token) {
 	if (token.length <= 8) return token.slice(0, 2) + '****'
 	return token.slice(0, 6) + '****' + token.slice(-4)
 }
+
+/**
+ * 取当前账号的营地凭证；未绑定时自动回复引导并返回 null。
+ * 用法：const camp = requireCamp(e); if (!camp) return
+ */
+export function requireCamp(e) {
+	const camp = getCamp(e.user_id)
+	if (camp && camp.token) return camp
+	e.reply([
+		'❌ 还没有绑定和平营地凭证',
+		'· 扫码登录：#和平QQ登录 或 #和平微信登录',
+		'· 已有凭证：#提交和平 openId:gameOpenId:userId:token',
+	]).catch(() => { })
+	return null
+}

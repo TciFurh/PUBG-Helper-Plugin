@@ -3,7 +3,7 @@ import path from 'node:path'
 import fetch from 'node-fetch'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
-import { getCamp, getUserInfo } from '../utils/storage.js'
+import { requireCamp } from '../utils/storage.js'
 import Button from '../utils/button.js'
 
 
@@ -66,8 +66,8 @@ export class AssetAndSign extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平资产(\\s+\\S+){0,3}$', fnc: 'showAsset' },
-        { reg: '^#和平签到$', fnc: 'dailySignin' },
+        { reg: '^#?和平资产(\\s+\\S+){0,3}$', fnc: 'showAsset' },
+        { reg: '^#?和平签到$', fnc: 'dailySignin' },
       ],
     })
   }
@@ -85,9 +85,8 @@ export class AssetAndSign extends plugin {
     const rest = args.filter((a) => a !== qualityArg)
     const catFilter = rest[0] || ''
     const subFilter = rest[1] || ''
-    const { info } = getUserInfo(e.user_id)
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
+    const camp = requireCamp(e)
+    if (!camp) return
 
     apiService.useCamp(camp)
     try {
@@ -224,7 +223,7 @@ export class AssetAndSign extends plugin {
           try {
             const img = await puppeteer.screenshot('asset', {
               tplFile: 'plugins/PUBG-Helper-Plugin/resources/asset.html',
-              section: { name: sectionName, rareCnt: (q || subFilter) ? section.rareCnt : section.rareCnt },
+              section: { name: sectionName, rareCnt: section.rareCnt },
               groups: pageList[i].groups,
               totalCount: section.count,
               filterNote,
@@ -272,9 +271,8 @@ export class AssetAndSign extends plugin {
   // ---- 每日签到 ----
   async dailySignin(e) {
     await e.reply('⏳ 正在执行每日签到...')
-    const { info } = getUserInfo(e.user_id)
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
+    const camp = requireCamp(e)
+    if (!camp) return
 
     apiService.useCamp(camp)
     try {

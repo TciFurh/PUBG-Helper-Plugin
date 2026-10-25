@@ -56,9 +56,12 @@ function cnNum(n) {
  * 晋级赛角标。
  *
  * 接口 `promotion` 字段：{ taskId, process, target, pass, protect, rank, divId, divName }
- * 实测语义（2026-10 排位数据）：
+ * 实测语义（2026-10 排位数据，对照游戏内实际段位核对）：
  * - `pass=1` 只表示「这一局赢了」——中间胜局同样是 pass=1，别拿它当最终局标志
- * - **`divName`/`divId` 只在打完整场晋级赛的最终局才有值**（如 divName="卓越王牌"），这是最终局判据
+ * - **`taskId` 才决定这次晋级的目标段位**：20001→卓越王牌(3局) / 20002→传奇王牌(4局) /
+ *   20003→绝世王牌(5局)。`divName` 是**当前所在段位**（如打传奇晋级赛时 divName=卓越王牌），
+ *   不能直接当目标用，否则会出现「在打传奇却显示卓越」的错位
+ * - `divName`/`divId` 只在打完整场晋级赛的最终局才有值（打满局数时出现），可作最终局判据之一
  * - `protect=1` 是保护局（输了但抵消一次）
  * - `result` 字段在列表接口里是 undefined，中间局胜负只能靠 pass/protect 推
  *
@@ -78,6 +81,20 @@ const PROMO_TIER_TONES = [
   { re: /卓越/, tone: 'purple' },
 ]
 
+/** 晋级任务 ID → 目标段位（局数：卓越 3 / 传奇 4 / 绝世 5） */
+const PROMO_TASK_TIER = { 20001: '卓越王牌', 20002: '传奇王牌', 20003: '绝世王牌' }
+
+/** 晋级目标段位：优先按 taskId 反推；未知 taskId 时用 divName（当前段位）推下一档 */
+function promoTargetTier(p) {
+  const byTask = PROMO_TASK_TIER[Number(p.taskId)]
+  if (byTask) return byTask
+  const name = p.divName || ''
+  if (!name) return ''
+  const order = ['卓越王牌', '传奇王牌', '绝世王牌', '无敌战神']
+  const i = order.indexOf(name)
+  return i >= 0 && i + 1 < order.length ? order[i + 1] : name
+}
+
 export function promoMeta(p) {
   if (!p || !p.taskId) return null
   const passed = String(p.pass) === '1' || Number(p.pass) === 1
@@ -87,13 +104,13 @@ export function promoMeta(p) {
   const progress = proc != null && target != null ? `${proc}/${target}` : ''
   const percent = proc != null && target ? Math.min(100, Math.round((proc / target) * 100)) : 0
 
-  const tier = p.divName || (Number(p.taskId) === 20001 ? '卓越王牌' : '')
+  const tier = promoTargetTier(p)
   const hit = PROMO_TIER_TONES.find((t) => t.re.test(tier))
   const tierPrefix = tier ? tier.replace(/王牌$/, '') : ''
   const stepText = proc != null && proc > 0 ? `${tierPrefix}第${cnNum(proc)}局` : ''
 
-  // 最终局 = 这局赢了，且（divName 有值 或 进度打满）。中间胜局 pass 同样是 1。
-  const clincher = passed && (!!p.divName || (proc != null && target != null && proc >= target))
+  // 最终局 = 这局赢了且进度打满（divName 是「当前段位」，mid-promo 也可能有值，不能单独当判据）
+  const clincher = passed && proc != null && target != null && proc >= target
 
   let small, big, tone
   if (clincher && hit) {

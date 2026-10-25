@@ -17,8 +17,8 @@ export class RecentBattle extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平最近战绩(\\d+)?$', fnc: 'showRecentBattle' },
-        { reg: '^#和平战绩详情(\\d+)$', fnc: 'showBattleDetail' },
+        { reg: '^#?和平最近战绩(\\d+)?$', fnc: 'showRecentBattle' },
+        { reg: '^#?和平战绩详情(\\d+)$', fnc: 'showBattleDetail' },
       ],
     })
   }

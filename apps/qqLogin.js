@@ -17,10 +17,10 @@ export class QqLogin extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平QQ登录$', fnc: 'startScan' },
-        { reg: '^#和平QQ登录强制$', fnc: 'startScan' },
-        { reg: '^#和平QQ登录取消$', fnc: 'cancelScan' },
-        { reg: '^#(设置QQ|QQ设置)(\\s+(\\d{5,12}))?$', fnc: 'setQqUin' },
+        { reg: '^#?和平QQ登录$', fnc: 'startScan' },
+        { reg: '^#?和平QQ登录强制$', fnc: 'startScan' },
+        { reg: '^#?和平QQ登录取消$', fnc: 'cancelScan' },
+        { reg: '^#?(设置QQ|QQ设置)(\\s+(\\d{5,12}))?$', fnc: 'setQqUin' },
       ],
     })
     this._session = null

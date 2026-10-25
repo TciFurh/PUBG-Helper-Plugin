@@ -9,7 +9,7 @@
  */
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
-import { getCamp } from '../utils/storage.js'
+import { requireCamp } from '../utils/storage.js'
 import Button from '../utils/button.js'
 
 
@@ -27,17 +27,17 @@ export class CampSocial extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平营地币$', fnc: 'coins' },
-        { reg: '^#和平访客$', fnc: 'visits' },
-        { reg: '^#和平在线好友$', fnc: 'onlineFriends' },
-        { reg: '^#和平赛事$', fnc: 'leagues' },
+        { reg: '^#?和平营地币$', fnc: 'coins' },
+        { reg: '^#?和平访客$', fnc: 'visits' },
+        { reg: '^#?和平在线好友$', fnc: 'onlineFriends' },
+        { reg: '^#?和平赛事$', fnc: 'leagues' },
       ],
     })
   }
 
   #context(e) {
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return null
+    const camp = requireCamp(e)
+    if (!camp) return null
     const api = new ApiService()
     api.useCamp(camp)
     return { camp, api }

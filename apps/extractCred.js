@@ -1,5 +1,5 @@
 // 和平营地凭证提取：明文输出 token 及全部登录数据（所有人可用，仅提取自己的）
-import { getCamp, getUserInfo } from '../utils/storage.js'
+import { getUserInfo, requireCamp } from '../utils/storage.js'
 
 export class ExtractCred extends plugin {
   constructor() {
@@ -9,16 +9,16 @@ export class ExtractCred extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#提取凭证$', fnc: 'extract' },
-        { reg: '^#提取凭证(数据|json)$', fnc: 'extractJson' },
+        { reg: '^#?提取凭证$', fnc: 'extract' },
+        { reg: '^#?提取凭证(数据|json)$', fnc: 'extractJson' },
       ],
     })
   }
 
   // 明文文本输出（方便复制）
   async extract(e) {
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地凭证，请先 #和平QQ登录 扫码或 #提交和平 抓包提交')
+    const camp = requireCamp(e)
+    if (!camp) return
 
     const { info } = getUserInfo(e.user_id)
     const lines = [
@@ -41,8 +41,8 @@ export class ExtractCred extends plugin {
 
   // JSON 输出（方便脚本/工具直接使用）
   async extractJson(e) {
-    const camp = getCamp(e.user_id)
-    if (!camp || !camp.token) return e.reply('❌ 未找到营地凭证，请先 #和平QQ登录 扫码或 #提交和平 抓包提交')
+    const camp = requireCamp(e)
+    if (!camp) return
 
     const { info } = getUserInfo(e.user_id)
     const payload = {

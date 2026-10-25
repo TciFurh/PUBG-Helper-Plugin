@@ -12,9 +12,9 @@ export class Login extends plugin {
 			priority: 1,
 			rule: [
 				{ reg: '^#?和平(精英|英精)?登录(帮助|教程)?$', fnc: 'loginGuide' },
-				{ reg: '^#提交和平\\s*(.*)$', fnc: 'submitCred' },
-				{ reg: '^#和平凭证$', fnc: 'viewCred' },
-				{ reg: '^#删除和平凭证$', fnc: 'removeCred' }
+				{ reg: '^#?提交和平\\s*(.*)$', fnc: 'submitCred' },
+				{ reg: '^#?和平凭证$', fnc: 'viewCred' },
+				{ reg: '^#?删除和平凭证$', fnc: 'removeCred' }
 			]
 		})
 	}

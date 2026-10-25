@@ -21,7 +21,7 @@ export class WeeklyReport extends plugin {
       event: 'message',
       priority: 1,
       rule: [
-        { reg: '^#和平周报$', fnc: 'showWeeklyReport' },
+        { reg: '^#?和平周报$', fnc: 'showWeeklyReport' },
       ],
     })
   }

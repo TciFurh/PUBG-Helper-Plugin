@@ -14,9 +14,9 @@ export class WxLogin extends plugin {
             event: 'message',
             priority: 1,
             rule: [
-                { reg: '^#和平微信登录$', fnc: 'startScan' },
-                { reg: '^#和平微信登录强制$', fnc: 'startScan' },
-                { reg: '^#和平微信登录取消$', fnc: 'cancelScan' }
+                { reg: '^#?和平微信登录$', fnc: 'startScan' },
+                { reg: '^#?和平微信登录强制$', fnc: 'startScan' },
+                { reg: '^#?和平微信登录取消$', fnc: 'cancelScan' }
             ]
         })
         this._session = null
