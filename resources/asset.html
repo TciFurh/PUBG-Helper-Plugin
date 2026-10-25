@@ -21,42 +21,42 @@
   .head { display: flex; align-items: center; gap: 22px; padding-bottom: 26px; border-bottom: 1px solid #262632; margin-bottom: 26px; }
   .collect-icon { width: 88px; height: 88px; border-radius: 20px; object-fit: contain; background: #1a1a22; }
   .collect-info { display: flex; flex-direction: column; gap: 4px; }
-  .collect-name { font-size: 30px; font-weight: 800; color: #ffffff; }
-  .collect-name .lvl { color: #fbbf24; margin-left: 10px; font-size: 24px; }
-  .collect-score { font-size: 22px; color: #a8a8a8; }
+  .collect-name { font-size: 32px; font-weight: 800; color: #ffffff; }
+  .collect-name .lvl { color: #fbbf24; margin-left: 10px; font-size: 25px; }
+  .collect-score { font-size: 23px; color: #a8a8a8; }
   .collect-score b { color: #fbbf24; }
   .spark { margin-left: auto; display: flex; align-items: center; gap: 14px; background: #1a1a22; border: 1px solid #3a2a18; border-radius: 18px; padding: 12px 24px; }
   .spark-ic { width: 52px; height: 52px; object-fit: contain; }
-  .spark .n { font-size: 34px; font-weight: 800; color: #ff9f43; }
-  .spark .l { font-size: 20px; color: #8a8a8a; margin-top: 2px; }
-  .sub { font-size: 22px; color: #8a8a8a; }
+  .spark .n { font-size: 36px; font-weight: 800; color: #ff9f43; }
+  .spark .l { font-size: 21px; color: #8a8a8a; margin-top: 2px; }
+  .sub { font-size: 23px; color: #8a8a8a; }
   /* ---- 货币 ---- */
   .coins { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 24px; }
   .coin { background: #17171d; border: 1px solid #262632; border-radius: 16px; padding: 14px 10px; text-align: center; }
-  .coin-n { font-size: 26px; font-weight: 700; color: #fbbf24; }
-  .coin-l { font-size: 18px; color: #8a8a8a; margin-top: 4px; }
+  .coin-n { font-size: 28px; font-weight: 700; color: #fbbf24; }
+  .coin-l { font-size: 20px; color: #8a8a8a; margin-top: 4px; }
   /* ---- 分类头 ---- */
   .sec-head { display: flex; align-items: baseline; gap: 14px; padding: 18px 22px; background: #17171d; border: 1px solid #262632; border-radius: 18px; margin-bottom: 20px; }
-  .sec-name { font-size: 26px; font-weight: 700; color: #ffffff; }
-  .sec-count { font-size: 22px; color: #8a8a8a; }
+  .sec-name { font-size: 28px; font-weight: 700; color: #ffffff; }
+  .sec-count { font-size: 23px; color: #8a8a8a; }
   .sec-count b { color: #d4d4d4; }
-  .page-note { margin-left: auto; font-size: 22px; color: #8a8a8a; }
-  .filter-note { display: inline-block; background: #262632; border: 1px solid #3a3a4a; border-radius: 10px; padding: 4px 14px; font-size: 20px; color: #d4d4d4; margin-left: 10px; }
+  .page-note { margin-left: auto; font-size: 23px; color: #8a8a8a; }
+  .filter-note { display: inline-block; background: #262632; border: 1px solid #3a3a4a; border-radius: 10px; padding: 4px 14px; font-size: 21px; color: #d4d4d4; margin-left: 10px; }
   /* ---- 物品图块（游戏风格：图上文下，品质渐变底） ---- */
   .groups { display: flex; flex-direction: column; gap: 14px; }
   .group { background: #141419; border: 1px solid #22222c; border-radius: 16px; padding: 16px 18px; }
-  .group-name { font-size: 22px; font-weight: 600; color: #b8b8b8; margin-bottom: 14px; }
+  .group-name { font-size: 23px; font-weight: 600; color: #b8b8b8; margin-bottom: 14px; }
   .items { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
   .tile { border-radius: 14px; overflow: hidden; border: 1px solid #2a2a36; background: #1c1c24; }
   .tile-img { height: 108px; display: flex; align-items: center; justify-content: center; background: #22222c; }
   .tile-img img { max-width: 92px; max-height: 96px; object-fit: contain; }
-  .noimg { font-size: 30px; color: #3a3a48; }
+  .noimg { font-size: 32px; color: #3a3a48; }
   .tile-name {
-    font-size: 17px; font-weight: 600; color: #e5e5e5; text-align: center;
+    font-size: 19px; font-weight: 600; color: #e5e5e5; text-align: center;
     padding: 6px 8px 7px; line-height: 1.3; height: 58px; display: flex; align-items: center; justify-content: center;
     background: rgba(0,0,0,.35); overflow: hidden;
   }
-  .tile-count { font-size: 15px; color: #8a8a8a; text-align: center; padding-bottom: 7px; background: rgba(0,0,0,.35); }
+  .tile-count { font-size: 16px; color: #8a8a8a; text-align: center; padding-bottom: 7px; background: rgba(0,0,0,.35); }
   /* 品质渐变（整体降一级：q6粉 q5紫 q4蓝 q3绿 q2默认灰，对齐游戏内实际配色） */
   .tile.q6 .tile-img { background: linear-gradient(160deg, #6b1d6b 0%, #a12380 55%, #e91e8c 100%); }
   .tile.q6 { border-color: #e91e8c; }

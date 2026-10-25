@@ -1,130 +1,151 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>本周数据</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 900px;
-      zoom: 2.0;
-      font-family: 'Noto Sans SC', sans-serif;
-      background: #000000;
-      color: #fafafa;
-      padding: 28px 30px;
-    }
-    .head {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-    .head .logo {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      background: #1a1a1a;
-      border: 1px solid #262626;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 30px;
-    }
-    .head .title { font-size: 33px; font-weight: 700; letter-spacing: 0.5px; }
-    .head .sub { font-size: 18px; color: #737373; margin-top: 2px; }
-    .head .spacer { flex: 1; }
-    .head .season {
-      font-size: 18px; color: #a8a8a8;
-      background: #1a1a1a; border: 1px solid #262626;
-      padding: 6px 14px; border-radius: 999px;
-    }
+<meta charset="UTF-8">
+<title>本周数据</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1080px;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0a0a0c; color: #f4f4f6;
+    padding: 40px 42px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  /* 头部 */
+  .head { display: flex; align-items: center; gap: 18px; flex: none; }
+  .logo {
+    width: 66px; height: 66px; border-radius: 18px;
+    background: #16161c; border: 1px solid #2a2a33;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 800; color: #f4f4f6;
+  }
+  .head .title { font-size: 45px; font-weight: 800; letter-spacing: 1px; }
+  .head .sub { font-size: 20px; color: #75757f; margin-top: 4px; letter-spacing: 1px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 21px; color: #b9b9c4; background: #17171d; border: 1px solid #26262f;
+    border-radius: 999px; padding: 9px 18px;
+  }
 
-    /* 段位卡 */
-    .div-card {
-      display: flex; align-items: center; gap: 18px;
-      background: #121212;
-      border: 1px solid #262626;
-      border-radius: 14px;
-      padding: 20px 22px;
-      margin-bottom: 16px;
-    }
-    .div-card img { width: 56px; height: 56px; object-fit: contain; }
-    .div-card .div-name { font-size: 25px; font-weight: 700; }
-    .div-card .div-score { font-size: 18px; color: #8e8e8e; margin-top: 3px; }
-    .div-card .rating-change {
-      margin-left: auto; text-align: right;
-    }
-    .rating-change .arrow { font-size: 28px; font-weight: 700; }
-    .rating-change .desc { font-size: 16px; color: #8e8e8e; margin-top: 2px; }
-    .up { color: #e0e0e0; }
-    .down { color: #9a9a9a; }
+  /* 段位条 */
+  .divbar {
+    flex: none; display: flex; align-items: center; gap: 22px;
+    background: linear-gradient(120deg, #15151b 0%, #101014 100%);
+    border: 1px solid #26262f; border-radius: 24px;
+    padding: 24px 28px;
+  }
+  .divbar .icon { width: 92px; height: 92px; object-fit: contain; flex: none; }
+  .divbar .icon.placeholder {
+    display: flex; align-items: center; justify-content: center;
+    background: #1c1c23; border: 1px solid #2c2c37; border-radius: 18px;
+    font-size: 32px; font-weight: 800; color: #9a9aa6;
+  }
+  .divbar .name { font-size: 41px; font-weight: 800; letter-spacing: 0.5px; }
+  .divbar .score { font-size: 22px; color: #8f8f9a; margin-top: 6px; }
+  .divbar .score b { color: #e6e6ec; font-weight: 700; }
+  .divbar .delta { margin-left: auto; text-align: right; }
+  .divbar .delta .v { font-size: 54px; font-weight: 800; line-height: 1; }
+  .divbar .delta .v.up { color: #fbbf24; }
+  .divbar .delta .v.down { color: #9a9aa6; }
+  .divbar .delta .from { font-size: 21px; color: #7d7d88; margin-top: 8px; }
 
-    /* 指标格 */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .stat {
-      background: #121212;
-      border: 1px solid #262626;
-      border-radius: 12px;
-      padding: 14px 10px;
-      text-align: center;
-    }
-    .stat .num { font-size: 30px; font-weight: 700; }
-    .stat .label { font-size: 16px; color: #8e8e8e; margin-top: 4px; }
-    .stat .delta { font-size: 16px; margin-top: 2px; }
+  /* 指标 */
+  .kpis {
+    flex: none; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+  }
+  .kpi {
+    background: #121216; border: 1px solid #23232c; border-radius: 18px;
+    padding: 18px 10px; text-align: center;
+    display: flex; flex-direction: column; gap: 4px; align-items: center;
+  }
+  .kpi .num { font-size: 45px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+  .kpi .label { font-size: 21px; color: #85858f; }
+  .kpi .delta { font-size: 19px; }
 
-    /* 周报备注 */
-    .foot {
-      display: flex; align-items: center;
-      font-size: 16px; color: #737373;
-      background: #121212; border: 1px solid #262626;
-      border-radius: 12px; padding: 12px 16px;
-    }
-    .foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #fafafa; margin-right: 8px; }
-  </style>
+  /* 比率条 */
+  .rates {
+    flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 22px;
+    background: #101014; border: 1px solid #202028; border-radius: 24px;
+    padding: 26px 30px;
+  }
+  .rate .top { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  .rate .k { font-size: 24px; font-weight: 700; color: #e8e8ee; }
+  .rate .v { font-size: 24px; font-weight: 800; color: #fbbf24; margin-left: auto; }
+  .rate .hint { font-size: 19px; color: #75757f; }
+  .bar { height: 16px; border-radius: 999px; background: #1e1e26; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #f5c451, #d99a2b); }
+  .bar.win i { background: linear-gradient(90deg, #f5c451, #e0a52e); }
+  .bar.top i { background: linear-gradient(90deg, #8b8bff, #6a5ae0); }
+
+  /* 底部 */
+  .foot {
+    flex: none; display: flex; align-items: center; gap: 10px;
+    font-size: 20px; color: #7d7d88;
+    background: #101014; border: 1px dashed #26262f; border-radius: 18px;
+    padding: 14px 20px;
+  }
+  .foot .dot { width: 8px; height: 8px; border-radius: 50%; background: #f5c451; }
+</style>
 </head>
 <body>
   <div class="head">
-    <div class="logo">▦</div>
+    <div class="logo">周</div>
     <div>
       <div class="title">本周数据</div>
-      <div class="sub">WEEKLY REPORT · {{roleName}}</div>
+      <div class="sub">WEEKLY REPORT · {{ roleName }}</div>
     </div>
     <div class="spacer"></div>
-    <div class="season">赛季 {{seasonId}}</div>
+    <div class="tag">赛季 {{ seasonId }}</div>
   </div>
 
-  <div class="div-card">
-    <img src="{{segmentPic}}" alt="" />
+  <div class="divbar">
+    {{ if segmentPicLocal }}
+    <img class="icon" src="{{ segmentPicLocal }}" />
+    {{ else }}
+    <div class="icon placeholder">段</div>
+    {{ /if }}
     <div>
-      <div class="div-name">{{segmentName}}</div>
-      <div class="div-score">当前积分 {{currentRating}}</div>
+      <div class="name">{{ segmentName }}</div>
+      <div class="score">当前积分 <b>{{ currentRating }}</b></div>
     </div>
-    <div class="rating-change">
-      <div class="arrow {{ratingClass}}">{{ratingChangeText}}</div>
-      <div class="desc">{{ratingChangeBefore}} → {{ratingChangeAfter}}</div>
+    <div class="delta">
+      <div class="v {{ ratingClass }}">{{ ratingChangeText }}</div>
+      <div class="from">{{ ratingChangeBefore }} → {{ ratingChangeAfter }}</div>
     </div>
   </div>
 
-  <div class="stats">
-    <div class="stat"><div class="num">{{battleNum}}</div><div class="label">场次</div></div>
-    <div class="stat"><div class="num">{{winNum}}</div><div class="label">胜场</div></div>
-    <div class="stat"><div class="num">{{top10Num}}</div><div class="label">前10</div></div>
-    <div class="stat"><div class="num">{{killNum}}</div><div class="label">淘汰</div></div>
-    <div class="stat"><div class="num">{{deadNum}}</div><div class="label">阵亡</div></div>
-    <div class="stat">
-      <div class="num">{{kd}}</div>
+  <div class="kpis">
+    <div class="kpi"><div class="num">{{ battleNum }}</div><div class="label">场次</div></div>
+    <div class="kpi"><div class="num">{{ winNum }}</div><div class="label">胜场</div></div>
+    <div class="kpi"><div class="num">{{ top10Num }}</div><div class="label">前10</div></div>
+    <div class="kpi"><div class="num">{{ killNum }}</div><div class="label">淘汰</div></div>
+    <div class="kpi"><div class="num">{{ deadNum }}</div><div class="label">阵亡</div></div>
+    <div class="kpi">
+      <div class="num">{{ kd }}</div>
       <div class="label">K/D</div>
-      <div class="delta" style="color:{{kdClass}}">{{kdChangeText}}</div>
+      <div class="delta" style="color:{{ kdClass }}">{{ kdChangeText }}</div>
+    </div>
+  </div>
+
+  <div class="rates">
+    <div class="rate">
+      <div class="top"><span class="k">吃鸡率</span><span class="hint">胜场 / 场次</span><span class="v">{{ winRate }}%</span></div>
+      <div class="bar win"><i style="width:{{ winRate }}%"></i></div>
+    </div>
+    <div class="rate">
+      <div class="top"><span class="k">前十率</span><span class="hint">前10 / 场次</span><span class="v">{{ top10Rate }}%</span></div>
+      <div class="bar top"><i style="width:{{ top10Rate }}%"></i></div>
+    </div>
+    <div class="rate">
+      <div class="top"><span class="k">场均淘汰</span><span class="hint">淘汰 / 场次</span><span class="v">{{ killAvg }}</span></div>
+      <div class="bar win"><i style="width:{{ killAvgPct }}%"></i></div>
     </div>
   </div>
 
   <div class="foot">
     <div class="dot"></div>
-    平均每场段位分变化 {{ratingChangeAvg}} · 数据更新于 {{updateTime}}
+    平均每场段位分变化 {{ ratingChangeAvg }} · 数据更新于 {{ updateTime }}
   </div>
 </body>
 </html>

@@ -13,41 +13,41 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
     color: #e8e8ea;
   }
-  .page { padding: 28px 32px; }
+  .page { padding: 22px 30px; }
 
   /* 头部 */
-  .head { display: flex; align-items: center; gap: 18px; padding-bottom: 16px; border-bottom: 1px solid #23232e; margin-bottom: 16px; }
+  .head { display: flex; align-items: center; gap: 18px; padding-bottom: 12px; border-bottom: 1px solid #23232e; margin-bottom: 12px; }
   .logo {
     width: 74px; height: 74px; border-radius: 20px; flex: none;
     background: linear-gradient(160deg, #f5c451 0%, #d9a12f 100%);
     display: flex; align-items: center; justify-content: center;
-    font-size: 32px; font-weight: 800; color: #1a1206;
+    font-size: 34px; font-weight: 800; color: #1a1206;
   }
-  .head-text .title { font-size: 46px; font-weight: 800; letter-spacing: 1px; }
-  .head-text .sub { font-size: 18px; color: #8b8b95; margin-top: 4px; }
+  .head-text .title { font-size: 47px; font-weight: 800; letter-spacing: 1px; }
+  .head-text .sub { font-size: 20px; color: #8b8b95; margin-top: 4px; }
   .head-text .sub b { color: #f5c451; font-weight: 600; }
 
   /* 卡片网格 */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .card { background: #14141a; border: 1px solid #23232e; border-radius: 18px; padding: 13px 17px 10px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .card { background: #14141a; border: 1px solid #23232e; border-radius: 16px; padding: 10px 14px 8px; }
   .card-title { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 5px; border-bottom: 1px solid #1f1f29; }
-  .chip { font-size: 14px; font-weight: 700; color: #1a1206; background: #f5c451; border-radius: 8px; padding: 2px 8px; }
+  .chip { font-size: 15px; font-weight: 700; color: #1a1206; background: #f5c451; border-radius: 8px; padding: 2px 8px; }
   .chip.purple { background: #a978f5; color: #160d26; }
   .chip.green { background: #4ade80; color: #06210f; }
   .chip.blue { background: #60a5fa; color: #061527; }
   .chip.orange { background: #fb923c; color: #260f04; }
   .chip.grey { background: #9ca3af; color: #111318; }
-  .card-name { font-size: 23px; font-weight: 700; color: #f2f2f4; }
+  .card-name { font-size: 24px; font-weight: 700; color: #f2f2f4; }
 
-  .row { padding: 4.5px 0; }
-  .row .cmd { font-size: 19px; font-weight: 600; color: #f2f2f4; line-height: 1.3; }
-  .row .cmd em { font-style: normal; color: #8b8b95; font-weight: 400; font-size: 16px; }
-  .row .desc { font-size: 14.5px; color: #8b8b95; line-height: 1.35; margin-top: 2px; }
+  .row { padding: 3.2px 0; }
+  .row .cmd { font-size: 21px; font-weight: 600; color: #f2f2f4; line-height: 1.3; }
+  .row .cmd em { font-style: normal; color: #8b8b95; font-weight: 400; font-size: 18px; }
+  .row .desc { font-size: 16px; color: #8b8b95; line-height: 1.35; margin-top: 2px; }
 
   /* 底部提示 */
-  .foot { margin-top: 12px; background: #14141a; border: 1px dashed #2b2b38; border-radius: 18px; padding: 13px 20px; }
-  .foot .t { font-size: 19px; font-weight: 700; color: #f5c451; margin-bottom: 6px; }
-  .foot .l { font-size: 15px; color: #9a9aa4; line-height: 1.55; }
+  .foot { margin-top: 10px; background: #14141a; border: 1px dashed #2b2b38; border-radius: 16px; padding: 11px 18px; }
+  .foot .t { font-size: 21px; font-weight: 700; color: #f5c451; margin-bottom: 6px; }
+  .foot .l { font-size: 16px; color: #9a9aa4; line-height: 1.55; }
   .foot .l b { color: #e8e8ea; font-weight: 600; }
 </style>
 </head>
@@ -133,9 +133,7 @@
   <div class="foot">
     <div class="t">使用提示</div>
     <div class="l">
-      · 每条指令 <b># 可省略</b>，如「和平战绩 排位」也能触发；参数用空格分隔。<br>
-      · 战绩/资产卡片的<b>按钮可直接点</b>翻页或切换分类，不必手打指令。<br>
-      · 首次查询会下载图片缓存，<b>之后秒出</b>；资产图/图标全部本地渲染。
+      统一入口 <b>#和平 功能 参数</b> · 指令 <b># 可省略</b> · 按钮可直接点 · 详解 <b>#和平详解</b>
     </div>
   </div>
 </div>

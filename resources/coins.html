@@ -6,72 +6,164 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    width: 1080px; zoom: 2.0;
+    width: 1080px; height: 1080px;
     font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: #000; color: #fafafa; padding: 26px 28px;
+    background: #0a0a0c; color: #f4f4f6;
+    padding: 40px 42px;
+    display: flex; flex-direction: column; gap: 18px;
   }
-  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-  .head .logo {
-    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
-    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 28px;
+  /* 头部 */
+  .head { display: flex; align-items: center; gap: 18px; flex: none; }
+  .logo {
+    width: 66px; height: 66px; border-radius: 18px;
+    background: linear-gradient(160deg, #f5c451 0%, #c98f24 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 800; color: #241a06;
   }
-  .head .title { font-size: 28px; font-weight: 700; }
-  .head .sub { font-size: 15px; color: #737373; margin-top: 2px; }
+  .head .title { font-size: 45px; font-weight: 800; letter-spacing: 1px; }
+  .head .sub { font-size: 21px; color: #7c7c88; margin-top: 4px; }
   .head .spacer { flex: 1; }
   .head .tag {
-    font-size: 16px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
-    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
+    font-size: 21px; color: #b9b9c4; background: #17171d; border: 1px solid #26262f;
+    border-radius: 999px; padding: 9px 18px;
   }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  /* 主货币 hero */
+  .hero {
+    flex: none; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #241d0c 0%, #16130a 55%, #121212 100%);
+    border: 1px solid #45350f; border-radius: 26px;
+    padding: 30px 34px;
+    display: flex; align-items: center; gap: 26px;
+  }
+  .hero::after {
+    content: ''; position: absolute; right: -60px; top: -70px; width: 240px; height: 240px;
+    border-radius: 50%; background: #f5c45110;
+  }
+  .hero .badge {
+    width: 76px; height: 76px; border-radius: 22px; flex: none;
+    background: #f5c451; color: #241a06;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; font-weight: 800;
+  }
+  .hero .meta { display: flex; flex-direction: column; gap: 2px; }
+  .hero .nm { font-size: 25px; color: #c8b98f; }
+  .hero .num { font-size: 95px; font-weight: 800; letter-spacing: -2px; line-height: 1.02; color: #fbbf24; }
+  .hero .side { margin-left: auto; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .hero .pill { font-size: 20px; color: #d7d7de; background: #ffffff10; border: 1px solid #ffffff18; border-radius: 999px; padding: 6px 14px; }
+  .hero .label { font-size: 21px; color: #8a7a52; margin-top: 2px; }
+
+  /* 其它货币：固定高度，不被拉伸 */
+  .grid {
+    flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
   .coin {
-    background: #121212; border: 1px solid #262626; border-radius: 18px; padding: 20px 18px;
-    position: relative; overflow: hidden;
+    height: 126px;
+    background: #121216; border: 1px solid #23232c; border-radius: 22px;
+    padding: 20px 26px; display: flex; align-items: center; gap: 18px;
   }
-  .coin::after {
-    content: ''; position: absolute; right: -30px; top: -30px; width: 90px; height: 90px;
-    border-radius: 50%; background: #ffffff06;
+  /* 说明区：三卡并排，吃掉剩余高度 */
+  .tips {
+    flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; min-height: 150px;
   }
+  .tip {
+    background: #101014; border: 1px solid #202028; border-radius: 24px;
+    padding: 26px 26px; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  }
+  .tip .t { font-size: 24px; font-weight: 700; color: #e9e9f0; }
+  .tip .l { font-size: 21px; color: #8b8b96; line-height: 1.65; }
+  .tip .l b { color: #d6d6de; font-weight: 600; }
   .coin .badge {
-    width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-size: 21px; font-weight: 700; background: #1c1c1c; border: 1px solid #2a2a2a; color: #d4d4d4;
+    width: 52px; height: 52px; border-radius: 16px; flex: none;
+    background: #1c1c23; border: 1px solid #2c2c37; color: #cdcdd6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700;
   }
-  .coin.main .badge { background: #2a2210; border-color: #4a3a12; color: #fbbf24; }
-  .coin .nm { font-size: 16px; color: #8e8e8e; margin-top: 12px; }
-  .coin .num { font-size: 35px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; line-height: 1.1; }
-  .coin.main .num { color: #fbbf24; }
+  .coin .info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .coin .nm { font-size: 22px; color: #9a9aa6; }
+  .coin .num { font-size: 47px; font-weight: 800; letter-spacing: -1px; line-height: 1.05; }
 
-  .foot { margin-top: 16px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
-  .foot .l { font-size: 16px; color: #8e8e8e; line-height: 1.9; }
-  .foot .l b { color: #d4d4d4; font-weight: 600; }
+  /* 底部 */
+  .foot {
+    flex: none; display: flex; align-items: center; gap: 10px;
+    background: #101014; border: 1px dashed #2a2a33; border-radius: 18px;
+    padding: 15px 22px; font-size: 21px; color: #86868f; line-height: 1.5;
+  }
+  .foot b { color: #d8d8de; font-weight: 600; }
 </style>
 </head>
 <body>
   <div class="head">
-    <div class="logo">💰</div>
+    <div class="logo">币</div>
     <div>
       <div class="title">营地资产</div>
-      <div class="sub">{{ roleName }} · {{ roleId }}</div>
+      <div class="sub">{{ roleName }} · 营地ID {{ roleId }}</div>
     </div>
     <div class="spacer"></div>
     <div class="tag">{{ date }}</div>
   </div>
 
+  <div class="hero">
+    <div class="badge">{{ hero.initial }}</div>
+    <div class="meta">
+      <div class="nm">{{ hero.name }}</div>
+      <div class="num">{{ hero.numFmt }}</div>
+      <div class="label">当前余额</div>
+    </div>
+    <div class="side">
+      <div class="pill">每日签到获取</div>
+      <div class="pill">完成营地任务获取</div>
+      <div class="pill">营地活动兑换</div>
+    </div>
+  </div>
+
+  {{ if others && others.length }}
   <div class="grid">
-    {{ each coins c }}
-    <div class="coin {{ if c.main }}main{{ /if }}">
+    {{ each others c }}
+    <div class="coin">
       <div class="badge">{{ c.initial }}</div>
-      <div class="nm">{{ c.name }}</div>
-      <div class="num">{{ c.numFmt }}</div>
+      <div class="info">
+        <div class="nm">{{ c.name }}</div>
+        <div class="num">{{ c.numFmt }}</div>
+      </div>
     </div>
     {{ /each }}
   </div>
+  {{ else }}
+  <div class="grid" style="align-items:center;justify-items:center;">
+    <div style="grid-column:span 2;font-size: 25px;color:#6f6f7a;">暂无其它营地货币</div>
+  </div>
+  {{ /if }}
+
+  <div class="tips">
+    <div class="tip">
+      <div class="t">如何获取</div>
+      <div class="l">
+        · <b>#和平签到</b> 每日签到<br>
+        · <b>#和平任务</b> 完成营地任务<br>
+        · 营地活动 / 节日福利
+      </div>
+    </div>
+    <div class="tip">
+      <div class="t">如何兑换</div>
+      <div class="l">
+        · 营地 App → 福利中心<br>
+        · → 兑换商城<br>
+        · 头像框 / 装饰 / 实物周边
+      </div>
+    </div>
+    <div class="tip">
+      <div class="t">小提示</div>
+      <div class="l">
+        · 余额有少量延迟<br>
+        · 兑换后刷新一次即可<br>
+        · 数据实时读自营地账户
+      </div>
+    </div>
+  </div>
 
   <div class="foot">
-    <div class="l">
-      共 <b>{{ coins.length }}</b> 种货币 · 福利币可通过 <b>#和平签到</b> 和 <b>#和平任务</b> 获取<br>
-      兑换入口：营地 App → 福利中心 → 兑换商城
-    </div>
+    共 <b>{{ coinsCount }}</b> 种营地货币 · 数据实时读取自营地账户
   </div>
 </body>
 </html>

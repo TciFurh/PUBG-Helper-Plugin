@@ -66,7 +66,6 @@ export class RecentBattle extends plugin {
         roleName: camp.roleName || camp.nickName || roleId,
         total: rows.length,
         rows,
-        sys: { scale: `style=transform:scale(1.4)` },
       })
       e.reply([image, Button.recent(rows.length)])
     } catch (err) {
@@ -97,7 +96,6 @@ export class RecentBattle extends plugin {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battledetail.html',
         ...buildDetailView(res.data || {}, camp),
         updateTime: new Date().toLocaleString('zh-CN', { hour12: false }),
-        sys: { scale: `style=transform:scale(1.4)` },
       })
       e.reply([image, Button.battleDetail()])
     } catch (err) {

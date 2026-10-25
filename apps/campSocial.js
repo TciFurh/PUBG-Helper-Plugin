@@ -63,6 +63,8 @@ export class CampSocial extends plugin {
           main: /福利币/.test(name),
         }
       })
+      const heroCoin = coins.find((c) => c.main) || coins[0]
+      const others = coins.filter((c) => c !== heroCoin)
       let image = null
       try {
         image = await puppeteer.screenshot('coins', {
@@ -70,7 +72,9 @@ export class CampSocial extends plugin {
           roleName,
           roleId,
           date: new Date().toLocaleDateString('zh-CN'),
-          coins,
+          hero: heroCoin,
+          others,
+          coinsCount: coins.length,
         })
       } catch { /* 渲染失败回文本 */ }
       if (image) return e.reply([image, Button.coins()])

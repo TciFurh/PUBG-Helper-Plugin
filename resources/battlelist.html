@@ -9,7 +9,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       width: 900px;
-      zoom: 2.0;
       font-family: 'Noto Sans SC', sans-serif;
       background: #000000;
       color: #fafafa;
@@ -19,13 +18,13 @@
     .head .logo {
       width: 40px; height: 40px; border-radius: 10px;
       background: #1a1a1a; border: 1px solid #262626;
-      display: flex; align-items: center; justify-content: center; font-size: 28px;
+      display: flex; align-items: center; justify-content: center; font-size: 30px;
     }
-    .head .title { font-size: 28px; font-weight: 700; }
-    .head .sub { font-size: 15px; color: #737373; margin-top: 2px; }
+    .head .title { font-size: 30px; font-weight: 700; }
+    .head .sub { font-size: 16px; color: #737373; margin-top: 2px; }
     .head .spacer { flex: 1; }
     .head .page-tag {
-      font-size: 16px; font-weight: 600; color: #d4d4d4;
+      font-size: 18px; font-weight: 600; color: #d4d4d4;
       background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 999px;
       padding: 4px 12px;
     }
@@ -36,16 +35,16 @@
       padding: 16px 18px; margin-bottom: 12px;
     }
     .profile .pt { display: flex; align-items: center; gap: 10px; }
-    .profile .pt .pn { font-size: 20px; font-weight: 700; }
-    .profile .pt .pd { font-size: 15px; color: #8e8e8e; margin-top: 2px; }
+    .profile .pt .pn { font-size: 21px; font-weight: 700; }
+    .profile .pt .pd { font-size: 16px; color: #8e8e8e; margin-top: 2px; }
     .profile .pt .div {
-      margin-left: auto; font-size: 16px; font-weight: 600; color: #d4d4d4;
+      margin-left: auto; font-size: 18px; font-weight: 600; color: #d4d4d4;
       background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 999px; padding: 3px 12px;
     }
     .profile .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 14px; }
     .profile .grid .g { text-align: center; }
-    .profile .grid .n { font-size: 20px; font-weight: 700; }
-    .profile .grid .l { font-size: 14px; color: #8e8e8e; margin-top: 2px; }
+    .profile .grid .n { font-size: 21px; font-weight: 700; }
+    .profile .grid .l { font-size: 15px; color: #8e8e8e; margin-top: 2px; }
 
     /* 列表行 */
     .row {
@@ -65,7 +64,7 @@
     .ribbon {
       position: absolute; top: 0; left: 0;
       display: flex; align-items: baseline; gap: 3px;
-      font-size: 13px; font-weight: 700; line-height: 1;
+      font-size: 14px; font-weight: 700; line-height: 1;
       padding: 3px 9px 3px 10px;
       border-radius: 12px 0 10px 0;
       letter-spacing: .5px;
@@ -75,25 +74,25 @@
     .ribbon.purple { background: linear-gradient(120deg, #E2D5FF, #A97BF5); color: #2A1350; }
     .ribbon.orange { background: linear-gradient(120deg, #FFDDB8, #F5913E); color: #3A1B00; }
     .ribbon.red { background: linear-gradient(120deg, #FFC9CB, #E8474B); color: #420608; }
-    .ribbon b { font-size: 15px; font-weight: 700; }
+    .ribbon b { font-size: 16px; font-weight: 700; }
 
     /* 第1列：结果块 or 排名 */
     .st { text-align: center; }
-    .st .sm { font-size: 13px; letter-spacing: .5px; }
-    .st .bg { font-size: 32px; font-weight: 700; line-height: 1.15; }
+    .st .sm { font-size: 14px; letter-spacing: .5px; }
+    .st .bg { font-size: 34px; font-weight: 700; line-height: 1.15; }
     .st.gold .sm { color: #A9853F; }
     .st.gold .bg { color: #F5C451; }
     .st.grey .sm { color: #5E5E5E; }
     .st.grey .bg { color: #7A7A7A; }
-    .rk { text-align: center; font-size: 32px; font-weight: 700; letter-spacing: -.5px; }
-    .rk.dim { color: #3F3F3F; font-size: 24px; }
+    .rk { text-align: center; font-size: 34px; font-weight: 700; letter-spacing: -.5px; }
+    .rk.dim { color: #3F3F3F; font-size: 25px; }
 
     /* 第2列：地图 + 模式 */
     .info { min-width: 0; }
-    .info .m { font-size: 19px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .info .m { font-size: 21px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .info .tags { display: flex; align-items: center; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
     .chip {
-      font-size: 13px; font-weight: 600; line-height: 1;
+      font-size: 14px; font-weight: 600; line-height: 1;
       padding: 3px 6px; border-radius: 4px;
       background: #1c1c1c; color: #8E8E8E; border: 1px solid #2a2a2a;
     }
@@ -105,19 +104,19 @@
 
     /* 数值列 */
     .num { text-align: center; }
-    .num .n { font-size: 21px; font-weight: 700; line-height: 1.2; }
-    .num .l { font-size: 13px; color: #6E6E6E; margin-top: 2px; }
+    .num .n { font-size: 22px; font-weight: 700; line-height: 1.2; }
+    .num .l { font-size: 14px; color: #6E6E6E; margin-top: 2px; }
 
     /* 评分列 */
     .rate { text-align: center; }
     .rate img { height: 26px; object-fit: contain; display: block; margin: 0 auto; }
-    .rate .rt { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .rate .rt { font-size: 21px; font-weight: 700; line-height: 1.2; }
     .rate .rt.gold { color: #F5C451; }
     .rate .rt.red { color: #E8474B; }
     .rate .rt.grey { color: #8E8E8E; }
     .streak {
       display: inline-block; margin-top: 4px;
-      font-size: 14px; font-weight: 700; line-height: 1;
+      font-size: 15px; font-weight: 700; line-height: 1;
       padding: 3px 8px; border-radius: 5px;
     }
     .streak.gold { background: linear-gradient(120deg, #FFE0A3, #E7A93E); color: #3A2400; }
@@ -125,15 +124,15 @@
 
     /* 时间列 */
     .time { text-align: right; }
-    .time .t { font-size: 15px; color: #8E8E8E; }
+    .time .t { font-size: 16px; color: #8E8E8E; }
     .time .rv {
       display: inline-block; margin-top: 4px;
-      font-size: 13px; color: #B4B4B4;
+      font-size: 14px; color: #B4B4B4;
       border: 1px solid #2e2e2e; border-radius: 999px; padding: 1px 7px;
     }
 
-    .foot { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 16px; color: #737373; margin-top: 14px; }
-    .legend { display: flex; gap: 14px; justify-content: center; font-size: 14px; color: #5E5E5E; margin-top: 10px; }
+    .foot { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 18px; color: #737373; margin-top: 14px; }
+    .legend { display: flex; gap: 14px; justify-content: center; font-size: 15px; color: #5E5E5E; margin-top: 10px; }
     .legend i { font-style: normal; }
     .legend .g { color: #F5C451; }
     .legend .p { color: #C9B0FB; }

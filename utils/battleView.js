@@ -252,7 +252,7 @@ export function buildDetailView(d, camp = {}) {
     // 段位图标（地铁用 divOriIcon/divUrl，其它模式用 divUrl）
     divIcon: d.divOriIcon || d.divUrl || '',
     // 荣誉标记：前十/前五，营地标题条右侧同款（MVP 图太大且与成员行徽章重复，不放）
-    honors: [d.honorIcon, d.rankIcon].filter(Boolean),
+    honors: [d.honorIcon, d.mvpIcon, d.rankIcon].filter(Boolean),
     radar: null,
     hero: null,
     plugins: [],
@@ -415,9 +415,9 @@ export function buildDetailView(d, camp = {}) {
             { k: '脚部', v: w.footRate ?? '0.0' },
           ],
         })
-        if (out.weapons.length >= 3) break
+        if (out.weapons.length >= 8) break
       }
-      if (out.weapons.length >= 3) break
+      if (out.weapons.length >= 8) break
     }
   }
 
