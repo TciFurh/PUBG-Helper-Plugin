@@ -78,7 +78,7 @@ export class AssetAndSign extends plugin {
   // #和平资产 时装 角色      → 指定子分类
   // #和平资产 紫/粉色        → 品质过滤；#和平资产 时装 粉色 → 组合过滤
   async showAsset(e) {
-    const argStr = String(e.msg || '').replace(/^#和平资产\s*/, '').trim()
+    const argStr = String(e.msg || '').replace(/^#?和平资产\s*/, '').trim()
     const args = argStr ? argStr.split(/\s+/).filter(Boolean) : []
     const qualityArg = args.find((a) => QUALITY_NUM[a]) || ''
     const q = qualityArg ? QUALITY_NUM[qualityArg] : 0

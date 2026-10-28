@@ -25,7 +25,7 @@ export class RecentBattle extends plugin {
 
   // ---- 最近对局列表 ----
   async showRecentBattle(e) {
-    const countArg = (e.msg.match(/^#和平最近战绩(\d+)?$/)?.[1]) || 10
+    const countArg = (e.msg.match(/^#?和平最近战绩(\d+)?$/)?.[1]) || 10
     const count = Math.min(Math.max(Number(countArg) || 10, 1), 30)
 
     await e.reply(`⏳ 正在查询最近 ${count} 局战绩...`)
@@ -75,7 +75,7 @@ export class RecentBattle extends plugin {
 
   // ---- 单局战绩详情（支持经典/地铁/超体/团竞） ----
   async showBattleDetail(e) {
-    const idxArg = Number(e.msg.match(/^#和平战绩详情(\d+)$/)?.[1])
+    const idxArg = Number(e.msg.match(/^#?和平战绩详情(\d+)$/)?.[1])
     const camp = getCamp(e.user_id)
     if (!camp || !camp.token) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录（#和平QQ登录 或 #和平微信登录）', Button.bind()])
 

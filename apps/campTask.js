@@ -359,7 +359,7 @@ export class CampTask extends plugin {
   async claimWeekly(e) {
     const ctx = this.#context(e)
     if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
-    const arg = String(e.msg || '').replace(/^#领取手册奖励/, '').trim()
+    const arg = String(e.msg || '').replace(/^#?领取手册奖励/, '').trim()
     let idList = null
     if (arg && !/^(全部|all)$/i.test(arg)) {
       idList = arg.split(/[\s,，、]+/).map(Number).filter((n) => Number.isInteger(n) && n > 0)

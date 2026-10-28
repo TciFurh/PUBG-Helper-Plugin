@@ -27,7 +27,7 @@ export class QqLogin extends plugin {
   }
 
   async setQqUin(e) {
-    const m = String(e.msg).match(/^#(?:设置QQ|QQ设置)(?:\s+(\d{5,12}))?$/)
+    const m = String(e.msg).match(/^#?(?:设置QQ|QQ设置)(?:\s+(\d{5,12}))?$/)
     const qqUin = m?.[1] || ''
     if (qqUin) {
       saveUserInfo(e.user_id, (cur) => ({ ...cur, qqUin }))

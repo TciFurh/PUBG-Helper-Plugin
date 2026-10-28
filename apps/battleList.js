@@ -102,7 +102,7 @@ export class BattleList extends plugin {
 
   /** 分类列表（分页）+ 地铁/古墓档案卡 */
   async showCategory(e) {
-    const m = e.msg.match(/^#和平战绩\s+(全部|排位|计分|地铁|地铁逃生|古墓|古墓迷途|团竞|团队竞技|巅峰|巅峰赛|全民|全民赛场|绿洲|绿洲共创|匹配|不计分|内鬼|谁是内鬼)\s*(\d+)?$/)
+    const m = e.msg.match(/^#?和平战绩\s+(全部|排位|计分|地铁|地铁逃生|古墓|古墓迷途|团竞|团队竞技|巅峰|巅峰赛|全民|全民赛场|绿洲|绿洲共创|匹配|不计分|内鬼|谁是内鬼)\s*(\d+)?$/)
     const alias = m[1]
     const page = Math.min(Math.max(Number(m[2]) || 1, 1), 10)
     const tab = TABS.find((t) => t.aliases.includes(alias))
