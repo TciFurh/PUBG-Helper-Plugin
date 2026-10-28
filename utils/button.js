@@ -218,6 +218,24 @@ export default class Button {
   }
 
   /**
+   * 段位排行榜：模式切换 + 入口
+   */
+  static rank() {
+    return segment.button(
+      [
+        { text: '排位榜', callback: '#和平排行榜 排位' },
+        { text: '团竞榜', callback: '#和平排行榜 团竞' },
+        { text: '地铁榜', callback: '#和平排行榜 地铁' }
+      ],
+      [
+        { text: '古墓榜', callback: '#和平排行榜 古墓' },
+        { text: '我的账号', callback: '#和平账号' },
+        { text: '主页', callback: '#和平主页' }
+      ]
+    )
+  }
+
+  /**
    * 资讯列表：前 5 条直达详情
    * @param {number} count 本次列表条数
    */

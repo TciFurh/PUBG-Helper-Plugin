@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>段位榜</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #000; color: #fafafa; padding: 26px 28px;
+  }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
+    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .head .title { font-size: 30px; font-weight: 700; }
+  .head .sub { font-size: 16px; color: #737373; margin-top: 2px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 18px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
+    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
+  }
+
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .row {
+    display: flex; align-items: center; gap: 14px;
+    background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 16px 18px;
+  }
+  .row.top1 { border-color: #5b4a1d; background: #1a160a; }
+  .row.top2 { border-color: #3f3f3f; background: #151515; }
+  .row.top3 { border-color: #5b3a1d; background: #1a120a; }
+  .row .badge {
+    width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; background: #1c1c1c; border: 1px solid #2a2a2a; color: #a3a3a3;
+  }
+  .row .badge.gold { background: #2a2310; border-color: #5b4a1d; color: #fbbf24; font-size: 30px; }
+  .row .badge.silver { background: #1c1c1c; border-color: #3f3f3f; color: #e5e5e5; font-size: 30px; }
+  .row .badge.bronze { background: #2a1a10; border-color: #5b3a1d; color: #fb923c; font-size: 30px; }
+  .row .main { flex: 1; min-width: 0; }
+  .row .line1 { display: flex; align-items: center; gap: 8px; }
+  .row .nm { font-size: 22px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .div {
+    font-size: 15px; font-weight: 600; border-radius: 999px; padding: 2px 8px; flex-shrink: 0;
+    color: #a3a3a3; background: #1c1c1c; border: 1px solid #2a2a2a;
+  }
+  .row .div.high { color: #fbbf24; background: #2a2310; border-color: #5b4a1d; }
+  .row .div.mid { color: #7dd3fc; background: #0c1f2a; border-color: #1d425b; }
+  .row .line2 { font-size: 16px; color: #8e8e8e; margin-top: 6px; }
+  .row .line2 b { color: #d4d4d4; font-weight: 600; }
+  .row .line2 .score { color: #fafafa; font-weight: 700; }
+  .row .right { text-align: right; flex-shrink: 0; }
+  .row .right .k { font-size: 15px; color: #737373; }
+  .row .right .v { font-size: 18px; color: #a3a3a3; margin-top: 3px; font-weight: 600; }
+
+  .foot { margin-top: 14px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
+  .foot .l { font-size: 17px; color: #8e8e8e; line-height: 1.9; }
+  .foot .l b { color: #d4d4d4; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">🏆</div>
+    <div>
+      <div class="title">和平段位榜</div>
+      <div class="sub">跨账号段位排行 · 数据取自各账号营地角色卡</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tag">{{ modeName }} · 共 {{ total }} 人</div>
+  </div>
+
+  <div class="list">
+    {{ each ranks r }}
+    <div class="row{{ if r.topClass }} {{ r.topClass }}{{ /if }}">
+      <div class="badge{{ if r.tone }} {{ r.tone }}{{ /if }}">{{ r.badge }}</div>
+      <div class="main">
+        <div class="line1">
+          <span class="nm">{{ r.name }}</span>
+          <span class="div{{ if r.divTone }} {{ r.divTone }}{{ /if }}">{{ r.div }}</span>
+        </div>
+        <div class="line2">
+          {{ if r.score }}<span class="score">{{ r.score }}</span> · {{ /if }}QQ <b>{{ r.qq }}</b>
+        </div>
+      </div>
+      <div class="right">
+        <div class="k">名次</div>
+        <div class="v">第 {{ r.rank }} 名</div>
+      </div>
+    </div>
+    {{ /each }}
+  </div>
+
+  <div class="foot">
+    <div class="l">
+      参与 <b>{{ total }}</b> 人 · 共 <b>{{ allCount }}</b> 个账号 · <b>{{ skipped }}</b> 个无数据/凭证失效<br>
+      数据 12 小时内自动复用；切换榜单：<b>#和平排行榜 排位/团竞/地铁/古墓</b>
+    </div>
+  </div>
+</body>
+</html>

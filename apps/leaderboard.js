@@ -1,3 +1,5 @@
+import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import Button from '../utils/button.js'
 import { ApiService } from '../utils/api.js'
 import { listAllCamps } from '../utils/storage.js'
 
@@ -19,6 +21,14 @@ function tierRank(name) {
 	if (!name) return 0
 	const i = TIER_ORDER.findIndex((t) => String(name).includes(t))
 	return i >= 0 ? (TIER_ORDER.length - i) * 100000 : 0
+}
+
+// 段位 → 卡片里的色阶（与 camps 卡片同一套深色配色思路）
+function divToneOf(tier) {
+	if (tier >= 900000) return 'high' // 战神 / 王牌 系列
+	if (tier >= 500000) return 'mid' // 金钻 ~ 铂金
+	if (tier > 0) return 'low' // 翡翠 ~ 青铜
+	return ''
 }
 
 const num = (v) => {
@@ -157,12 +167,47 @@ export class Leaderboard extends plugin {
 
 		entries.sort((a, b) => b.score - a.score || b.tier - a.tier || String(a.name).localeCompare(String(b.name)))
 
-		const medal = (i) => (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ` ${i + 1}.`)
+		const ranks = entries.map((en, i) => {
+			const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1)
+			const tone = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''
+			const topClass = i <= 2 ? `top${i + 1}` : ''
+			const score = en.score ? `${en.score} ${md.metric}` : ''
+			return {
+				badge: medal,
+				tone,
+				topClass,
+				name: en.name,
+				div: en.divName,
+				divTone: divToneOf(en.tier),
+				score,
+				qq: maskQq(en.qq),
+				rank: i + 1,
+			}
+		})
+
+		const data = {
+			modeName: md.name,
+			total: entries.length,
+			allCount: all.length,
+			skipped,
+			ranks,
+		}
+
+		// 优先出图片卡片，渲染失败回退文本
+		try {
+			const image = await puppeteer.screenshot('rank', {
+				tplFile: 'plugins/PUBG-Helper-Plugin/resources/rank.html',
+				...data,
+			})
+			if (image) return e.reply([image, Button.rank()])
+		} catch { /* 渲染失败回文本 */ }
+
+		// 文本兜底（与卡片同口径）
+		const medal = (i) => (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`)
 		const lines = entries.map((en, i) => {
 			const scoreTxt = en.score ? ` · ${en.score}${md.metric}` : ''
 			return `${medal(i)} ${en.name} · ${en.divName}${scoreTxt}（QQ ${maskQq(en.qq)}）`
 		})
-
 		const head = [
 			`🏆 和平段位榜 · ${md.name}`,
 			`参与 ${entries.length} 人（共 ${all.length} 个账号，其中 ${skipped} 个无数据/凭证失效）`,
@@ -172,7 +217,6 @@ export class Leaderboard extends plugin {
 			'',
 			'提示：数据取自各账号营地角色卡，12 小时内自动复用；切换模式：#和平排行榜 排位/团竞/地铁/古墓',
 		]
-
-		return e.reply([head.join('\n'), lines.join('\n'), foot.join('\n')].join('\n'))
+		return e.reply([head.join('\n'), lines.join('\n'), foot.join('\n'), '', Button.rank()].join('\n'))
 	}
 }
