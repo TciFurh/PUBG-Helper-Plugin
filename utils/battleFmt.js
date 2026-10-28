@@ -107,7 +107,10 @@ export function promoMeta(p) {
   const tier = promoTargetTier(p)
   const hit = PROMO_TIER_TONES.find((t) => t.re.test(tier))
   const tierPrefix = tier ? tier.replace(/王牌$/, '') : ''
-  const stepText = proc != null && proc > 0 ? `${tierPrefix}第${cnNum(proc)}局` : ''
+  // 保护局：process 记的是「已完成的胜局数」，保护发生在胜局之后，
+  // 所以它实际是当前系列里的「下一局」——第2局已成功，保护局应显示第3局。
+  const stepRound = protect && proc != null ? proc + 1 : proc
+  const stepText = stepRound != null && stepRound > 0 ? `${tierPrefix}第${cnNum(stepRound)}局` : ''
 
   // 最终局 = 这局赢了且进度打满（divName 是「当前段位」，mid-promo 也可能有值，不能单独当判据）
   const clincher = passed && proc != null && target != null && proc >= target
