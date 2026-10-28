@@ -46,7 +46,7 @@ export class Login extends plugin {
 
 	// 提交凭证
 	async submitCred(e) {
-		const raw = String(e.msg.replace(/^#提交和平\s*/, '')).trim()
+		const raw = String(e.msg.replace(/^#?提交和平\s*/, '')).trim()
 		const parts = raw.split(/[:：\s]+/).filter(Boolean)
 		if (parts.length < 4) {
 			return e.reply('格式错误。示例：\n#提交和平 openId:gameOpenId:userId:token[:seasonId]')
@@ -57,12 +57,13 @@ export class Login extends plugin {
 		}
 		const r = await saveCampAndBind(e.user_id, { openId, gameOpenId, userId, token, seasonId: seasonId || '0', platform: 'cookie' })
 		const info = getUserInfo(e.user_id).info
+		const idList = info.ids.length ? '角色列表:\n' + (await formatIdList(info)) : ''
 		const lines = [
 			'✅ 凭证已保存' + (r.isNew ? '' : '（已更新同账号旧凭证）'),
 			`营地账号: ${r.camp.userId}`,
 			r.roleId ? `已绑定营地ID: ${r.camp?.userId || ''}（角色ID: ${r.roleId}）` : `已绑定营地ID: ${r.camp?.userId || ''}（角色ID未解析，可 #绑定和平 <营地ID>`,
 			`当前账号数: ${r.total}（#和平账号 查看）`,
-			info.ids.length ? '角色列表:\n' + formatIdList(info) : '',
+			idList,
 			'现在可以使用个人凭证查询了。'
 		].filter(Boolean)
 		return e.reply(lines.join('\n'))

@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { ApiService } from './api.js'
 
 const dataDir = path.join(process.cwd(), 'data', 'PUBG-Helper-Plugin')
 const dataFile = path.join(dataDir, 'UserData.json')
@@ -73,12 +74,60 @@ export function saveUserInfo(userId, updater) {
 	return store[userId]
 }
 
-export function formatIdList(info) {
-	return info.ids.map((id, index) => {
-		const owner = (info.camps || []).find((c) => String(c.userId) === String(id) || String(c.roleId) === String(id))
-		const tag = owner ? `（${owner.nickname || owner.userName || owner.userId}）` : ''
-		return `${index === info.current ? '✅' : '☑️'} ${index + 1}. ${id}${tag}`
-	}).join('\n')
+/**
+ * 用凭证真实请求一次，确认登录态是否仍有效。
+ * 仅当接口返回 returnCode===0 且能搜到自身角色，才视为有效。
+ * 网络异常/超时一律归为 error，避免把「暂时连不上」误判成「凭证失效」。
+ * @returns {Promise<{valid:boolean, state:string, code?:number, msg?:string}>}
+ *   state: ok | invalid | no_credential | error
+ */
+export async function verifyCampToken(camp, { timeout = 12000 } = {}) {
+	if (!camp?.openId || !camp?.token) {
+		return { valid: false, state: 'no_credential' }
+	}
+	const api = new ApiService()
+	api.useCamp(camp)
+	try {
+		const json = await Promise.race([
+			api.check_login_state(),
+			new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
+		])
+		const code = json?.returnCode
+		if (code == null) return { valid: false, state: 'error', code }
+		const list = json?.data?.user?.list
+		const ok = code === 0 && Array.isArray(list) && list.length > 0
+		return { valid: ok, state: ok ? 'ok' : 'invalid', code, msg: json?.returnMsg }
+	} catch (err) {
+		return { valid: false, state: 'error', error: String(err?.message || err) }
+	}
+}
+
+const CAMP_STATUS_TAG = {
+	ok: ' [✅已登录]',
+	invalid: ' [❎凭证已失效]',
+	error: ' [⚠️校验失败]',
+	no_credential: '',
+}
+
+/** 凭证校验状态 → 展示标签（无凭证返回空串，不重复数字、也不误报） */
+export function campStatusTag(state) {
+	if (state === 'no_credential') return ''
+	return CAMP_STATUS_TAG[state] ?? ''
+}
+
+export async function formatIdList(info) {
+	const camps = info.camps || []
+	const lines = await Promise.all(info.ids.map(async (id, index) => {
+		const owner = camps.find((c) => String(c.userId) === String(id) || String(c.roleId) === String(id))
+		let status = ''
+		// 只有真正持有凭证的账号才去校验；纯角色ID（无营地账号）不重复数字、也不误报
+		if (owner && owner.token) {
+			const v = await verifyCampToken(owner)
+			status = CAMP_STATUS_TAG[v.state] ?? ''
+		}
+		return `${index === info.current ? '✅' : '☑️'} ${index + 1}. ${id}${status}`
+	}))
+	return lines.join('\n')
 }
 
 // ---- 营地登录凭证 ----
@@ -247,17 +296,37 @@ export function removeRole(qqUserId, index) {
 	})
 }
 
-/** 营地账号列表文案 */
-export function formatCampList(info) {
+/** 营地账号列表文案（async：对每个账号真实校验登录态，附在线状态标签） */
+export async function formatCampList(info) {
 	const camps = info.camps || []
 	if (!camps.length) return '还没有绑定营地账号'
 	const platform = { wechat: '微信', qq: 'QQ', cookie: '凭证' }
-	return camps.map((c, i) => {
+	const lines = await Promise.all(camps.map(async (c, i) => {
 		const name = c.nickname || c.userName || c.uin || c.userId
 		const pf = platform[c.platform] || (c.platform ? c.platform : '未知')
 		const role = c.roleId ? `角色 ${c.roleId}` : '未解析角色'
-		return `${i === info.currentCamp ? '✅' : '☑️'} ${i + 1}. ${name}（${pf} · ${role}）`
-	}).join('\n')
+		let status = ''
+		// 有 token 才校验；纯 cookie 缺失的账号不误报
+		if (c.token) {
+			const v = await verifyCampToken(c)
+			status = campStatusTag(v.state)
+		}
+		return `${i === info.currentCamp ? '✅' : '☑️'} ${i + 1}. ${name}（${pf} · ${role}）${status}`
+	}))
+	return lines.join('\n')
+}
+
+/** 列出本机所有 QQ 用户绑定的全部营地账号（跨用户段位榜用），返回 [{ qq, camp }] */
+export function listAllCamps() {
+	const store = readStore()
+	const out = []
+	for (const [qq, info] of Object.entries(store)) {
+		const camps = Array.isArray(info?.camps) ? info.camps : []
+		for (const c of camps) {
+			if (c?.userId) out.push({ qq, camp: c })
+		}
+	}
+	return out
 }
 
 export function maskToken(token) {

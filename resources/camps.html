@@ -46,6 +46,10 @@
     font-size: 15px; font-weight: 700; color: #4ade80; background: #14351f;
     border: 1px solid #1e5132; border-radius: 999px; padding: 2px 8px; flex-shrink: 0;
   }
+  .acc .st { font-size: 15px; font-weight: 700; border-radius: 999px; padding: 2px 8px; flex-shrink: 0; }
+  .acc .st-ok { color: #4ade80; background: #14351f; border: 1px solid #1e5132; }
+  .acc .st-invalid { color: #f87171; background: #2a1414; border: 1px solid #5b1d1d; }
+  .acc .st-error { color: #fbbf24; background: #2a2310; border: 1px solid #5b4a1d; }
   .acc .line2 { font-size: 16px; color: #8e8e8e; margin-top: 6px; }
   .acc .line2 b { color: #d4d4d4; font-weight: 600; }
   .acc .right { text-align: right; flex-shrink: 0; }
@@ -77,6 +81,7 @@
           <span class="nm">{{ c.name }}</span>
           <span class="pf">{{ c.platform }}</span>
           {{ if c.isCurrent }}<span class="cur-tag">当前</span>{{ /if }}
+          {{ if c.status }}<span class="st st-{{ c.statusTone }}">{{ c.status }}</span>{{ /if }}
         </div>
         <div class="line2">
           角色ID <b>{{ c.roleId }}</b> · token <b>{{ c.tokenTail }}</b>

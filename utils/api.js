@@ -294,6 +294,34 @@ class ApiService {
         return list[0]?.roleId ? String(list[0].roleId) : null
     }
 
+    /**
+     * 真实请求一次校验当前凭证登录态是否仍有效（搜索自己，需 openId+token）。
+     * 成功：returnCode===0 且 data.user.list 非空；失效：returnCode 非 0（如 -30003 登录态失效）。
+     * 返回原始响应，调用方据 returnCode 判断，不直接抛异常。
+     */
+    async check_login_state() {
+        const p = await this.get_param()
+        if (!p) return { result: 0, returnCode: -1, returnMsg: '无登录参数' }
+        const params = {
+            keyword: p.userId,
+            openId: p.openId,
+            gameOpenId: p.gameOpenId,
+            userId: p.userId,
+            token: p.token,
+            seasonId: p.seasonId,
+            type: 'comprehensive',
+            page: '1',
+            ...this.params,
+        }
+        const postData = querystring.stringify(params)
+        const res = await fetch(this.main + this.baseUrl.getresultbytypev2, {
+            method: 'POST',
+            headers: this.headers,
+            body: postData,
+        })
+        return res.json()
+    }
+
     /** 资产：仓库分类（返回 时装/枪械/装备/载具/战备 及各自数量） */
     async get_maintabs(friendRoleId) {
         const p = await this.get_param()
