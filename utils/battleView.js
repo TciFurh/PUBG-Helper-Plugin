@@ -12,6 +12,13 @@ import { val, fmtNum, fmtWan, qualityColor, promoMeta, resultText, resultTone, r
  * 统一成「结果/排名 · 模式 · 数值1 · 数值2 · 评分 · 时间」六列，
  * 各分类只决定每列取什么，模板不再按模式分支。
  */
+/** 积分变化文字色调：+XX 金 / -XX 红 / 无变化返回空 */
+function gainTone(v) {
+  const s = v == null ? '' : String(v).trim()
+  if (!s || !/^[+-]/.test(s)) return ''
+  return s.startsWith('-') ? 'red' : 'gold'
+}
+
 export function buildRow(it, tab, idx) {
   const isMetro = tab.type === 'metro' || Number(it.tabIndex) === 5
   const isTdm = Number(it.tabIndex) === 2 || Number(it.mode) === 803
@@ -24,7 +31,7 @@ export function buildRow(it, tab, idx) {
   // 颜色沿用 promoMeta 的 tone（成功金 / 失败·保护灰 / 卓越紫 / 传奇橙 / 绝世红）。
   const rawSelfRank = it.promotion ? it.promotion.rank : null
   const personalRank = rawSelfRank != null && String(rawSelfRank) !== '' && String(rawSelfRank) !== '0'
-    ? `#${rawSelfRank}`
+    ? `[个人排名 ${rawSelfRank}名]`
     : ''
 
   const row = {
@@ -61,7 +68,7 @@ export function buildRow(it, tab, idx) {
   } else if (isTdm) {
     row.cols = [
       { n: it.killingCount ?? '—', l: `助攻 ${it.assistCount ?? 0}` },
-      { n: it.ratingValue || '—', l: it.ratingChange || '积分' },
+      { n: it.ratingValue || '—', l: it.ratingChange || '积分', tone: gainTone(it.ratingChange) },
     ]
     // 评分列放连击徽章（营地 UI 同位置），不再重复展示积分变化
     if (it.lianshaNum) {
@@ -73,7 +80,7 @@ export function buildRow(it, tab, idx) {
   } else {
     row.cols = [
       { n: it.killingCount ?? '—', l: `伤害 ${it.damageAmount ?? 0}` },
-      { n: it.ratingValue && it.ratingValue !== '0' ? it.ratingValue : '—', l: it.ratingChange || '积分' },
+      { n: it.ratingValue && it.ratingValue !== '0' ? it.ratingValue : '—', l: it.ratingChange || '积分', tone: gainTone(it.ratingChange) },
     ]
     row.ratingIcon = it.ratingIcon || ''
     if (Number(it.isMvp) === 1) row.records.push('MVP')

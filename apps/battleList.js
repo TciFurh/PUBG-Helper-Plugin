@@ -25,6 +25,17 @@ const TABS = [
   { key: 'mole', name: '内鬼', aliases: ['内鬼', '谁是内鬼'], tabIndex: 8, type: 'classic' },
 ]
 
+// 列表表头：各模式每列含义不同，按 tab.key / tab.type 取
+const LIST_HEADERS = {
+  all: ['排名', '模式', '数据', '数值', '评分', '时间'], // 混合模式，用中性列名
+  classic: ['队伍排名', '模式', '淘汰 / 伤害', '积分', '评分', '时间'],
+  metro: ['结果', '模式', '击败', '狩猎分', '收益', '时间'],
+  tdm: ['结果', '模式', '淘汰 / 助攻', '积分', '连击', '时间'],
+}
+function headersFor(tab) {
+  return LIST_HEADERS[tab.key] || LIST_HEADERS[tab.type] || LIST_HEADERS.classic
+}
+
 export class BattleList extends plugin {
   constructor() {
     super({
@@ -144,6 +155,7 @@ export class BattleList extends plugin {
         nextPage: page + 1,
         hasMore,
         profile,
+        headers: headersFor(tab),
         rows: buildListRows(list, tab, page),
         sys: { scale: `style=transform:scale(1.4)` },
       })

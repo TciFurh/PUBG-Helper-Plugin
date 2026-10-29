@@ -47,10 +47,23 @@
     .profile .grid .l { font-size: 15px; color: #8e8e8e; margin-top: 2px; }
 
     /* 列表行 */
+    /* 表头：与行同栅格，两边多 1px 抵掉行的边框 */
+    .thead {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr) 88px 84px 100px 92px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 15px 7px;
+      font-size: 14px; font-weight: 600; color: #6E6E6E;
+    }
+    .thead > div { text-align: center; }
+    .thead > div:nth-child(2) { text-align: left; }
+    .thead > div:last-child { text-align: right; }
+
     .row {
       position: relative;
       display: grid;
-      grid-template-columns: 86px minmax(0, 1fr) 88px 84px 100px 92px;
+      grid-template-columns: 104px minmax(0, 1fr) 88px 84px 100px 92px;
       align-items: center;
       gap: 8px;
       background: #101010;
@@ -89,8 +102,8 @@
     /* 队伍排名 + 下面一行更小的个人排名 */
     .rk-wrap { text-align: center; }
     .prk {
-      font-size: 16px; font-weight: 700; line-height: 1;
-      margin-top: 3px; letter-spacing: .3px;
+      font-size: 12.5px; font-weight: 700; line-height: 1;
+      margin-top: 3px; letter-spacing: .2px; white-space: nowrap;
       color: #FFFFFF;
     }
     .prk.gold { color: #F5C451; }
@@ -118,6 +131,8 @@
     .num { text-align: center; }
     .num .n { font-size: 22px; font-weight: 700; line-height: 1.2; }
     .num .l { font-size: 14px; color: #6E6E6E; margin-top: 2px; }
+    .num .l.gold { color: #F5C451; }
+    .num .l.red { color: #E8474B; }
 
     /* 评分列 */
     .rate { text-align: center; }
@@ -180,6 +195,12 @@
   </div>
   {{ /if }}
 
+  {{ if headers && rows.length }}
+  <div class="thead">
+    {{ each headers h }}<div>{{h}}</div>{{ /each }}
+  </div>
+  {{ /if }}
+
   {{ each rows r }}
   <div class="row">
     {{ if r.ribbon }}
@@ -214,7 +235,7 @@
     </div>
 
     <div class="num"><div class="n">{{r.cols[0].n}}</div><div class="l">{{r.cols[0].l}}</div></div>
-    <div class="num"><div class="n">{{r.cols[1].n}}</div><div class="l">{{r.cols[1].l}}</div></div>
+    <div class="num"><div class="n">{{r.cols[1].n}}</div><div class="l {{r.cols[1].tone}}">{{r.cols[1].l}}</div></div>
 
     <div class="rate">
       {{ if r.ratingIcon }}<img src="{{r.ratingIcon}}" alt="" />{{ /if }}
