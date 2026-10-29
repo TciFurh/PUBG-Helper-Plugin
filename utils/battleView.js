@@ -31,7 +31,7 @@ export function buildRow(it, tab, idx) {
   // 颜色沿用 promoMeta 的 tone（成功金 / 失败·保护灰 / 卓越紫 / 传奇橙 / 绝世红）。
   const rawSelfRank = it.promotion ? it.promotion.rank : null
   const personalRank = rawSelfRank != null && String(rawSelfRank) !== '' && String(rawSelfRank) !== '0'
-    ? `[个人排名 ${rawSelfRank}名]`
+    ? `个人排名: ${rawSelfRank}`
     : ''
 
   const row = {
