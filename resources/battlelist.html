@@ -86,6 +86,18 @@
     .st.grey .bg { color: #7A7A7A; }
     .rk { text-align: center; font-size: 34px; font-weight: 700; letter-spacing: -.5px; }
     .rk.dim { color: #3F3F3F; font-size: 25px; }
+    /* 队伍排名 + 下面一行更小的个人排名 */
+    .rk-wrap { text-align: center; }
+    .prk {
+      font-size: 16px; font-weight: 700; line-height: 1;
+      margin-top: 3px; letter-spacing: .3px;
+      color: #FFFFFF;
+    }
+    .prk.gold { color: #F5C451; }
+    .prk.grey { color: #8E8E8E; }
+    .prk.purple { color: #C9B0FB; }
+    .prk.orange { color: #F5A551; }
+    .prk.red { color: #E8474B; }
 
     /* 第2列：地图 + 模式 */
     .info { min-width: 0; }
@@ -180,7 +192,10 @@
       <div class="bg">{{r.status.big}}</div>
     </div>
     {{ else if r.rankText }}
-    <div class="rk" style="color:{{r.rankColor || '#FAFAFA'}}">{{r.rankText}}</div>
+    <div class="rk-wrap">
+      <div class="rk" style="color:{{r.rankColor || '#FAFAFA'}}">{{r.rankText}}</div>
+      {{ if r.personalRank }}<div class="prk {{r.personalRankTone}}">{{r.personalRank}}</div>{{ /if }}
+    </div>
     {{ else }}
     <div class="rk dim">—</div>
     {{ /if }}

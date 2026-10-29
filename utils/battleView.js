@@ -20,6 +20,13 @@ export function buildRow(it, tab, idx) {
   // #0 表示该模式无排名意义（如绿洲跑酷），不展示
   const teamRank = it.teamRank && it.teamRank !== '#0' ? it.teamRank : ''
 
+  // 个人排名：营地列表只在晋级赛阶段的对局里带（promotion.rank），
+  // 颜色沿用 promoMeta 的 tone（成功金 / 失败·保护灰 / 卓越紫 / 传奇橙 / 绝世红）。
+  const rawSelfRank = it.promotion ? it.promotion.rank : null
+  const personalRank = rawSelfRank != null && String(rawSelfRank) !== '' && String(rawSelfRank) !== '0'
+    ? `#${rawSelfRank}`
+    : ''
+
   const row = {
     idx,
     modeIcon: it.modeIcon || '',
@@ -29,6 +36,8 @@ export function buildRow(it, tab, idx) {
     ribbon: promo,
     rankText: teamRank,
     rankColor: it.rankColor || '',
+    personalRank,
+    personalRankTone: promo ? promo.tone : '',
     cols: [],
     ratingIcon: '',
     ratingText: '',

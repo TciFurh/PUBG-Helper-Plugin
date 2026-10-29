@@ -49,7 +49,7 @@
 |---|---|---|
 | `teamRank` | 队伍名次 | `#0` 表示该模式无排名意义（如绿洲跑酷），不展示 |
 | `rankColor` | 名次配色 | 接口直出，如 `#D98500` |
-| `promotion` | 晋级赛 | `taskId` / `process` / `target` / `pass` / `protect` |
+| `promotion` | 晋级赛 | `taskId` / `process` / `target` / `pass` / `protect` / `rank`（个人排名） |
 | `killingCount` | 击败 | |
 | `ratingValue` / `ratingChange` | 积分 / 积分变化 | |
 | `ratingIcon` | 评级图标 | S+ / SS / SSS |
@@ -286,6 +286,7 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
   - 列表统一为「结果/排名 · 模式 · 数值1 · 数值2 · 评分 · 时间」六列，由 `buildRow` 按分类决定每列取什么，模板不再按模式分支
   - **晋级赛角标**：左上角金 / 灰丝带「晋级赛·成功 / 失败 / 保护」，含晋级进度
   - **排名配色**：取接口 `rankColor`，`#0` 视为无排名不展示
+  - **个人排名**：`promotion.rank`（**仅晋级赛阶段的对局返回**），显示在队伍排名下方一行小字，颜色沿用晋级角标 tone（成功金 / 失败·保护灰 / 卓越紫 / 传奇橙 / 绝世红）；无该字段的对局不显示（接口未提供，不能编）
   - **地铁行**：`hardType` + 成败、击败、狩猎积分、收益（负数标红、新高标「新纪录」）
   - **团竞行**：胜 / 败、淘汰 + 助攻、积分 + 变化、连击徽章（胜金败红）
   - 地铁 / 古墓列表顶部附带赛季档案卡（场数 / 收益 / 撤离率等）
