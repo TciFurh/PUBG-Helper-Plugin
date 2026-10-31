@@ -63,22 +63,22 @@ const data = {
     roleName: '秋舞风', roleId: '3508062251', dateText: '2026/10/24',
     tone: 'ok', emoji: '✅', status: '签到成功', note: '奖励已入账，明天 00:00 后再来',
     fulibi: '32,030', fragment: '1,280', liveness: '80/100', todayTasks: '6/10', coins,
-    taskNote: '本次自动完成 9 项 · 领手册积分 40 分 · 营地奖励 2 份',
+    taskNote: '本次自动完成 9 项 · 手册 4 项待领（游戏内领）· 营地奖励 2 份',
     rewardsText: '福利币 ×50、营地装饰碎片 ×2',
     tasks: [
       { name: '营地每日任务', value: '6/10', tone: '' },
       { name: '福利中心任务', value: '3/3', tone: 'good' },
       { name: '手册周任务', value: '12/14', tone: '' },
-      { name: '手册积分', value: '领到 4 项', tone: 'good' },
+      { name: '手册待领', value: '4 项待领', tone: 'warn' },
     ],
   },
   signinAll: {
     total: 3, signOk: 2, signDone: 1, fail: 0,
-    taskRate: '46/58', pointSum: 90, dateText: '2026/10/29',
+    taskRate: '46/58', waitSum: 9, dateText: '2026/10/29',
     rows: [
-      { no: 1, name: '秋舞风', roleId: '3508062251', signText: '签到成功', signTone: 'good', taskText: '18/18', taskTone: 'good', pointText: '+50分', note: '本次自动完成 9 项 · 领手册积分 50 分' },
-      { no: 2, name: '小号', roleId: '1981655374', signText: '今天已经签过到了', signTone: 'warn', taskText: '16/20', taskTone: '', pointText: '+40分', note: '本次自动完成 6 项 · 领手册积分 40 分' },
-      { no: 3, name: '备用号', roleId: '1011464912', signText: '签到成功', signTone: 'good', taskText: '12/20', taskTone: '', pointText: '—', note: '今日任务均已处理' },
+      { no: 1, name: '秋舞风', roleId: '3508062251', signText: '签到成功', signTone: 'good', taskText: '18/18', taskTone: 'good', pointText: '5 项待领', pointTone: 'warn', note: '本次自动完成 9 项 · 手册 5 项待领（游戏内领）' },
+      { no: 2, name: '小号', roleId: '1981655374', signText: '今天已经签过到了', signTone: 'warn', taskText: '16/20', taskTone: '', pointText: '4 项待领', pointTone: 'warn', note: '本次自动完成 6 项 · 手册 4 项待领（游戏内领）' },
+      { no: 3, name: '备用号', roleId: '1011464912', signText: '签到成功', signTone: 'good', taskText: '12/20', taskTone: '', pointText: '—', pointTone: '', note: '今日任务均已处理' },
     ],
   },
   camps: {

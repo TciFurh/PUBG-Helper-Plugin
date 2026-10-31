@@ -168,7 +168,7 @@ const isSuper = d.isSuperBody === true
 
 ## 每日任务（福利中心）
 
-签到页那份任务的自动化在 `utils/dailyTask.js`（编排），由 `apps/assetAndSign.js` 的 `#和平签到` 统一驱动（签到 → 每日任务 → 手册周任务 → 领手册积分），接口要点：
+签到页那份任务的自动化在 `utils/dailyTask.js`（编排），由 `apps/assetAndSign.js` 的 `#和平签到` 统一驱动（签到 → 每日任务 → 手册周任务；手册积分只做不领），接口要点：
 
 | 接口 | 用途 |
 |---|---|
@@ -269,7 +269,8 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
 
 以下改动为本仓库相对上游插件的增强：
 
-- **签到合一**（2026-10-31）：`#和平签到` 一次完成「签到 + 营地每日任务 + 手册周任务 + 领取手册积分」，`#和平签到 全部` 串行跑名下所有已登录账号
+- **签到合一**（2026-10-31）：`#和平签到` 一次完成「签到 + 营地每日任务 + 手册周任务」，`#和平签到 全部` 串行跑名下所有已登录账号
+  - 手册积分**不自动领取**（当天调整）：只调 `runWeeklyTasks`，不再调 `claimWeeklyTasks`；卡片第四格改为「手册待领 N 项」，`claimWeeklyTasks` 仍保留在 `utils/dailyTask.js` 里备用
   - 主流程：`apps/assetAndSign.js` 的 `signOne()`（单账号）/ `signAll()`（批量），任务编排仍在 `utils/dailyTask.js`
   - 模板：`resources/signin.html`（单账号，含「今日任务」四格）/ `signinAll.html`（批量汇总、每账号一行）
   - 原 `#和平任务` 系列（每日/周任务、领奖、定时自动任务）已整体移除，`apps/campTask.js` 与 `dailyTasks.html` / `weekly.html` 一并删除

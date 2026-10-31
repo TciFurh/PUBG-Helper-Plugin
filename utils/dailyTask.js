@@ -494,10 +494,30 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
   // 结束后再拉一次，把最新进度回填到行上（分享/浏览类计数是服务端异步确认的）
   const after = await api.get_season_pass_task(roleId)
   const progressById = new Map()
+  const statusById = new Map()
   for (const w of after?.data?.weekList || []) {
-    for (const t of w.taskList || []) progressById.set(Number(t.id), `${t.progress}/${t.maxProgress} ${Number(t.status) === 2 ? '已领' : Number(t.status) === 1 ? '待领' : ''}`.trim())
+    for (const t of w.taskList || []) {
+      const id = Number(t.id)
+      const st = Number(t.status)
+      progressById.set(id, `${t.progress}/${t.maxProgress} ${st === 2 ? '已领' : st === 1 ? '待领' : ''}`.trim())
+      statusById.set(id, st)
+    }
   }
-  for (const w of out.weeks) for (const r of w.rows) if (progressById.has(r.id)) r.progress = progressById.get(r.id)
+  for (const w of out.weeks) {
+    for (const r of w.rows) {
+      if (progressById.has(r.id)) r.progress = progressById.get(r.id)
+      const st = statusById.get(r.id)
+      if (st === 2) {
+        r.status = 'done'
+        r.note = ''
+      } else if (st === 1 && r.status !== 'waitClaim') {
+        // 本次刚做完（或服务端异步确认）的任务，回填成「待领」，否则待领数会少算
+        r.status = 'waitClaim'
+        r.note = '已完成，手册积分待手动领取'
+        out.waitClaim.push(r.title)
+      }
+    }
+  }
   return out
 }
 

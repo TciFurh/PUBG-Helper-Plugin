@@ -59,6 +59,7 @@
   .cols .c .k { font-size: 14px; color: #737373; }
   .cols .c .v { font-size: 20px; font-weight: 700; color: #d4d4d4; margin-top: 3px; }
   .cols .c .v.good { color: #4ade80; }
+  .cols .c .v.warn { color: #fbbf24; }
   .cols .c .v.bad { color: #f87171; }
 
   .foot { margin-top: 14px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
@@ -81,7 +82,7 @@
     <div class="stat"><div class="n">{{ total }}</div><div class="l">账号数</div></div>
     <div class="stat good"><div class="n">{{ signOk }}</div><div class="l">本次签到成功</div></div>
     <div class="stat hl"><div class="n">{{ taskRate }}</div><div class="l">任务完成</div></div>
-    <div class="stat hl"><div class="n">{{ pointSum }}</div><div class="l">手册积分到手</div></div>
+    <div class="stat hl"><div class="n">{{ waitSum }}</div><div class="l">手册待领项</div></div>
   </div>
 
   {{ if fail }}
@@ -101,7 +102,7 @@
       </div>
       <div class="cols">
         <div class="c"><div class="k">任务</div><div class="v {{ r.taskTone }}">{{ r.taskText }}</div></div>
-        <div class="c"><div class="k">手册积分</div><div class="v {{ if r.pointText !== '—' }}good{{ /if }}">{{ r.pointText }}</div></div>
+        <div class="c"><div class="k">手册待领</div><div class="v {{ r.pointTone }}">{{ r.pointText }}</div></div>
       </div>
     </div>
     {{ /each }}
@@ -110,7 +111,7 @@
   <div class="foot">
     <div class="l">
       📌 只有<b>已登录（有凭证）</b>的账号会参与；今天已签过的不算失败（显示「已签到」）<br>
-      单账号执行发 <b>#和平签到</b>；账号管理发 <b>#和平账号</b>
+      手册任务<b>只完成不领取</b>，「手册待领」项请到游戏内手册页自己点；单账号发 <b>#和平签到</b>
     </div>
   </div>
 </body>

@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { requireCamp, getUserInfo } from '../utils/storage.js'
-import { runDailyTasks, runWeeklyTasks, claimWeeklyTasks } from '../utils/dailyTask.js'
+import { runDailyTasks, runWeeklyTasks } from '../utils/dailyTask.js'
 import Button from '../utils/button.js'
 
 
@@ -66,7 +66,8 @@ async function prefetchItems(items) {
 }
 
 /**
- * 单个账号：签到 → 营地每日任务（积分+福利，含领奖）→ 手册周任务 → 领手册积分。
+ * 单个账号：签到 → 营地每日任务（积分+福利，含领奖）→ 手册周任务（只做不领）。
+ * 手册积分故意不自动领取，留给用户在游戏内自己点，避免代领风险。
  * 任一步失败都不抛（除了拿不到角色ID），结果里带上错误原因，便于逐账号汇总。
  */
 async function signOne(camp, { withCoins = false } = {}) {
@@ -78,8 +79,9 @@ async function signOne(camp, { withCoins = false } = {}) {
     note: '奖励已入账，明天 00:00 后再来', signState: 'ok',
     tasks: [], taskNote: '', rewardsText: '',
     liveness: '-', todayTasks: '-', fulibi: '-', fragment: '-', coins: [],
-    daily: null, weekly: null, claim: null,
-    dailyErr: '', weeklyErr: '', claimErr: '',
+    daily: null, weekly: null,
+    dailyErr: '', weeklyErr: '',
+    waitWeekly: 0,
     acted: 0, numDone: 0, numTotal: 0,
   }
 
@@ -110,15 +112,9 @@ async function signOne(camp, { withCoins = false } = {}) {
     r.dailyErr = err.message || String(err)
   }
 
-  // 3) 手册周任务 + 领取手册积分（签到即完成，不再留着待领）
+  // 3) 手册周任务（只做不领，积分留给用户自己领）
   try {
     r.weekly = await runWeeklyTasks(api, roleId)
-    try {
-      const c = await claimWeeklyTasks(api, roleId, null)
-      if (c && c.total) r.claim = c
-    } catch (err) {
-      r.claimErr = err.message || String(err)
-    }
   } catch (err) {
     r.weeklyErr = err.message || String(err)
   }
@@ -130,8 +126,7 @@ async function signOne(camp, { withCoins = false } = {}) {
   const scoreDone = score.filter((x) => DONE_STATES.has(x.status)).length
   const welfareDone = welfare.filter((x) => DONE_STATES.has(x.status)).length
   const weeklyDone = wRows.filter((x) => DONE_STATES.has(x.status)).length
-  const waitWeekly = (r.weekly?.waitClaim || []).length
-  const pts = (r.claim?.claimed || []).reduce((s, c) => s + (c.point || 0), 0)
+  r.waitWeekly = (r.weekly?.waitClaim || []).length
   const toneOf = (done, total) => (total ? (done >= total ? 'good' : '') : '')
 
   r.tasks = [
@@ -151,9 +146,9 @@ async function signOne(camp, { withCoins = false } = {}) {
       tone: r.weeklyErr ? 'bad' : toneOf(weeklyDone, wRows.length),
     },
     {
-      name: '手册积分',
-      value: r.claim ? `领到 ${r.claim.total} 项` : (r.claimErr ? '领取失败' : (waitWeekly ? `${waitWeekly} 项待领` : '无待领')),
-      tone: r.claim ? 'good' : (r.claimErr ? 'bad' : ''),
+      name: '手册待领',
+      value: r.waitWeekly ? `${r.waitWeekly} 项待领` : (r.weeklyErr ? '失败' : '无待领'),
+      tone: r.waitWeekly ? 'warn' : '',
     },
   ]
 
@@ -164,10 +159,9 @@ async function signOne(camp, { withCoins = false } = {}) {
     + (r.weekly?.acted || 0)
   r.numDone = scoreDone + welfareDone + weeklyDone
   r.numTotal = score.length + welfare.length + wRows.length
-  r.pointGot = pts
   const bits = []
   if (r.acted) bits.push(`本次自动完成 ${r.acted} 项`)
-  if (r.claim?.total) bits.push(`领手册积分 ${pts} 分`)
+  if (r.waitWeekly) bits.push(`手册 ${r.waitWeekly} 项待领（游戏内领）`)
   if (rewards.length) bits.push(`营地奖励 ${rewards.length} 份`)
   r.taskNote = bits.join(' · ') || '今日任务均已处理'
 
@@ -203,7 +197,6 @@ function describeSignin(r) {
   if (r.rewardsText) lines.push(`🎁 领到：${r.rewardsText}`)
   if (r.dailyErr) lines.push(`⚠️ 营地任务失败：${r.dailyErr}`)
   if (r.weeklyErr) lines.push(`⚠️ 手册任务失败：${r.weeklyErr}`)
-  if (r.claimErr) lines.push(`⚠️ 手册积分领取失败：${r.claimErr}`)
   return lines.join('\n')
 }
 
@@ -512,7 +505,7 @@ export class AssetAndSign extends plugin {
       const signDone = okRows.filter((r) => r.signState === 'done').length
       const totalTask = okRows.reduce((n, r) => n + r.numTotal, 0)
       const doneTask = okRows.reduce((n, r) => n + r.numDone, 0)
-      const pointSum = okRows.reduce((n, r) => n + (r.pointGot || 0), 0)
+      const waitSum = okRows.reduce((n, r) => n + (r.waitWeekly || 0), 0)
 
       const rows = results.map((r, i) => ({
         no: i + 1,
@@ -522,7 +515,8 @@ export class AssetAndSign extends plugin {
         signTone: r.failed || r.signState === 'fail' ? 'bad' : (r.signState === 'done' ? 'warn' : 'good'),
         taskText: r.failed ? '—' : `${r.numDone}/${r.numTotal}`,
         taskTone: r.failed ? 'bad' : (r.numTotal && r.numDone >= r.numTotal ? 'good' : ''),
-        pointText: r.failed ? '—' : (r.pointGot ? `+${r.pointGot}分` : '—'),
+        pointText: r.failed ? '—' : (r.waitWeekly ? `${r.waitWeekly} 项待领` : '—'),
+        pointTone: !r.failed && r.waitWeekly ? 'warn' : '',
         note: r.failed ? (r.err || '') : (r.taskNote || ''),
       }))
 
@@ -532,7 +526,7 @@ export class AssetAndSign extends plugin {
         signDone,
         fail: results.length - okRows.length,
         taskRate: totalTask ? `${doneTask}/${totalTask}` : '—',
-        pointSum,
+        waitSum,
         rows,
         dateText: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
       }
@@ -550,7 +544,7 @@ export class AssetAndSign extends plugin {
       const lines = [
         `📅 签到全部完成：${results.length} 个账号`,
         `· 签到成功 ${signOk} · 今天已签 ${signDone} · 失败 ${data.fail}`,
-        `· 任务完成 ${data.taskRate}${pointSum ? ` · 手册积分 +${pointSum}` : ''}`,
+        `· 任务完成 ${data.taskRate}${waitSum ? ` · 手册待领 ${waitSum} 项（游戏内领）` : ''}`,
         '',
       ]
       for (const row of rows) {
