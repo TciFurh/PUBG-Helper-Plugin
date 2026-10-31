@@ -3,7 +3,7 @@
  *
  * 用法：
  *   node docs/tools/pubg_card_preview.mjs [模板名...]
- *   node docs/tools/pubg_card_preview.mjs weekly camps
+ *   node docs/tools/pubg_card_preview.mjs signin signinAll camps
  *
  * 产物在 D:\jiuli\temp_preview\card-*.png
  */
@@ -57,45 +57,29 @@ const coins = [
 ]
 
 const data = {
-  weekly: {
-    roleName: '秋舞风', roleId: '3508062251', season: 'S6',
-    total: 24, acted: 2, waitCount: 6, skipCount: 2,
-    waitNames: '浏览资讯、查看战绩复盘、分享战绩',
-    skipNames: '需在 App 看放映中心 3 分钟、需在 App 点开绿洲专区页',
-    weeks: [
-      { no: 5, done: 4, total: 4, percent: 100, rows: [
-        { title: '登录和平营地', progress: '5/5 待领', status: 'waitClaim', icon: '🎁', note: '' },
-        { title: '分享战绩', progress: '3/3 待领', status: 'waitClaim', icon: '🎁', note: '' },
-      ] },
-      { no: 6, done: 2, total: 4, percent: 50, rows: [
-        { title: '查看战绩复盘', progress: '1/3', status: 'acted', icon: '＋', note: '累计 3 天，今天 +1' },
-        { title: '浏览资讯', progress: '5/5 待领', status: 'waitClaim', icon: '🎁', note: '' },
-        { title: '浏览页面', progress: '3/3 待领', status: 'waitClaim', icon: '🎁', note: '' },
-        { title: '浏览页面', progress: '0/1', status: 'skip', icon: '—', note: '需在 App 点开绿洲专区页（客户端埋点）' },
-      ] },
-    ],
-  },
-  dailyTasks: {
-    roleName: '秋舞风', roleId: '3508062251', date: '2026/10/24',
-    scoreDone: 6, scoreTotal: 10, welfareDone: 3, welfareTotal: 3, rewardCount: 2,
-    rewards: ['福利币 ×50', '营地装饰碎片 ×2'], rewardsText: '福利币 ×50、营地装饰碎片 ×2',
-    liveness: '80/100', rounds: 3, welfareActed: 7, refreshCount: 2, likesCleared: 4,
-    score: [
-      { name: '每日签到', status: 'done', icon: '✓', note: '' },
-      { name: '分享一次战绩', status: 'acted', icon: '＋', note: '已完成' },
-      { name: '观看直播 5 分钟', status: 'skip', icon: '—', note: '暂不支持自动完成' },
-      { name: '开启对局工具', status: 'fail', icon: '✕', note: '只开启 3/4' },
-    ],
-    welfare: [
-      { name: '浏览资讯 3 条', status: 'done', icon: '✓', note: '已领取' },
-      { name: '给好友点赞', status: 'waitClaim', icon: '🎁', note: '已完成，待手动领取' },
-    ],
-  },
+  help: {},
   coins: { roleName: '秋舞风', roleId: '3508062251', date: '2026/10/24', coins },
   signin: {
     roleName: '秋舞风', roleId: '3508062251', dateText: '2026/10/24',
     tone: 'ok', emoji: '✅', status: '签到成功', note: '奖励已入账，明天 00:00 后再来',
     fulibi: '32,030', fragment: '1,280', liveness: '80/100', todayTasks: '6/10', coins,
+    taskNote: '本次自动完成 9 项 · 领手册积分 40 分 · 营地奖励 2 份',
+    rewardsText: '福利币 ×50、营地装饰碎片 ×2',
+    tasks: [
+      { name: '营地每日任务', value: '6/10', tone: '' },
+      { name: '福利中心任务', value: '3/3', tone: 'good' },
+      { name: '手册周任务', value: '12/14', tone: '' },
+      { name: '手册积分', value: '领到 4 项', tone: 'good' },
+    ],
+  },
+  signinAll: {
+    total: 3, signOk: 2, signDone: 1, fail: 0,
+    taskRate: '46/58', pointSum: 90, dateText: '2026/10/29',
+    rows: [
+      { no: 1, name: '秋舞风', roleId: '3508062251', signText: '签到成功', signTone: 'good', taskText: '18/18', taskTone: 'good', pointText: '+50分', note: '本次自动完成 9 项 · 领手册积分 50 分' },
+      { no: 2, name: '小号', roleId: '1981655374', signText: '今天已经签过到了', signTone: 'warn', taskText: '16/20', taskTone: '', pointText: '+40分', note: '本次自动完成 6 项 · 领手册积分 40 分' },
+      { no: 3, name: '备用号', roleId: '1011464912', signText: '签到成功', signTone: 'good', taskText: '12/20', taskTone: '', pointText: '—', note: '今日任务均已处理' },
+    ],
   },
   camps: {
     total: 2,
@@ -107,11 +91,11 @@ const data = {
 }
 
 const map = {
-  weekly: ['weekly.html', 'weekly'],
-  dailyTasks: ['dailyTasks.html', 'dailyTasks'],
   coins: ['coins.html', 'coins'],
   signin: ['signin.html', 'signin'],
+  signinAll: ['signinAll.html', 'signinAll'],
   camps: ['camps.html', 'camps'],
+  help: ['help.html', 'help'],
 }
 
 const want = process.argv.slice(2)

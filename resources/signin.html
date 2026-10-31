@@ -46,10 +46,23 @@
   .stat.good .n { color: #4ade80; }
 
   .sec { background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 16px 18px; }
+  .sec + .sec { margin-top: 12px; }
   .sec .st { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .sec .st .t { font-size: 21px; font-weight: 700; }
   .sec .st .c { font-size: 16px; color: #8e8e8e; margin-left: auto; }
   .sec .st .dot { width: 6px; height: 6px; border-radius: 50%; background: #d4d4d4; }
+
+  .tasks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .task {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: #161616; border: 1px solid #242424; border-radius: 12px; padding: 12px 16px;
+  }
+  .task .tn { font-size: 17px; color: #8e8e8e; }
+  .task .tv { font-size: 22px; font-weight: 700; color: #d4d4d4; }
+  .task .tv.good { color: #4ade80; }
+  .task .tv.bad { color: #f87171; }
+  .rw { margin-top: 10px; font-size: 17px; color: #8e8e8e; line-height: 1.7; }
+  .rw b { color: #fbbf24; font-weight: 600; }
 
   .coins { display: flex; flex-wrap: wrap; gap: 10px; }
   .coin {
@@ -97,6 +110,19 @@
   </div>
 
   <div class="sec">
+    <div class="st"><span class="dot"></span><span class="t">今日任务</span><span class="c">{{ taskNote }}</span></div>
+    <div class="tasks">
+      {{ each tasks t }}
+      <div class="task">
+        <div class="tn">{{ t.name }}</div>
+        <div class="tv {{ t.tone }}">{{ t.value }}</div>
+      </div>
+      {{ /each }}
+    </div>
+    {{ if rewardsText }}<div class="rw">🎁 营地任务领到：<b>{{ rewardsText }}</b></div>{{ /if }}
+  </div>
+
+  <div class="sec">
     <div class="st"><span class="dot"></span><span class="t">当前资产</span><span class="c">签到奖励直接入账，可在营地兑换商城使用</span></div>
     <div class="coins">
       {{ each coins c }}
@@ -113,8 +139,8 @@
 
   <div class="foot">
     <div class="l">
-      📌 签到每天一次，<b>跨天 00:00 刷新</b>；积分任务在 <b>#和平任务</b> 里能自动做完<br>
-      想看完整资产发 <b>#和平营地币</b>，想攒福利币就每天跑一次 <b>#和平任务</b>
+      📌 一条指令搞定：<b>签到 + 营地每日任务 + 手册周任务（含领积分）</b>，跨天 00:00 刷新<br>
+      多账号一起做发 <b>#和平签到 全部</b>；看完整资产发 <b>#和平营地币</b>
     </div>
   </div>
 </body>

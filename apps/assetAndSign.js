@@ -3,11 +3,18 @@ import path from 'node:path'
 import fetch from 'node-fetch'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
-import { requireCamp } from '../utils/storage.js'
+import { requireCamp, getUserInfo } from '../utils/storage.js'
+import { runDailyTasks, runWeeklyTasks, claimWeeklyTasks } from '../utils/dailyTask.js'
 import Button from '../utils/button.js'
 
 
 const apiService = new ApiService()
+
+/** `#和平签到 全部` 的别名 */
+const ALL_RE = /^(全部|所有|全部账号|所有账号|所有号|全账号|all)$/i
+/** 任务状态里算作「已完成」的几档 */
+const DONE_STATES = new Set(['done', 'acted', 'waitClaim'])
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 /** 品质名 → quality 值（编码整体比叫法低一级：6粉 5紫 4蓝 3绿，7红[最高档]） */
 const QUALITY_NUM = {
@@ -58,6 +65,148 @@ async function prefetchItems(items) {
   }
 }
 
+/**
+ * 单个账号：签到 → 营地每日任务（积分+福利，含领奖）→ 手册周任务 → 领手册积分。
+ * 任一步失败都不抛（除了拿不到角色ID），结果里带上错误原因，便于逐账号汇总。
+ */
+async function signOne(camp, { withCoins = false } = {}) {
+  const api = new ApiService()
+  api.useCamp(camp)
+  const who = camp.nickname || camp.roleName || camp.userName || camp.userId || '未知账号'
+  const r = {
+    who, roleId: '', tone: 'ok', emoji: '✅', status: '签到成功',
+    note: '奖励已入账，明天 00:00 后再来', signState: 'ok',
+    tasks: [], taskNote: '', rewardsText: '',
+    liveness: '-', todayTasks: '-', fulibi: '-', fragment: '-', coins: [],
+    daily: null, weekly: null, claim: null,
+    dailyErr: '', weeklyErr: '', claimErr: '',
+    acted: 0, numDone: 0, numTotal: 0,
+  }
+
+  const roleId = await api.get_self_role_id()
+  if (!roleId) throw new Error('未能获取营地角色ID（凭证可能已失效）')
+  r.roleId = String(roleId)
+
+  // 1) 签到
+  try {
+    const res = await api.get_act_dailysigninmonthly(roleId)
+    const code = res.returnCode
+    if (code === -71003) {
+      r.tone = 'warn'; r.emoji = '📅'; r.status = '今天已经签过到了'
+      r.note = '每天只能签一次，明天 00:00 刷新'; r.signState = 'done'
+    } else if (code !== 0) {
+      r.tone = 'err'; r.emoji = '⚠️'; r.status = '签到失败'
+      r.note = res.returnMsg || `错误码 ${code}`; r.signState = 'fail'
+    }
+  } catch (err) {
+    r.tone = 'err'; r.emoji = '⚠️'; r.status = '签到失败'
+    r.note = err.message || String(err); r.signState = 'fail'
+  }
+
+  // 2) 营地每日任务（积分任务 + 福利任务，内部已含领奖）
+  try {
+    r.daily = await runDailyTasks(api, roleId)
+  } catch (err) {
+    r.dailyErr = err.message || String(err)
+  }
+
+  // 3) 手册周任务 + 领取手册积分（签到即完成，不再留着待领）
+  try {
+    r.weekly = await runWeeklyTasks(api, roleId)
+    try {
+      const c = await claimWeeklyTasks(api, roleId, null)
+      if (c && c.total) r.claim = c
+    } catch (err) {
+      r.claimErr = err.message || String(err)
+    }
+  } catch (err) {
+    r.weeklyErr = err.message || String(err)
+  }
+
+  // ---- 汇总卡片数据 ----
+  const score = r.daily?.score || []
+  const welfare = r.daily?.welfare || []
+  const wRows = (r.weekly?.weeks || []).flatMap((w) => w.rows || [])
+  const scoreDone = score.filter((x) => DONE_STATES.has(x.status)).length
+  const welfareDone = welfare.filter((x) => DONE_STATES.has(x.status)).length
+  const weeklyDone = wRows.filter((x) => DONE_STATES.has(x.status)).length
+  const waitWeekly = (r.weekly?.waitClaim || []).length
+  const pts = (r.claim?.claimed || []).reduce((s, c) => s + (c.point || 0), 0)
+  const toneOf = (done, total) => (total ? (done >= total ? 'good' : '') : '')
+
+  r.tasks = [
+    {
+      name: '营地每日任务',
+      value: score.length ? `${scoreDone}/${score.length}` : (r.dailyErr ? '失败' : '—'),
+      tone: r.dailyErr ? 'bad' : toneOf(scoreDone, score.length),
+    },
+    {
+      name: '福利中心任务',
+      value: welfare.length ? `${welfareDone}/${welfare.length}` : (r.dailyErr ? '失败' : '—'),
+      tone: r.dailyErr ? 'bad' : toneOf(welfareDone, welfare.length),
+    },
+    {
+      name: '手册周任务',
+      value: wRows.length ? `${weeklyDone}/${wRows.length}` : (r.weeklyErr ? '失败' : '—'),
+      tone: r.weeklyErr ? 'bad' : toneOf(weeklyDone, wRows.length),
+    },
+    {
+      name: '手册积分',
+      value: r.claim ? `领到 ${r.claim.total} 项` : (r.claimErr ? '领取失败' : (waitWeekly ? `${waitWeekly} 项待领` : '无待领')),
+      tone: r.claim ? 'good' : (r.claimErr ? 'bad' : ''),
+    },
+  ]
+
+  const rewards = r.daily?.rewards || []
+  r.rewardsText = rewards.join('、')
+  r.acted = (r.daily?.welfareActed || 0)
+    + score.filter((x) => x.status === 'acted').length
+    + (r.weekly?.acted || 0)
+  r.numDone = scoreDone + welfareDone + weeklyDone
+  r.numTotal = score.length + welfare.length + wRows.length
+  r.pointGot = pts
+  const bits = []
+  if (r.acted) bits.push(`本次自动完成 ${r.acted} 项`)
+  if (r.claim?.total) bits.push(`领手册积分 ${pts} 分`)
+  if (rewards.length) bits.push(`营地奖励 ${rewards.length} 份`)
+  r.taskNote = bits.join(' · ') || '今日任务均已处理'
+
+  // 4) 活跃度 / 今日积分任务（直接复用任务视图，不再额外请求）
+  r.liveness = r.daily?.liveness ?? '-'
+  r.todayTasks = score.length ? `${scoreDone}/${score.length}` : '-'
+
+  // 5) 货币（仅单账号卡需要）
+  if (withCoins) {
+    const coinsRes = await api.get_user_coins().catch(() => null)
+    r.coins = (coinsRes?.data?.coins || []).map((c) => {
+      const num = Number(c.num) || 0
+      const name = c.name || '未知货币'
+      return {
+        name,
+        numFmt: num.toLocaleString('en-US'),
+        initial: name.slice(0, 1),
+        main: /福利币/.test(name),
+      }
+    })
+    const findCoin = (re) => r.coins.find((c) => re.test(c.name))?.numFmt || '-'
+    r.fulibi = findCoin(/福利币/)
+    r.fragment = findCoin(/碎片/)
+  }
+
+  return r
+}
+
+/** 单账号结果 → 纯文本兜底 */
+function describeSignin(r) {
+  const lines = [`${r.emoji} ${r.who} · ${r.status}`, r.note]
+  for (const t of r.tasks) lines.push(`· ${t.name}：${t.value}`)
+  if (r.rewardsText) lines.push(`🎁 领到：${r.rewardsText}`)
+  if (r.dailyErr) lines.push(`⚠️ 营地任务失败：${r.dailyErr}`)
+  if (r.weeklyErr) lines.push(`⚠️ 手册任务失败：${r.weeklyErr}`)
+  if (r.claimErr) lines.push(`⚠️ 手册积分领取失败：${r.claimErr}`)
+  return lines.join('\n')
+}
+
 export class AssetAndSign extends plugin {
   constructor() {
     super({
@@ -67,9 +216,11 @@ export class AssetAndSign extends plugin {
       priority: 1,
       rule: [
         { reg: '^#?和平资产(\\s+\\S+){0,3}$', fnc: 'showAsset' },
-        { reg: '^#?和平签到$', fnc: 'dailySignin' },
+        { reg: '^#?和平签到(\\s+\\S+)?$', fnc: 'dailySignin' },
       ],
     })
+    /** 签到/任务全流程同一时间只跑一份，避免并发打爆接口 */
+    this.running = false
   }
 
   // ---- 资产查询 ----
@@ -268,83 +419,149 @@ export class AssetAndSign extends plugin {
     }
   }
 
-  // ---- 每日签到 ----
+  // ---- 每日签到（签到 + 营地任务 + 手册任务，一次跑完） ----
+  // #和平签到        → 当前账号
+  // #和平签到 全部   → 名下所有已登录账号
   async dailySignin(e) {
-    await e.reply('⏳ 正在执行每日签到...')
+    const arg = String(e.msg || '').replace(/^#?和平签到\s*/, '').trim()
+    if (ALL_RE.test(arg)) return this.signAll(e)
+    if (arg) {
+      return e.reply([
+        `❌ 不认识「${arg}」这个参数`,
+        '用法：',
+        '· #和平签到　只做当前账号',
+        '· #和平签到 全部　名下所有已登录账号一起做',
+      ])
+    }
+
     const camp = requireCamp(e)
     if (!camp) return
+    if (this.running) return e.reply('⏳ 上一个签到任务还在跑，稍等一下再发')
 
-    apiService.useCamp(camp)
+    this.running = true
+    await e.reply('⏳ 正在签到，并自动完成营地每日任务与手册周任务...')
     try {
-      const roleId = await apiService.get_self_role_id()
-      if (!roleId) return e.reply('❌ 未能获取你的营地角色ID，请确认已绑定营地账号')
-
-      const res = await apiService.get_act_dailysigninmonthly(roleId)
-      const code = res.returnCode
-
-      let tone = 'ok'
-      let emoji = '✅'
-      let status = '签到成功'
-      let note = '奖励已入账，明天 00:00 后再来'
-      if (code === 0) {
-        // 成功
-      } else if (code === -71003) {
-        tone = 'warn'
-        emoji = '📅'
-        status = '今天已经签过到了'
-        note = '每天只能签一次，明天 00:00 刷新'
-      } else {
-        tone = 'err'
-        emoji = '⚠️'
-        status = '签到失败'
-        note = res.returnMsg || '未知错误，稍后再试'
-      }
-
-      // 附加信息：资产 + 活跃度 + 今日任务（任一失败都不影响签到结果展示）
-      const [coinsRes, scoreRes] = await Promise.all([
-        apiService.get_user_coins().catch(() => null),
-        apiService.get_score_tasklist(roleId).catch(() => null),
-      ])
-      const coins = (coinsRes?.data?.coins || []).map((c) => {
-        const num = Number(c.num) || 0
-        const name = c.name || '未知货币'
-        return {
-          name,
-          numFmt: num.toLocaleString('en-US'),
-          initial: name.slice(0, 1),
-          main: /福利币/.test(name),
-        }
-      })
-      const findCoin = (re) => coins.find((c) => re.test(c.name))?.numFmt || '-'
-      const lv = scoreRes?.data?.liveness || {}
-      const liveness = lv.current != null ? `${lv.current}/${lv.total ?? 100}` : '-'
-      const taskList = scoreRes?.data?.taskList || []
-      const taskDone = taskList.filter((t) => Number(t.status) !== 0).length
-      const todayTasks = taskList.length ? `${taskDone}/${taskList.length}` : '-'
-
+      const r = await signOne(camp, { withCoins: true })
       let image = null
       try {
         image = await puppeteer.screenshot('signin', {
           tplFile: 'plugins/PUBG-Helper-Plugin/resources/signin.html',
-          tone,
-          emoji,
-          status,
-          note,
-          roleName: camp.nickname || camp.roleName || camp.userName || roleId,
-          roleId,
+          tone: r.tone,
+          emoji: r.emoji,
+          status: r.status,
+          note: r.note,
+          roleName: r.who,
+          roleId: r.roleId,
           dateText: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
-          fulibi: findCoin(/福利币/),
-          fragment: findCoin(/碎片/),
-          liveness,
-          todayTasks,
-          coins,
+          fulibi: r.fulibi,
+          fragment: r.fragment,
+          liveness: r.liveness,
+          todayTasks: r.todayTasks,
+          coins: r.coins,
+          tasks: r.tasks,
+          taskNote: r.taskNote,
+          rewardsText: r.rewardsText,
         })
       } catch { /* 渲染失败回文本 */ }
-      if (image) return e.reply([image, Button.signin()])
-      // 兜底纯文本
-      e.reply([status, note, `福利币：${findCoin(/福利币/)}`, `活跃度：${liveness}`].join('\n'))
+      if (image) return await e.reply([image, Button.signin()])
+      await e.reply([describeSignin(r), Button.signin()])
     } catch (err) {
-      e.reply('❌ 签到失败：' + (err.message || err))
+      await e.reply('❌ 签到失败：' + (err.message || err))
+    } finally {
+      this.running = false
+    }
+  }
+
+  /** `#和平签到 全部`：名下所有已登录（有 token）的营地账号逐个跑 */
+  async signAll(e) {
+    const { info } = getUserInfo(e.user_id)
+    const camps = (info.camps || []).filter((c) => c && c.token)
+    if (!camps.length) {
+      return e.reply(['❌ 名下还没有已登录的营地账号', '· 扫码登录：#和平QQ登录 或 #和平微信登录', Button.bind()])
+    }
+    if (this.running) return e.reply('⏳ 上一个签到任务还在跑，稍等一下再发')
+
+    this.running = true
+    await e.reply(`⏳ 开始为 ${camps.length} 个账号执行「签到 + 营地任务 + 手册任务」，逐个进行，请稍等...`)
+    try {
+      const results = []
+      for (let i = 0; i < camps.length; i++) {
+        const camp = camps[i]
+        try {
+          results.push(await signOne(camp))
+        } catch (err) {
+          results.push({
+            who: camp.nickname || camp.roleName || camp.userName || camp.userId || '未知账号',
+            roleId: String(camp.roleId || ''),
+            failed: true,
+            err: err.message || String(err),
+          })
+        }
+        if (i < camps.length - 1) {
+          // 单个账号要跑 1~2 分钟，中途报个进度，免得用户以为卡住
+          const cur = results[results.length - 1]
+          const tip = cur.failed ? '执行失败' : `${cur.status} · 任务 ${cur.numDone}/${cur.numTotal}`
+          await e.reply(`[${i + 1}/${camps.length}] ${cur.who} ${tip}`).catch(() => { })
+          await sleep(800)
+        }
+      }
+
+      // 汇总
+      const okRows = results.filter((r) => !r.failed)
+      const signOk = okRows.filter((r) => r.signState === 'ok').length
+      const signDone = okRows.filter((r) => r.signState === 'done').length
+      const totalTask = okRows.reduce((n, r) => n + r.numTotal, 0)
+      const doneTask = okRows.reduce((n, r) => n + r.numDone, 0)
+      const pointSum = okRows.reduce((n, r) => n + (r.pointGot || 0), 0)
+
+      const rows = results.map((r, i) => ({
+        no: i + 1,
+        name: r.who,
+        roleId: r.roleId || '—',
+        signText: r.failed ? '执行失败' : r.status,
+        signTone: r.failed || r.signState === 'fail' ? 'bad' : (r.signState === 'done' ? 'warn' : 'good'),
+        taskText: r.failed ? '—' : `${r.numDone}/${r.numTotal}`,
+        taskTone: r.failed ? 'bad' : (r.numTotal && r.numDone >= r.numTotal ? 'good' : ''),
+        pointText: r.failed ? '—' : (r.pointGot ? `+${r.pointGot}分` : '—'),
+        note: r.failed ? (r.err || '') : (r.taskNote || ''),
+      }))
+
+      const data = {
+        total: results.length,
+        signOk,
+        signDone,
+        fail: results.length - okRows.length,
+        taskRate: totalTask ? `${doneTask}/${totalTask}` : '—',
+        pointSum,
+        rows,
+        dateText: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      }
+
+      let image = null
+      try {
+        image = await puppeteer.screenshot('signinAll', {
+          tplFile: 'plugins/PUBG-Helper-Plugin/resources/signinAll.html',
+          ...data,
+        })
+      } catch { /* 渲染失败回文本 */ }
+      if (image) return await e.reply([image, Button.signin()])
+
+      // 文本兜底
+      const lines = [
+        `📅 签到全部完成：${results.length} 个账号`,
+        `· 签到成功 ${signOk} · 今天已签 ${signDone} · 失败 ${data.fail}`,
+        `· 任务完成 ${data.taskRate}${pointSum ? ` · 手册积分 +${pointSum}` : ''}`,
+        '',
+      ]
+      for (const row of rows) {
+        lines.push(`${row.no}. ${row.name}｜${row.signText}｜任务 ${row.taskText}${row.pointText !== '—' ? `｜${row.pointText}` : ''}`)
+        if (row.note && row.note !== '今日任务均已处理') lines.push(`   ${row.note}`)
+      }
+      await e.reply([lines.join('\n'), Button.signin()])
+    } catch (err) {
+      await e.reply('❌ 批量签到失败：' + (err.message || err))
+    } finally {
+      this.running = false
     }
   }
 }

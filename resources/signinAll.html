@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>全部账号签到</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px;
+    font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #000; color: #fafafa; padding: 26px 28px;
+  }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; background: #1a1a1a;
+    border: 1px solid #262626; display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .head .title { font-size: 30px; font-weight: 700; }
+  .head .sub { font-size: 16px; color: #737373; margin-top: 2px; }
+  .head .spacer { flex: 1; }
+  .head .tag {
+    font-size: 18px; font-weight: 600; color: #d4d4d4; background: #1a1a1a;
+    border: 1px solid #2e2e2e; border-radius: 999px; padding: 5px 14px;
+  }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: #121212; border: 1px solid #262626; border-radius: 14px; padding: 14px 16px; }
+  .stat .n { font-size: 32px; font-weight: 700; line-height: 1.1; }
+  .stat .l { font-size: 16px; color: #8e8e8e; margin-top: 5px; }
+  .stat.good .n { color: #4ade80; }
+  .stat.hl .n { color: #fbbf24; }
+  .stat.bad .n { color: #f87171; }
+
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .warnbar {
+    font-size: 17px; color: #f87171; background: #1a0f0f; border: 1px solid #4a1a1a;
+    border-radius: 12px; padding: 10px 16px; margin-bottom: 12px;
+  }
+  .acc {
+    display: flex; align-items: center; gap: 14px;
+    background: #121212; border: 1px solid #262626; border-radius: 16px; padding: 15px 18px;
+  }
+  .acc .no {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; font-weight: 700; background: #1c1c1c; border: 1px solid #2a2a2a; color: #a3a3a3;
+  }
+  .acc .main { flex: 1; min-width: 0; }
+  .acc .line1 { display: flex; align-items: center; gap: 8px; }
+  .acc .nm { font-size: 21px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acc .st { font-size: 15px; font-weight: 700; border-radius: 999px; padding: 2px 8px; flex-shrink: 0; }
+  .acc .st-good { color: #4ade80; background: #14351f; border: 1px solid #1e5132; }
+  .acc .st-warn { color: #fbbf24; background: #2a2310; border: 1px solid #5b4a1d; }
+  .acc .st-bad { color: #f87171; background: #2a1414; border: 1px solid #5b1d1d; }
+  .acc .line2 { font-size: 16px; color: #8e8e8e; margin-top: 6px; }
+  .acc .line2 b { color: #d4d4d4; font-weight: 600; }
+
+  .cols { display: flex; gap: 26px; flex-shrink: 0; text-align: right; }
+  .cols .c .k { font-size: 14px; color: #737373; }
+  .cols .c .v { font-size: 20px; font-weight: 700; color: #d4d4d4; margin-top: 3px; }
+  .cols .c .v.good { color: #4ade80; }
+  .cols .c .v.bad { color: #f87171; }
+
+  .foot { margin-top: 14px; background: #0d0d0d; border: 1px dashed #2a2a2a; border-radius: 14px; padding: 14px 18px; }
+  .foot .l { font-size: 18px; color: #8e8e8e; line-height: 1.9; }
+  .foot .l b { color: #d4d4d4; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="logo">📅</div>
+    <div>
+      <div class="title">全部账号 · 每日签到</div>
+      <div class="sub">签到 + 营地每日任务 + 手册周任务，一次跑完</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tag">{{ dateText }}</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">{{ total }}</div><div class="l">账号数</div></div>
+    <div class="stat good"><div class="n">{{ signOk }}</div><div class="l">本次签到成功</div></div>
+    <div class="stat hl"><div class="n">{{ taskRate }}</div><div class="l">任务完成</div></div>
+    <div class="stat hl"><div class="n">{{ pointSum }}</div><div class="l">手册积分到手</div></div>
+  </div>
+
+  {{ if fail }}
+  <div class="warnbar">⚠️ {{ fail }} 个账号执行失败，原因见下方对应行</div>
+  {{ /if }}
+
+  <div class="list">
+    {{ each rows r }}
+    <div class="acc">
+      <div class="no">{{ r.no }}</div>
+      <div class="main">
+        <div class="line1">
+          <span class="nm">{{ r.name }}</span>
+          <span class="st st-{{ r.signTone }}">{{ r.signText }}</span>
+        </div>
+        <div class="line2">角色ID <b>{{ r.roleId }}</b>{{ if r.note }} · {{ r.note }}{{ /if }}</div>
+      </div>
+      <div class="cols">
+        <div class="c"><div class="k">任务</div><div class="v {{ r.taskTone }}">{{ r.taskText }}</div></div>
+        <div class="c"><div class="k">手册积分</div><div class="v {{ if r.pointText !== '—' }}good{{ /if }}">{{ r.pointText }}</div></div>
+      </div>
+    </div>
+    {{ /each }}
+  </div>
+
+  <div class="foot">
+    <div class="l">
+      📌 只有<b>已登录（有凭证）</b>的账号会参与；今天已签过的不算失败（显示「已签到」）<br>
+      单账号执行发 <b>#和平签到</b>；账号管理发 <b>#和平账号</b>
+    </div>
+  </div>
+</body>
+</html>

@@ -25,13 +25,13 @@ export default class Button {
       ],
       [
         { text: '周报', callback: '#和平周报' },
-        { text: '周任务', callback: '#和平周任务' },
-        { text: '每日任务状态', callback: '#和平任务状态' }
+        { text: '签到', callback: '#和平签到' },
+        { text: '签到全部', callback: '#和平签到 全部' }
       ],
       [
         { text: '资产', callback: '#和平资产' },
         { text: '营地币', callback: '#和平营地币' },
-        { text: '签到', callback: '#和平签到' }
+        { text: '排行榜', callback: '#和平排行榜' }
       ]
     )
   }
@@ -139,57 +139,6 @@ export default class Button {
     ])
   }
 
-  /** 手册周任务状态卡 */
-  static weekly() {
-    return segment.button(
-      [
-        { text: '▶ 执行手册任务', callback: '#完成手册任务' },
-        { text: '领取全部奖励', callback: '#领取手册奖励' }
-      ],
-      [
-        { text: '刷新状态', callback: '#和平周任务' },
-        { text: '每日任务状态', callback: '#和平任务状态' }
-      ]
-    )
-  }
-
-  /** 手册任务执行结果 */
-  static weeklyRun() {
-    return segment.button(
-      [
-        { text: '领取全部奖励', callback: '#领取手册奖励' },
-        { text: '刷新状态', callback: '#和平周任务' }
-      ],
-      [
-        { text: '每日任务状态', callback: '#和平任务状态' },
-        { text: '主页', callback: '#和平主页' }
-      ]
-    )
-  }
-
-  /** 领奖结果 */
-  static claim() {
-    return segment.button([
-      { text: '刷新状态', callback: '#和平周任务' },
-      { text: '▶ 执行手册任务', callback: '#完成手册任务' }
-    ])
-  }
-
-  /** 营地每日任务结果 / 状态 */
-  static daily() {
-    return segment.button(
-      [
-        { text: '刷新状态', callback: '#和平任务状态' },
-        { text: '周任务状态', callback: '#和平周任务' },
-        { text: '▶ 完成手册任务', callback: '#完成手册任务' }
-      ],
-      [
-        { text: '资产', callback: '#和平资产' },
-        { text: '签到', callback: '#和平签到' }
-      ]
-    )
-  }
-
   /** 仓库资产 */
   static assets() {
     return segment.button([
@@ -204,17 +153,22 @@ export default class Button {
     return segment.button([
       { text: '资产', callback: '#和平资产' },
       { text: '签到', callback: '#和平签到' },
-      { text: '周任务', callback: '#和平周任务' }
+      { text: '重签全部', callback: '#和平签到 全部' }
     ])
   }
 
   /** 签到详情 */
   static signin() {
-    return segment.button([
-      { text: '每日任务状态', callback: '#和平任务状态' },
-      { text: '营地币', callback: '#和平营地币' },
-      { text: '主页', callback: '#和平主页' }
-    ])
+    return segment.button(
+      [
+        { text: '再签全部账号', callback: '#和平签到 全部' },
+        { text: '营地币', callback: '#和平营地币' }
+      ],
+      [
+        { text: '资产', callback: '#和平资产' },
+        { text: '主页', callback: '#和平主页' }
+      ]
+    )
   }
 
   /**

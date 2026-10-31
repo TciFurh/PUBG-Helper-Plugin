@@ -168,7 +168,7 @@ const isSuper = d.isSuperBody === true
 
 ## 每日任务（福利中心）
 
-签到页那份任务的自动化在 `utils/dailyTask.js`（编排）+ `apps/campTask.js`（指令/定时），接口要点：
+签到页那份任务的自动化在 `utils/dailyTask.js`（编排），由 `apps/assetAndSign.js` 的 `#和平签到` 统一驱动（签到 → 每日任务 → 手册周任务 → 领手册积分），接口要点：
 
 | 接口 | 用途 |
 |---|---|
@@ -269,12 +269,12 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
 
 以下改动为本仓库相对上游插件的增强：
 
-- **卡片化输出**（2026-10-24）：`#和平任务` / `#和平周任务` / `#和平营地币` / `#和平账号` / `#和平签到` 全部改成图片
-  - 模板：`resources/dailyTasks.html` / `weekly.html` / `coins.html` / `camps.html`，`signin.html` 重写
-  - 数据构造：`apps/campTask.js` 的 `dailyRenderData` / `weeklyRenderData`（已导出，便于预览脚本复用）
-  - 渲染失败一律回落到原来的文本，不会因为出图挂掉整条指令
-  - 预览：`node docs/tools/pubg_card_preview.mjs [weekly camps ...]` → `D:\jiuli\temp_preview\card-*.png`
-  - 签到卡除了状态，还会显示福利币 / 装饰碎片 / 活跃度 / 今日积分任务进度（`get_act_dailysigninmonthly` 成功时只回 `data:true`，所以详情全靠 `get_user_coins` + `get_score_tasklist` 补）
+- **签到合一**（2026-10-31）：`#和平签到` 一次完成「签到 + 营地每日任务 + 手册周任务 + 领取手册积分」，`#和平签到 全部` 串行跑名下所有已登录账号
+  - 主流程：`apps/assetAndSign.js` 的 `signOne()`（单账号）/ `signAll()`（批量），任务编排仍在 `utils/dailyTask.js`
+  - 模板：`resources/signin.html`（单账号，含「今日任务」四格）/ `signinAll.html`（批量汇总、每账号一行）
+  - 原 `#和平任务` 系列（每日/周任务、领奖、定时自动任务）已整体移除，`apps/campTask.js` 与 `dailyTasks.html` / `weekly.html` 一并删除
+  - 失败隔离：单账号任一环节失败只标记该项，不影响其它环节与其它账号；批量模式账号间间隔 800ms
+  - 预览：`node docs/tools/pubg_card_preview.mjs signin signinAll camps` → `D:\jiuli\temp_preview\card-*.png`
 - **扫码登录**：`utils/wxQrLogin.js` 实现微信扫码登录，营地客户端版本号（`cClientVersionCode` / `cClientVersionName`）从 APK 解包取真实值修正，解决「此版本已停用」报错
 - **QQ 扫码登录**（`apps/qqLogin.js` + `utils/qqPageLogin.js`）：QQ 网页授权（m_authorize）+ 营地 `/user/login(qqconnect)` 换凭证，支持 `#设置QQ` 指定账号，扫码成功自动保存凭证
 - **资产与签到**（`apps/assetAndSign.js` + `apps/extractCred.js`）：营地仓库分类资产查询、每日签到；签到修复 `roleId` 被公共参数覆盖导致 `-71005` 的问题
