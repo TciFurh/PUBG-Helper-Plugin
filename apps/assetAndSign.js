@@ -295,11 +295,14 @@ export class AssetAndSign extends plugin {
           }))
           groups = groups.filter((g) => g.items && g.items.length)
           section.groups = groups
+          const flat = groups.flatMap((g) => g.items)
           if (wantSub || q) {
-            section.count = groups.reduce((n, g) => n + g.items.length, 0)
-            section.rareCnt = groups.reduce((n, g) => n + g.items.filter((it) => Number(it.quality) >= 6).length, 0)
+            section.count = flat.length
+            section.rareCnt = flat.filter((it) => Number(it.quality) >= 6).length
             if (wantSub && subFilter) section.name = `${tab.tabName}·${wantSub}`
           }
+          // 带 level 的是「可升级皮肤」（升级枪 / 升级载具等），单独计一下
+          section.upCnt = flat.filter((it) => Number(it.level) > 0).length
         }
         sections.push(section)
         await new Promise((r) => setTimeout(r, 120))

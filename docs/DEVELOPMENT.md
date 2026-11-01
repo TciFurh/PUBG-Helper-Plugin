@@ -125,6 +125,20 @@ const isSuper = d.isSuperBody === true
 - `buildRadar()` 在 JS 里把网格、轴线、数据多边形、标签锚点全算成 SVG 坐标字符串，模板只填空 —— **模板里不碰三角函数**
 - 经典与超体都有，地铁接口不返回该块
 
+### 营地仓库（`getdepotdetail`）
+
+分类层级**不统一**，取数前先压平（`apps/assetAndSign.js` 的 `flattenItems()`）：
+
+| 分类 | 层级 |
+|---|---|
+| 时装 / 装备 / 战备 | 分类（套装 / 三级头盔…）→ 物品 |
+| 枪械 | 分类（突击步枪…）→ 型号组（ARX / M416…）→ 物品 |
+
+物品字段：`itemId / itemName / quality / imageUrl / count / time`，另外：
+
+- `level`：**只有可升级皮肤才带**（升级枪、升级飞行器等），取值 1–7，7 为满级；普通物品没有这个字段。资产卡片右上角的 `Lv.N` 角标、分类头的「可升级 N」都来自它。
+- `quality`：3 绿 / 4 蓝 / 5 紫 / 6 粉 / 7 红，卡片底色按它上色。
+
 ---
 
 ## 图片本地缓存（`utils/localImg.js`）
