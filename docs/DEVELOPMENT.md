@@ -127,6 +127,39 @@ const isSuper = d.isSuperBody === true
 
 ---
 
+## 图片本地缓存（`utils/localImg.js`）
+
+**原则：先落盘，再渲染。** 卡片里任何来自网络的图片，都先存到
+`data/PUBG-Helper-Plugin/assetCache/`，模板里用 data URI 内嵌渲染 —— 渲染期不依赖网络，
+不会裂图、不会每次重拉，网络抖动也不影响出图速度。
+
+| API | 用途 |
+|---|---|
+| `localImage(url, key)` | 单张；命中缓存直接返回，签名与旧版兼容 |
+| `cachedImage(url, key)` / `hasCached(url, key)` | 只看缓存（不联网），给「先探测再决定」的场景用 |
+| `saveBufferImage(url, buf, key)` | 已经拿到 Buffer（如印记探测）时直接落盘并返回 data URI |
+| `cacheItems(items, { urlField, targetField, keyOf })` | 对象数组批量填字段（资产物品图、枪械图） |
+| `cacheItemsWithNotice(e, items, label, opts)` | 同上 + 「正在存到本地」提醒，存完自动撤回提醒 |
+| `localizeData(data, opts)` | 深遍历对象/数组，把图片 URL 就地换成 data URI |
+| `localizeWithNotice(e, data, label, opts)` | 同上 + 提醒；**整卡数据一次搞定，出图前调这一句就够** |
+
+约定：
+- 缓存 key 默认是 URL 的 sha1（`img_<hash>.img`），跨功能共享；资产物品图沿用 `item_<itemId>.png`、段位图 `segment_*.png`，不要随意改，否则历史缓存全废。
+- 缓存文件名后缀不可信时按**文件头**判断 mime（jpg/webp/gif 不会被打成 png）。
+- 判断「是不是图片」：URL 带图片后缀，或字段名命中 `icon / avatar / img / image / pic / cover / url …`。非图片链接（如资讯跳转地址）不会被替换。
+- 已经是 `data:` 的字段会自动跳过，重复调用是幂等的。
+- 提醒文案：`⏳ 正在把 N 张<卡片名>图存到本地（共 M 张，已缓存 X 张），存好就出图…`
+  - **全命中缓存时不发提醒**，秒出图；
+  - 提醒自带 `recallMsg: 180` 兜底撤回，正常在渲染完成后立刻撤回（`e.group.recallMsg` / `e.friend.recallMsg`）。
+- 下载并发默认 6，单张超时 15s；失败的图渲染成占位（资产会额外提示「N 张图没能存到本地」）。
+
+已接入：资产（物品图 + 收藏家图标）、我的主页、最近战绩、战绩详情、战绩列表/总览、
+资讯列表/详情、王牌印记（探测即落盘，命中缓存不再联网）、枪械熟练度、周报段位图。
+
+**不在缓存范围**：登录二维码（一次性的，缓存无意义）、模板里的 webfont / tailwind CDN（不是图片）。
+
+---
+
 ## 踩坑清单
 
 | 坑 | 现象 | 解法 |
@@ -138,6 +171,9 @@ const isSuper = d.isSuperBody === true
 | 收益小数值被转万 | `4128` 显示成 `0.4万` | 绝对值 < 10000 时走 `toLocaleString` 原样显示 |
 | art-template 旧语法 | 每次渲染刷一堆 `Template upgrade` 告警 | 用 4.x 的 `{{ each list item }}`，不写 `as` |
 | `equipment.list` 是对象 | `.map()` 报 not a function | `Array.isArray() ? list : Object.values(list)` |
+| 卡片图直连网络 | 偶发裂图、出图慢、CDN 抖一次就整页空白 | 一律走 `utils/localImg.js` 先落盘再渲染，见上一节 |
+| 缓存 key 随便改 | 老缓存全部失效，用户那里“第一次又要重新下” | 物品图 `item_<itemId>.png`、段位 `segment_*.png` 属于历史约定，别动 |
+| 一页 48 件图全内嵌 | 单张 HTML 能做到几 MB，puppeteer 仍可渲染但会慢 | 别再往同一张卡片里堆更大的图；翻页数量受 `MAX_PAGES` 限制 |
 
 ---
 

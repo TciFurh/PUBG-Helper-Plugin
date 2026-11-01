@@ -2,6 +2,7 @@ import { ApiService } from '../utils/api.js'
 import Button from '../utils/button.js'
 
 import { getUserInfo } from '../utils/storage.js'
+import { localizeWithNotice } from '../utils/localImg.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -249,6 +250,9 @@ export class MyHomepage extends plugin {
                 scale: `style=transform:scale(2)`
             }
         }
+
+        // 头像/段位/印记等图先存本地，存完再出图（只提醒一次，存完自动撤回提醒）
+        await localizeWithNotice(e, tplData, '主页')
 
         const image = await puppeteer.screenshot('myHomepage', {
             tplFile: 'plugins/PUBG-Helper-Plugin/resources/myHomepage.html',

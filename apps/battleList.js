@@ -6,6 +6,7 @@ import Button from '../utils/button.js'
 import { setBattleCache } from '../utils/battleCache.js'
 import { fmtWan, resultText } from '../utils/battleFmt.js'
 import { buildListRows, buildMetroProfile, buildTombProfile } from '../utils/battleView.js'
+import { localizeWithNotice } from '../utils/localImg.js'
 
 const apiService = new ApiService()
 
@@ -98,6 +99,8 @@ export class BattleList extends plugin {
           recentDesc: recent ? `${recent.modeDesc || t.name}${extra ? ' · ' + extra : ''}` : '—',
         })
       }
+      await localizeWithNotice(e, tabs, '战绩')
+
       const image = await puppeteer.screenshot('battleoverview', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battleoverview.html',
         roleName: camp.roleName || camp.nickName || roleId,
@@ -147,6 +150,9 @@ export class BattleList extends plugin {
       if (list.length) setBattleCache(e.user_id, roleId, list, 'all')
 
       const hasMore = Number(d.hasMore || 0) === 1
+      const rows = buildListRows(list, tab, page)
+      await localizeWithNotice(e, rows, '战绩')
+
       const image = await puppeteer.screenshot('battlelist', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battlelist.html',
         roleName: camp.roleName || camp.nickName || roleId,
@@ -156,7 +162,7 @@ export class BattleList extends plugin {
         hasMore,
         profile,
         headers: headersFor(tab),
-        rows: buildListRows(list, tab, page),
+        rows,
         sys: { scale: `style=transform:scale(1.4)` },
       })
       e.reply([image, Button.category(tab, page, hasMore)])

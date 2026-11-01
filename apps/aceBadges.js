@@ -1,4 +1,5 @@
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import { cachedImage, saveBufferImage } from '../utils/localImg.js'
 
 const BASE = 'https://imgcdn.gp.qq.com/images/BattleAchievements/yinji/'
 const PLACEHOLDER_LEN = 5093  // CDN 对不存在的印记返回的占位图字节数
@@ -18,12 +19,20 @@ export class AceBadges extends plugin {
   }
 
   async aceBadges(e) {
-    await e.reply('⏳ 正在遍历王牌印记图片，约需数秒...')
+    await e.reply('⏳ 正在把王牌印记图存到本地（首次要下几张，之后走缓存）...')
     const list = []
     let failed = 0
     for (let n = 1; n <= MAX_TRY; n++) {
+      const url = `${BASE}${n}.png`
       try {
-        const resp = await fetch(`${BASE}${n}.png`)
+        // 缓存里有就直接用，不再联网探测
+        const hit = cachedImage(url)
+        if (hit) {
+          list.push({ n, url: hit })
+          failed = 0
+          continue
+        }
+        const resp = await fetch(url)
         if (!resp.ok) {
           failed++
           if (failed >= 2) break
@@ -36,7 +45,14 @@ export class AceBadges extends plugin {
           if (failed >= 2) break
           continue
         }
-        list.push({ n, url: `${BASE}${n}.png` })
+        // 探测拿到的字节直接落盘，模板就不必再从 CDN 拉一次
+        const uri = saveBufferImage(url, buf)
+        if (!uri) {
+          failed++
+          if (failed >= 2) break
+          continue
+        }
+        list.push({ n, url: uri })
         failed = 0
       } catch {
         failed++

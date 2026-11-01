@@ -4,6 +4,7 @@ import { getCamp } from '../utils/storage.js'
 import { setBattleCache, getBattleCache } from '../utils/battleCache.js'
 import { buildDetailView } from '../utils/battleView.js'
 import { promoMeta } from '../utils/battleFmt.js'
+import { localizeWithNotice } from '../utils/localImg.js'
 import Button from '../utils/button.js'
 
 
@@ -61,6 +62,8 @@ export class RecentBattle extends plugin {
         ribbon: promoMeta(item.promotion),
       }))
 
+      await localizeWithNotice(e, rows, '战绩')
+
       const image = await puppeteer.screenshot('recentbattle', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/recentbattle.html',
         roleName: camp.roleName || camp.nickName || roleId,
@@ -92,9 +95,13 @@ export class RecentBattle extends plugin {
       const res = await apiService.get_pubgplaydetail(item.battleId, item.battleMode, battleCache.roleId)
       if (res.returnCode !== 0) return e.reply('❌ 战绩详情获取失败：' + (res.returnMsg || res.returnCode || '未知错误'))
 
+      const detail = buildDetailView(res.data || {}, camp)
+      // 头像 / 段位 / 印记 / 装备图标先存本地，再渲染
+      await localizeWithNotice(e, detail, '战绩详情')
+
       const image = await puppeteer.screenshot('battledetail', {
         tplFile: 'plugins/PUBG-Helper-Plugin/resources/battledetail.html',
-        ...buildDetailView(res.data || {}, camp),
+        ...detail,
         updateTime: new Date().toLocaleString('zh-CN', { hour12: false }),
       })
       e.reply([image, Button.battleDetail()])

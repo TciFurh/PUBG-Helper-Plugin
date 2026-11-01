@@ -1,10 +1,8 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import fetch from 'node-fetch'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { ApiService } from '../utils/api.js'
 import { requireCamp, getUserInfo } from '../utils/storage.js'
 import { runDailyTasks, runWeeklyTasks } from '../utils/dailyTask.js'
+import { localImage, cacheItemsWithNotice } from '../utils/localImg.js'
 import Button from '../utils/button.js'
 
 
@@ -29,41 +27,9 @@ const QUALITY_NAME = { 3: '绿色', 4: '蓝色', 5: '紫色', 6: '粉色', 7: '�
 /**
  * 资产图片本地缓存：首次渲染下载一次落盘，之后全部走本地，
  * 避免每次渲染都从网络拉图片（网络抖动会导致图片加载不出来）。
+ * 具体实现在 utils/localImg.js，这里只保留资产物品图的命名规则。
  */
-const IMG_CACHE_DIR = path.resolve('./data/PUBG-Helper-Plugin/assetCache')
-
-/** 返回本地缓存的图片 data URI；没有缓存就下载并落盘。失败返回 '' */
-async function localImage(url, key) {
-  if (!url) return ''
-  const file = path.join(IMG_CACHE_DIR, key)
-  try {
-    const buf = fs.readFileSync(file)
-    if (buf.length > 0) return 'data:image/png;base64,' + buf.toString('base64')
-  } catch { }
-  try {
-    const res = await fetch(url)
-    if (!res.ok) return ''
-    const buf = Buffer.from(await res.arrayBuffer())
-    if (!buf.length) return ''
-    try {
-      fs.mkdirSync(IMG_CACHE_DIR, { recursive: true })
-      fs.writeFileSync(file, buf)
-    } catch { }
-    return 'data:image/png;base64,' + buf.toString('base64')
-  } catch {
-    return ''
-  }
-}
-
-/** 批量把物品图本地化（并发 8） */
-async function prefetchItems(items) {
-  const todo = (items || []).filter((it) => it && it.imageUrl && !it.localImg)
-  for (let i = 0; i < todo.length; i += 8) {
-    await Promise.all(todo.slice(i, i + 8).map(async (it) => {
-      it.localImg = await localImage(it.imageUrl, `item_${it.itemId}.png`)
-    }))
-  }
-}
+const itemImgKey = (it) => `item_${it.itemId}.png`
 
 /**
  * 单个账号：签到 → 营地每日任务（积分+福利，含领奖）→ 手册周任务（只做不领）。
@@ -359,11 +325,13 @@ export class AssetAndSign extends plugin {
         subFilter ? `子分类「${subFilter}」` : '',
       ].filter(Boolean).join(' · ')
 
+      // ---- 先把这次要渲染的所有物品图存到本地（只下一次，之后走缓存），再开始出图 ----
+      const allItems = pages.flatMap(({ pages: pageList }) => pageList.flatMap((p) => p.groups.flatMap((g) => g.items)))
+      const cacheStats = await cacheItemsWithNotice(e, allItems, '资产', { keyOf: itemImgKey, concurrency: 8 })
+
       const images = []
       for (const { section, pages: pageList } of pages) {
         for (let i = 0; i < pageList.length; i++) {
-          const pageItems = pageList[i].groups.flatMap((g) => g.items)
-          await prefetchItems(pageItems)   // 图片本地化（已缓存的不再下载）
           try {
             const img = await puppeteer.screenshot('asset', {
               tplFile: 'plugins/PUBG-Helper-Plugin/resources/asset.html',
@@ -397,6 +365,9 @@ export class AssetAndSign extends plugin {
             try { await e.reply(image) } catch { /* 单张也失败则跳过 */ }
           }
         }
+      }
+      if (cacheStats.failed) {
+        await e.reply(`⚠️ 有 ${cacheStats.failed} 张图没能存到本地（网络问题），对应物品显示为占位，下次再查会重试`)
       }
       if (sections.some((s) => s.count > MAX_PAGES * PER_PAGE)) {
         await e.reply(`📦 该分类共 ${sections.reduce((n, s) => n + s.count, 0)} 件，仅显示前 ${MAX_PAGES * PER_PAGE} 件\n加品质可缩小范围，如「#和平资产 ${catFilter || '时装'} 粉色」`)

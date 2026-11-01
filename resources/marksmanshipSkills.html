@@ -109,6 +109,18 @@
       filter: brightness(1.2) contrast(1.05);
     }
 
+    /* 图没缓存下来时的占位，尺寸和图片一致，避免行高跳动 */
+    .gun-image.noimg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      color: #4a4a4a;
+      font-size: 26px;
+      font-weight: 700;
+      filter: none;
+    }
+
     .gun-details {
       display: flex;
       flex-direction: column;
@@ -232,7 +244,7 @@
           <tr>
             <td>
               <div class="gun-info">
-                <img src="https://imgcdn.gp.qq.com/images/baike/gun/{{item.ResID}}.png" alt="gun" class="gun-image">
+                {{if item.localImg}}<img src="{{item.localImg}}" alt="gun" class="gun-image">{{else}}<span class="gun-image noimg">?</span>{{/if}}
                 <div class="gun-details">
                   <span class="gun-type">{{item.Type}}</span>
                   <span class="gun-name">{{item.Name}}</span>

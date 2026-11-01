@@ -2,6 +2,7 @@ import { ApiService } from '../utils/api.js'
 import Button from '../utils/button.js'
 
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import { localizeWithNotice } from '../utils/localImg.js'
 
 const apiService = new ApiService()
 const TARGET_NEWS_IDS = ['561782362', '546341686'] // 同时查询的两个资讯ID
@@ -58,6 +59,9 @@ export class News extends plugin {
         const { error, list, listA, listB } = await this.getMergedNewsList(page)
         if (error) return e.reply(error)
 
+        // 封面 / 头像先存本地，再出图
+        await localizeWithNotice(e, { list, listA, listB }, '资讯')
+
         const image = await puppeteer.screenshot('news', {
             tplFile: 'plugins/PUBG-Helper-Plugin/resources/news.html',
             sys: {
@@ -88,6 +92,8 @@ export class News extends plugin {
         if (!item) {
             return e.reply(`没有找到编号为${index}的资讯`)
         }
+
+        await localizeWithNotice(e, item, '资讯')
 
         const image = await puppeteer.screenshot('news_detail', {
             tplFile: 'plugins/PUBG-Helper-Plugin/resources/news_detail.html',

@@ -1,6 +1,7 @@
 import { ApiService } from '../utils/api.js'
 import { getUserInfo } from '../utils/storage.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import { cacheItemsWithNotice } from '../utils/localImg.js'
 
 const apiService = new ApiService()
 
@@ -79,6 +80,7 @@ export class MarksmanshipSkills extends plugin {
             const progressOffset = Number((circumference * (1 - expRatio)).toFixed(1))
             list.push({
                 ResID: firearmsList[i].ResID,
+                imgUrl: `https://imgcdn.gp.qq.com/images/baike/gun/${firearmsList[i].ResID}.png`,
                 Type: firearmsList[i].Type,
                 Name: firearmsList[i].Name,
                 TotalOwnTime: isNaN(firearmsList[i].TotalOwnTime / 60 / 60) ? 0 : (firearmsList[i].TotalOwnTime / 60 / 60).toFixed(1),
@@ -110,6 +112,9 @@ export class MarksmanshipSkills extends plugin {
             }
             return b.WeaponExp - a.WeaponExp
         })
+
+        // 枪械图先存本地（首次下载，之后走缓存），再渲染
+        await cacheItemsWithNotice(e, list, '枪械', { urlField: 'imgUrl', targetField: 'localImg' })
 
         const image = await puppeteer.screenshot('marksmanshipSkills', {
             tplFile: 'plugins/PUBG-Helper-Plugin/resources/marksmanshipSkills.html',
