@@ -32,6 +32,22 @@ const QUALITY_NAME = { 3: '绿色', 4: '蓝色', 5: '紫色', 6: '粉色', 7: '�
 const itemImgKey = (it) => `item_${it.itemId}.png`
 
 /**
+ * 把任意深度的分组压平成「物品数组」。
+ * 接口分类层级不统一：时装/装备/战备是「分类 → 物品」两层，
+ * 枪械是「分类 → 型号(ARX/M416…) → 物品」三层。只按两层取会把
+ * 型号组当成物品渲染（没有 itemName / imageUrl，图上就是一片「?」）。
+ */
+function flattenItems(list) {
+  const out = []
+  for (const node of list || []) {
+    if (!node) continue
+    if (Array.isArray(node.items)) out.push(...flattenItems(node.items))
+    else out.push(node)
+  }
+  return out
+}
+
+/**
  * 单个账号：签到 → 营地每日任务（积分+福利，含领奖）→ 手册周任务（只做不领）。
  * 手册积分故意不自动领取，留给用户在游戏内自己点，避免代领风险。
  * 任一步失败都不抛（除了拿不到角色ID），结果里带上错误原因，便于逐账号汇总。
@@ -261,6 +277,10 @@ export class AssetAndSign extends plugin {
         if (tab.count > 0) {
           const detail = await apiService.get_depotdetail(roleId, tab.tabId)
           let groups = (detail.data && detail.data.items) || []
+          // 统一压平成「分组 → 物品」，兼容枪械的三层结构（型号层只做聚合，物品名自带型号前缀）
+          groups = groups
+            .map((g) => ({ ...g, items: flattenItems(g.items || []) }))
+            .filter((g) => g.items.length)
           // 默认子分类：时装只显示「套装」；显式指定子分类优先
           const wantSub = subFilter || (String(tab.tabName) === '时装' ? '套装' : '')
           if (wantSub) groups = groups.filter((g) => String(g.tabName).includes(wantSub))

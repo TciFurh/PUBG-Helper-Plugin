@@ -174,6 +174,7 @@ const isSuper = d.isSuperBody === true
 | 卡片图直连网络 | 偶发裂图、出图慢、CDN 抖一次就整页空白 | 一律走 `utils/localImg.js` 先落盘再渲染，见上一节 |
 | 缓存 key 随便改 | 老缓存全部失效，用户那里“第一次又要重新下” | 物品图 `item_<itemId>.png`、段位 `segment_*.png` 属于历史约定，别动 |
 | 一页 48 件图全内嵌 | 单张 HTML 能做到几 MB，puppeteer 仍可渲染但会慢 | 别再往同一张卡片里堆更大的图；翻页数量受 `MAX_PAGES` 限制 |
+| 资产接口层级不统一 | 枪械整页全是「?」方块、没有物品名（时装/装备正常） | `getdepotdetail` 的枪械是「分类 → 型号(ARX/M416) → 物品」**三层**，其它分类是两层。`showAsset` 里统一用 `flattenItems()` 压平后再分页，别假设只有两层 |
 
 ---
 
