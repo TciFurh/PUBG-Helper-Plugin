@@ -193,7 +193,8 @@ const isSuper = d.isSuperBody === true
 | 资产接口层级不统一 | 枪械整页全是「?」方块、没有物品名（时装/装备正常） | `getdepotdetail` 的枪械是「分类 → 型号(ARX/M416) → 物品」**三层**，其它分类是两层。`showAsset` 里统一用 `flattenItems()` 压平后再分页，别假设只有两层 |
 | 埋点上报不推进任务 | 照抄反编译出来的 page/module/subModule，`returnCode:0 ok`，任务进度仍 0/1 | **先确认真机抓到的 page/eventId，别只信反编译**。反编译只能看到「谁调了上报」，同一个模块里不同层级页面的 page 号差很多（找搭子：容器页 106001/100019 vs 匹配卡片页 106042/100001），猜错一个就白跑。抓包时注意看 `p6`，它只是 `seq`（全局递增序号），不是语义参数 |
 | 抓包 overlay 的 p6 | 显示的 `p6=5` / `p6=6` 看起来像页面参数 | 对应 `reportModuleLogData(...)` 的第 6 个 int，落到报文里就是 `seq`，每上报一条 +1。别把它当成页面/入口编号去复刻 |
-| 页面停留任务全线不推进 | 用真机抓到的参数上报（绿洲 115004/15/27、地铁 104055/4/27、找搭子 106001/100019），全部 `returnCode:0 ok`，任务进度一动不动 | 2026-11-02 在新账号上逐个试过：三个不同 module 都不动，说明不是 page 号的问题，是**上报被服务端静默丢弃**。`BatchModuleLogReportScene` 的表单除 `extData` 外还带 `getModuleCommonParam()` 的 `Qimei / cchannelId / cClientVersionName+Code / cSystemVersionName+Code / userId / token / areaId / platId / openid`，缺设备指纹大概率整批不入库。已排除：`roleId`、`sq_id`+`seq`、`actionTime` 递增、actionType 1/2/5/6、eventId 100001/100002/200160/500001。**要修必须拿到真机 POST body**，别再猜参数 |
+| 页面停留任务全线不推进 | 用真机抓到的参数上报（绿洲 115004/15/27、地铁 104055/4/27、找搭子 106001/100019），全部 `returnCode:0 ok`，任务进度一动不动 | 2026-11-02 已拿到**真机完整 POST body**（mitmproxy，手机 root + 系统级 CA）逐条比对，能排除的都排除了：域名已改成真机的 `formal.report.gp.qq.com`、31 个表单字段（含 `Qimei/cDeviceKey/cDeviceId`）全带、`actionType=1` 每 5 秒一条的实时节奏、`sq_id/seq/actionTime` 全部照抄、换 page/eventId/module 各试一遍 —— 仍然不计数。**而同一个手机里 App 自己打开绿洲页 45 秒，76 号任务立刻 0/1 → 1/1**。结论：这类任务不是参数问题，服务端只认客户端自己那条会话（上报与 App 的页面生命周期/会话强绑定），纯接口复刻做不到，别再往里投时间 |
+| 手机开了营地后插件「登录态失效」 | 后台接口突然全部 `returnCode:-30003 登录态失效，请重新登录` | 营地的 `token` 是 8 位短串，由 `POST /user/login`（带 QQ `accessToken` + `payToken`）签发，**每次客户端登录都会轮换**。用户在手机上打开营地（QQ 快登是自动的）就会把插件里存的 token 顶掉，需要重新绑定/登录刷新 |
 
 ---
 
@@ -286,21 +287,32 @@ const isSuper = d.isSuperBody === true
   这几个页面的 id 拿不到；用现有 3 套埋点模板（资讯/看直播/PEL）轮流投，112（放映中心）和 76（绿洲专区）都不动
 - 动作完成后**再拉一次列表**回填最新进度（分享/浏览类计数是服务端异步确认的）
 
-**页面埋点速查**（反编译 `com.tencent.gamehelper.statistics.DataReportManager` + 各页面调用点）
+**页面埋点速查**（反编译 `com.tencent.gamehelper.statistics.DataReportManager` + 各页面调用点 + 真机 mitmproxy 抓包）
 
-App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subModuleId, seq, ext...)`，
-「停留时长」统一 `eventId=100001`、`actionType=1`，一批 12 条 × `reportInterval=5` 秒 = 1 分钟：
+> **接口地址**：`POST https://formal.report.gp.qq.com/game/batchmodulelogreport`
+> —— 是 `report` 不是 `api`！`formal.api.gp.qq.com` 下同名路径接口也返回 `returnCode:0`，但不计数。
+>
+> **必带设备块**（31 个表单字段，缺了照样返回 ok 但任务不动）：
+> `openId / gameOpenId / userId / token / areaId / platId / cGzip / cGameId / cCurrentGameId / cRand /
+> cChannelId / cchannelId / cDeviceKey / cDeviceId / Qimei / pf / cSystem / cSystemVersionName /
+> cSystemVersionCode / cDeviceModel / cDeviceRom / cDeviceCPU / cDeviceScreenWidth / cDeviceScreenHeight /
+> cDevicePPI / cDeviceMem / cDeviceNet / cClientVersionName / cClientVersionCode / extData`
+> 其中 `Qimei = cDeviceKey = cDeviceId`（App 上报里三者同值，是该机的设备指纹）。
+
+App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subModuleId, seq, ext...)`。
+**真机实测**「页面停留」是每 5 秒一条 `eventId=100001 / actionType=1`，同一次访问共用同一个 `sq_id`、`seq` 不变，
+`actionTime` 为本地时间 `YYYY-MM-DD HH:mm:ss`。
 
 | 页面 | page | moduleId | subModuleId | 说明 |
 |---|---|---|---|---|
-| 资讯详情 | 101004 | 1 | 27 | 实证：投一批 +1 分钟，5 批满（`#和平周任务` 的浏览资讯靠它） |
-| 放映中心 | 101044 | 1 | 27 | **实证有效**：3 批把「观看放映中心3分钟」从 0/3 推到 3/3 |
-| 地铁战利品页 | 104055 | 4 | 27 | 按 `SubwayAssetsActivity` 参数复刻，未验证（该周任务当时已完成） |
+| 资讯详情 | 101004 | 1 | 27 | 实证：投一批 +1 分钟，5 批满（`#和平签到` 的浏览资讯靠它） |
+| 放映中心 | 101044 | 1 | 27 | 曾有实证：3 批把「观看放映中心3分钟」从 0/3 推到 3/3 |
+| 地铁战利品页 | 104055 | 4 | 27 | 按 `SubwayAssetsActivity` 参数复刻，未验证 |
 | 地铁变卖物图鉴 | 104065 | 4 | 27 | 按 `SubwaySellActivity` 参数复刻（另有点击事件 200388 / action 2 / 4 / 33） |
 | 直播页 | 109002 | 9 | 1 | 观看直播任务（eventId 10901001） |
-| 绿洲专区 | 115004 | 15 | 27 | `PAGE_ID_OASIS_HOME`。**真机抓包**：停留 `eventId=100001/actionType=6`、离开 `500001/actionType=5`；点 tab 另有一组 `200160/actionType=2/subModuleId=33`。⚠️ 三组全发、含 roleId，76 号任务仍 0/1 |
-| 找搭子首页 | 106001 | 6 | 27 | `eventId=100019`。**真机抓包确认**：切到「好友 → 找搭子」时打的就是这一组（好友 tab 容器页），任务 106/108「查看 1 次找搭子首页」看的是它，`jumpParam.buttonName` 也正是 `haoyou` |
-| 找搭子匹配卡片页 | 106042 | 6 | 27 | `eventId=100001`，`FindPartnerFragment` 进入时打，带 `ext1..ext11`（ext5=卡片 uuid、ext6=对方 uid、ext11=算法串）。属于「翻卡片」而不是「首页」，任务不靠它 |
+| 绿洲专区 | 115004 | 15 | 27 | `PAGE_ID_OASIS_HOME`。**真机抓包确认**：停留 `100001/actionType=1` 每 5 秒一条、离开 `500001/actionType=5`、点 tab `200160/actionType=2/subModuleId=33`。App 内打开该页 45 秒，76 号任务 0/1 → 1/1 |
+| 找搭子首页 | 106001 | 6 | 27 | `eventId=100019`。**真机抓包确认**：切到「好友 → 找搭子」时打的就是这一组（好友 tab 容器页），任务 106/108「查看 1 次找搭子首页」看的是它 |
+| 找搭子匹配卡片页 | 106042 | 6 | 27 | `eventId=100001`，`FindPartnerFragment` 进入时打，带 `ext1..ext11`（ext5=卡片 uuid、ext6=对方 uid、ext11=算法串）。属于「翻卡片」而不是「首页」 |
 
 `actionType`：1=停留/进入、2=点击、3=曝光、4=结果、5=PV。`PAGE_ID_*` 常量在 `DataReportManager` 里能查到全量。
 

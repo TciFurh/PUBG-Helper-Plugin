@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import fetch from 'node-fetch'
 import querystring from 'node:querystring'
 
@@ -7,6 +8,8 @@ const LOCAL_SEASON_ID = '0'
 class ApiService {
     constructor() {
         this.main = 'https://formal.api.gp.qq.com'
+        // 行为埋点单独一个域名（真机抓包确认）
+        this.report = 'https://formal.report.gp.qq.com'
         this.baseUrl = {
             rolecard3: '/game/rolecard3',
             gethonorinfo: '/play/gethonorinfo',
@@ -735,9 +738,53 @@ class ApiService {
         return this._postForm(this.main + this.baseUrl.momentlike, { momentId: String(momentId), type: String(type) })
     }
 
-    /** 行为埋点上报（浏览资讯5分钟 / 看直播5分钟任务靠这个模拟） */
+    /**
+     * 客户端设备块：真机抓包确认，服务端只认带齐这一套字段的上报。
+     * 缺 Qimei / cDeviceKey 等内容时接口照样返回 returnCode 0，但任务进度不动。
+     */
+    _deviceParams() {
+        const p = this.camp || {}
+        const areaId = String(p.areaId || this.params.areaId || '2')
+        // 真机上是 Qimei（设备指纹），这里没有设备就从账号派生一个稳定值，保证同一账号始终一致
+        const key = p.deviceKey || crypto.createHash('md5').update(String(p.openId || p.userId || '')).digest('hex')
+        return {
+            areaId,
+            platId: String(p.platId || '1'),
+            cGzip: '1',
+            cGameId: '20004',
+            cCurrentGameId: '20004',
+            cRand: String(Date.now()),
+            cChannelId: '3',
+            cchannelId: '3',
+            cDeviceKey: key,
+            cDeviceId: key,
+            Qimei: key,
+            pf: 'desktop_m_qq-10000144-android-2002-',
+            cSystem: 'android',
+            cSystemVersionName: '10',
+            cSystemVersionCode: '29',
+            cDeviceModel: 'ONEPLUS A6000',
+            cDeviceRom: 'ONEPLUS',
+            cDeviceCPU: 'arm64-v8a$',
+            cDeviceScreenWidth: '1080',
+            cDeviceScreenHeight: '2280',
+            cDevicePPI: '420',
+            cDeviceMem: '110357',
+            cDeviceNet: 'WIFI',
+            cClientVersionName: '3.38.3.1625',
+            cClientVersionCode: '2102091536',
+        }
+    }
+
+    /**
+     * 行为埋点上报（浏览资讯 / 浏览页面类任务靠这个模拟）。
+     * 注意域名：真机上报走 formal.report.gp.qq.com，不是 formal.api.gp.qq.com。
+     */
     async batch_module_report(extData) {
-        return this._postForm(this.main + this.baseUrl.batchmodulelogreport, { extData: JSON.stringify(extData) })
+        return this._postForm(this.report + this.baseUrl.batchmodulelogreport, {
+            ...this._deviceParams(),
+            extData: JSON.stringify(extData),
+        })
     }
 
     /** 开关对局工具（任务要求「启用 N 个工具」） */

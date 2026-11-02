@@ -30,6 +30,17 @@
  */
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+/** 埋点报文里的 actionTime，真机是本地时间 `YYYY-MM-DD HH:mm:ss` */
+const fmtTime = (ts = Date.now()) => {
+  const d = new Date(ts)
+  const p = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+}
+
+/** 每次「页面访问」分配一个 sq_id，真机是自增的会话序号 */
+let sqCounter = 0
+const nextSqId = () => (sqCounter = (sqCounter + 1) % 1000)
+
 /** 埋点上报一版的公共字段（interval 5 分钟 × 12 条 = 模拟在线时长） */
 const REPORT_TEMPLATES = {
   30: { eventId: 100004, subModuleId: 27, page: 101004, moduleId: 1 }, // 浏览资讯
@@ -394,23 +405,33 @@ async function pageStay(ctx) {
   if (!tpl) return { ok: false, note: '缺该页面的埋点参数' }
   const need = Math.max(1, Number(ctx.task?.maxProgress || 1) - Number(ctx.task?.progress || 0))
   return repeat(ctx, need, async (c) => {
-    // 有入口页的先按 App 顺序打一遍：1 条进入（actionType=1）+ 3 条停留 tick（actionType=6）
+    // 一次「页面访问」用同一个 sq_id，tick 的 actionTime 按 5 秒一条往回排，与真机报文一致
+    const sq = nextSqId()
+    const startedAt = Date.now()
+    const tickAt = (i, total) => fmtTime(startedAt - (total - 1 - i) * 5000)
+    // 有入口页的先按 App 顺序打一遍：1 条进入 + 3 条停留 tick
     if (tpl.entry) {
       const head = [
-        { ...tpl.entry, actionType: 1, reportInterval: 5 },
-        ...Array.from({ length: 3 }, () => ({ ...tpl.entry, actionType: 6, reportInterval: 5 })),
+        { ...tpl.entry, actionType: 1, reportInterval: 5, sq_id: sq, seq: 0, actionTime: fmtTime(startedAt - 18000) },
+        ...Array.from({ length: 3 }, (_, i) => ({
+          ...tpl.entry, actionType: 6, reportInterval: 5, sq_id: sq, seq: i + 1, actionTime: fmtTime(startedAt - 15000 + i * 5000),
+        })),
       ]
       const headOk = await ok(c.api, await c.api.batch_module_report(head))
       if (!headOk) return { ok: false, note: '入口页埋点上报失败' }
       await sleep(1000)
     }
-    const batch = Array.from({ length: 12 }, () => ({
+    // 停留 tick：真机是 eventId=100001 / actionType=1，每 5 秒一条，同 sq_id + 同 seq
+    const batch = Array.from({ length: 12 }, (_, i) => ({
       page: tpl.page,
-      eventId: 100001,
+      eventId: tpl.eventId || 100001,
       actionType: 1,
       moduleId: tpl.moduleId,
       subModuleId: tpl.subModuleId,
       reportInterval: 5,
+      sq_id: sq,
+      seq: 1,
+      actionTime: tickAt(i, 12),
     }))
     const r = await ok(c.api, await c.api.batch_module_report(batch))
     await sleep(1200)
@@ -467,7 +488,7 @@ const WEEKLY_CANNOT = {
   104: '需真实绑定企微助手',
   101: '需在 App 点开好友排行榜（未找到该页埋点参数）',
   72: '需在 App 打开壁纸库 H5（H5 埋点，无对应接口）',
-  76: '需在 App 点开绿洲专区页（真机参数 115004/15/27 上报后仍不推进，见 docs 踩坑）',
+  76: '需在 App 点开绿洲专区页（真机页面号 115004 已确认，纯接口上报服务端不计数，见 docs 踩坑）',
 }
 
 /** 按标题兜底的「不可自动完成」说明（id 会变，标题不会） */
