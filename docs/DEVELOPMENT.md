@@ -191,6 +191,7 @@ const isSuper = d.isSuperBody === true
 | 缓存 key 随便改 | 老缓存全部失效，用户那里“第一次又要重新下” | 物品图 `item_<itemId>.png`、段位 `segment_*.png` 属于历史约定，别动 |
 | 一页 48 件图全内嵌 | 单张 HTML 能做到几 MB，puppeteer 仍可渲染但会慢 | 别再往同一张卡片里堆更大的图；翻页数量受 `MAX_PAGES` 限制 |
 | 资产接口层级不统一 | 枪械整页全是「?」方块、没有物品名（时装/装备正常） | `getdepotdetail` 的枪械是「分类 → 型号(ARX/M416) → 物品」**三层**，其它分类是两层。`showAsset` 里统一用 `flattenItems()` 压平后再分页，别假设只有两层 |
+| 埋点参数对了任务却不推进 | 完全照抄 App 的 page/module/subModule，`returnCode:0 ok`，任务进度仍 0/1（找搭子首页 106042） | 已排除的变量：actionType 1 与 6、有无 `sq_id`/`seq`、`actionTime` 用 UTC 还是本地时间、带不带真实 `roleId`。App 端公共参数里还有 **Qimei 设备指纹 + 渠道 + 客户端版本**，服务端很可能是按 Qimei 归集停留数据 —— 光有 page 参数不够。别再盲试页面号，直接抓包看 App 真实报文 |
 
 ---
 
@@ -296,6 +297,7 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
 | 地铁变卖物图鉴 | 104065 | 4 | 27 | 按 `SubwaySellActivity` 参数复刻（另有点击事件 200388 / action 2 / 4 / 33） |
 | 直播页 | 109002 | 9 | 1 | 观看直播任务（eventId 10901001） |
 | 绿洲专区 | 115004 | 15 | 33 | 点击事件 200160 / action 2 / 15 / 33；**实测各类组合都不推进 76 号任务**，需抓包 |
+| 找搭子首页 | 106042 | 6 | 27 | 反编译确认：`ChatMainFragmentV2.getPageByChannel("partner")` → `0x19e3a`，与 `FindPartnerFragment` 的 `startReportModuleLogData` 一致；**但手工上报后 106/108 任务不推进**（见踩坑） |
 
 `actionType`：1=停留/进入、2=点击、3=曝光、4=结果、5=PV。`PAGE_ID_*` 常量在 `DataReportManager` 里能查到全量。
 

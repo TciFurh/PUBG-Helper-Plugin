@@ -378,6 +378,10 @@ const PAGE_STAY_TEMPLATES = {
   112: { page: 101044, moduleId: 1, subModuleId: 27 }, // 放映中心（实测：一轮 1 分钟，3 轮满）
   71: { page: 104055, moduleId: 4, subModuleId: 27 },  // 地铁战利品页（按 App 参数复刻，未验证）
   111: { page: 104065, moduleId: 4, subModuleId: 27 }, // 地铁变卖物图鉴（同上）
+  // 找搭子首页：好友 tab 下的 partner 频道（反编译 ChatMainFragmentV2.getPageByChannel("partner") → 0x19e3a，
+  // 与 FindPartnerFragment 的 startReportModuleLogData 一致）。⚠️ 手工上报后任务不推进，待抓包核实
+  106: { page: 106042, moduleId: 6, subModuleId: 27 },
+  108: { page: 106042, moduleId: 6, subModuleId: 27 },
 }
 
 async function pageStay(ctx) {
@@ -417,6 +421,8 @@ const WEEKLY_ACTIONS = {
   112: pageStay,   // 放映中心 3 分钟
   71: pageStay,    // 地铁战利品页
   111: pageStay,   // 地铁变卖物图鉴
+  106: pageStay,   // 找搭子首页（参数已定位，效果待验证）
+  108: pageStay,   // 同上（第 7 周同名任务）
   66: (c) => ACTIONS.tool4(c),
   1012: (c) => ACTIONS.likeInfo(c),
   1013: (c) => ACTIONS.likeMoment(c),
@@ -430,7 +436,6 @@ const WEEKLY_CANNOT = {
   109: '需真机使用小组件（有 widgetslogreport 口，缺请求格式）',
   104: '需真实绑定企微助手',
   101: '需在 App 点开好友排行榜（未找到该页埋点参数）',
-  106: '需在 App 点开找搭子首页（未找到该页埋点参数）',
   72: '需在 App 打开壁纸库 H5（H5 埋点，无对应接口）',
   76: '需在 App 点开绿洲专区页（试过 115004/115001 全部事件组合，进度不动）',
 }
@@ -462,7 +467,7 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
     for (const t of w.taskList || []) {
       const id = Number(t.id)
       const st = Number(t.status)
-      const row = { id, title: t.title || `任务${id}`, progress: `${t.progress}/${t.maxProgress}`, status: 'done', note: '' }
+      const row = { id, title: t.title || `任务${id}`, progress: `${t.progress}/${t.maxProgress}`, status: 'done', note: '', p0: Number(t.progress) || 0 }
       if (st === 1) {
         row.status = 'waitClaim'
         row.note = '已完成，手册积分待手动领取'
@@ -495,12 +500,14 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
   const after = await api.get_season_pass_task(roleId)
   const progressById = new Map()
   const statusById = new Map()
+  const progressNumById = new Map()
   for (const w of after?.data?.weekList || []) {
     for (const t of w.taskList || []) {
       const id = Number(t.id)
       const st = Number(t.status)
       progressById.set(id, `${t.progress}/${t.maxProgress} ${st === 2 ? '已领' : st === 1 ? '待领' : ''}`.trim())
       statusById.set(id, st)
+      progressNumById.set(id, Number(t.progress) || 0)
     }
   }
   for (const w of out.weeks) {
@@ -515,6 +522,12 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
         r.status = 'waitClaim'
         r.note = '已完成，手册积分待手动领取'
         out.waitClaim.push(r.title)
+      } else if (st === 0 && r.status === 'acted' && progressNumById.get(r.id) === r.p0) {
+        // 上报成功了但进度没动 —— 别显示「已执行」骗人，标成没做成
+        r.status = 'fail'
+        r.note = '上报成功但任务进度未推进'
+        out.acted = Math.max(0, out.acted - 1)
+        out.skipped.push(r.title)
       }
     }
   }
