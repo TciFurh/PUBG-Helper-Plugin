@@ -371,17 +371,22 @@ async function browseNews(ctx) {
 /**
  * 「在 App 里看某页面」类任务：照抄 App 内 DataReportManager 的真实参数上报停留时长。
  * App 里的调用形如 reportModuleLogData(page, eventId, actionType, moduleId, subModuleId, seq)，
- * 停留类统一是 eventId=100001（停留时长）、actionType=1，一批 12 条 × reportInterval=5 秒 = 1 分钟。
- * 页面/模块号来自反编译（smali）里的常量，见 docs/DEVELOPMENT.md 的「页面埋点速查」。
+ * 停留类一般是 eventId=100001（停留时长）、actionType=1，一批 12 条 × reportInterval=5 秒 = 1 分钟。
+ * 少数页面走的是别的 eventId（如好友 tab 容器 106001/100019），按真机抓包为准。
+ * 页面/模块号来自反编译常量 + 真机抓包，见 docs/DEVELOPMENT.md 的「页面埋点速查」。
  */
+// 「好友」tab 容器页：page 106001 = PAGE_ID_FRIEND_MESSAGE，eventId 100019 是切到好友 tab 时的停留上报。
+// 任务「查看 1 次找搭子首页」的 jumpParam 是 {buttonName:haoyou, subButtonName:找搭子}，
+// 命中的就是这一层，而不是下面的匹配卡片页。真机抓包实测参数见 docs/DEVELOPMENT.md。
+const PARTNER_ENTRY = { page: 106001, eventId: 100019, moduleId: 6, subModuleId: 27 }
+
 const PAGE_STAY_TEMPLATES = {
   112: { page: 101044, moduleId: 1, subModuleId: 27 }, // 放映中心（实测：一轮 1 分钟，3 轮满）
   71: { page: 104055, moduleId: 4, subModuleId: 27 },  // 地铁战利品页（按 App 参数复刻，未验证）
   111: { page: 104065, moduleId: 4, subModuleId: 27 }, // 地铁变卖物图鉴（同上）
-  // 找搭子首页：好友 tab 下的 partner 频道（反编译 ChatMainFragmentV2.getPageByChannel("partner") → 0x19e3a，
-  // 与 FindPartnerFragment 的 startReportModuleLogData 一致）。⚠️ 手工上报后任务不推进，待抓包核实
-  106: { page: 106042, moduleId: 6, subModuleId: 27 },
-  108: { page: 106042, moduleId: 6, subModuleId: 27 },
+  // 找搭子首页：先打好友 tab 容器（106001/100019），再打匹配卡片页（106042/100001，与 FindPartnerFragment 一致）
+  106: { entry: PARTNER_ENTRY, page: 106042, moduleId: 6, subModuleId: 27 },
+  108: { entry: PARTNER_ENTRY, page: 106042, moduleId: 6, subModuleId: 27 },
 }
 
 async function pageStay(ctx) {
@@ -389,6 +394,16 @@ async function pageStay(ctx) {
   if (!tpl) return { ok: false, note: '缺该页面的埋点参数' }
   const need = Math.max(1, Number(ctx.task?.maxProgress || 1) - Number(ctx.task?.progress || 0))
   return repeat(ctx, need, async (c) => {
+    // 有入口页的先按 App 顺序打一遍：1 条进入（actionType=1）+ 3 条停留 tick（actionType=6）
+    if (tpl.entry) {
+      const head = [
+        { ...tpl.entry, actionType: 1, reportInterval: 5 },
+        ...Array.from({ length: 3 }, () => ({ ...tpl.entry, actionType: 6, reportInterval: 5 })),
+      ]
+      const headOk = await ok(c.api, await c.api.batch_module_report(head))
+      if (!headOk) return { ok: false, note: '入口页埋点上报失败' }
+      await sleep(1000)
+    }
     const batch = Array.from({ length: 12 }, () => ({
       page: tpl.page,
       eventId: 100001,
