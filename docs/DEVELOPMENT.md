@@ -193,6 +193,7 @@ const isSuper = d.isSuperBody === true
 | 资产接口层级不统一 | 枪械整页全是「?」方块、没有物品名（时装/装备正常） | `getdepotdetail` 的枪械是「分类 → 型号(ARX/M416) → 物品」**三层**，其它分类是两层。`showAsset` 里统一用 `flattenItems()` 压平后再分页，别假设只有两层 |
 | 埋点上报不推进任务 | 照抄反编译出来的 page/module/subModule，`returnCode:0 ok`，任务进度仍 0/1 | **先确认真机抓到的 page/eventId，别只信反编译**。反编译只能看到「谁调了上报」，同一个模块里不同层级页面的 page 号差很多（找搭子：容器页 106001/100019 vs 匹配卡片页 106042/100001），猜错一个就白跑。抓包时注意看 `p6`，它只是 `seq`（全局递增序号），不是语义参数 |
 | 抓包 overlay 的 p6 | 显示的 `p6=5` / `p6=6` 看起来像页面参数 | 对应 `reportModuleLogData(...)` 的第 6 个 int，落到报文里就是 `seq`，每上报一条 +1。别把它当成页面/入口编号去复刻 |
+| 页面停留任务全线不推进 | 用真机抓到的参数上报（绿洲 115004/15/27、地铁 104055/4/27、找搭子 106001/100019），全部 `returnCode:0 ok`，任务进度一动不动 | 2026-11-02 在新账号上逐个试过：三个不同 module 都不动，说明不是 page 号的问题，是**上报被服务端静默丢弃**。`BatchModuleLogReportScene` 的表单除 `extData` 外还带 `getModuleCommonParam()` 的 `Qimei / cchannelId / cClientVersionName+Code / cSystemVersionName+Code / userId / token / areaId / platId / openid`，缺设备指纹大概率整批不入库。已排除：`roleId`、`sq_id`+`seq`、`actionTime` 递增、actionType 1/2/5/6、eventId 100001/100002/200160/500001。**要修必须拿到真机 POST body**，别再猜参数 |
 
 ---
 
@@ -297,7 +298,7 @@ App 的上报是 `reportModuleLogData(page, eventId, actionType, moduleId, subMo
 | 地铁战利品页 | 104055 | 4 | 27 | 按 `SubwayAssetsActivity` 参数复刻，未验证（该周任务当时已完成） |
 | 地铁变卖物图鉴 | 104065 | 4 | 27 | 按 `SubwaySellActivity` 参数复刻（另有点击事件 200388 / action 2 / 4 / 33） |
 | 直播页 | 109002 | 9 | 1 | 观看直播任务（eventId 10901001） |
-| 绿洲专区 | 115004 | 15 | 33 | 点击事件 200160 / action 2 / 15 / 33；**实测各类组合都不推进 76 号任务**，需抓包 |
+| 绿洲专区 | 115004 | 15 | 27 | `PAGE_ID_OASIS_HOME`。**真机抓包**：停留 `eventId=100001/actionType=6`、离开 `500001/actionType=5`；点 tab 另有一组 `200160/actionType=2/subModuleId=33`。⚠️ 三组全发、含 roleId，76 号任务仍 0/1 |
 | 找搭子首页 | 106001 | 6 | 27 | `eventId=100019`。**真机抓包确认**：切到「好友 → 找搭子」时打的就是这一组（好友 tab 容器页），任务 106/108「查看 1 次找搭子首页」看的是它，`jumpParam.buttonName` 也正是 `haoyou` |
 | 找搭子匹配卡片页 | 106042 | 6 | 27 | `eventId=100001`，`FindPartnerFragment` 进入时打，带 `ext1..ext11`（ext5=卡片 uuid、ext6=对方 uid、ext11=算法串）。属于「翻卡片」而不是「首页」，任务不靠它 |
 

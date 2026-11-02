@@ -443,6 +443,21 @@ const WEEKLY_ACTIONS = {
   1013: (c) => ACTIONS.likeMoment(c),
 }
 
+/**
+ * 同名任务在不同账号 / 赛季里 id 是变的（「分享资产」在旧号是 63、新号是 79），
+ * 所以 id 匹配不到时再按标题兜底，避免同一条任务在另一个号上变成「暂不支持」。
+ */
+const TITLE_ACTIONS = {
+  '分享战绩': (c) => repeat(c, 3, ACTIONS.shareMatch),
+  '分享战绩复盘': (c) => repeat(c, 3, ACTIONS.shareMatch),
+  '分享资讯': (c) => ACTIONS.shareInfo(c),
+  '分享资产': (c) => ACTIONS.shareAssets(c),
+  '浏览资讯': browseNews,
+  '查看榜单': (c) => ACTIONS.hotRank(c),
+  '查看战绩复盘': (c) => ACTIONS.replay(c),
+  '开启对局工具': (c) => ACTIONS.tool4(c),
+}
+
 /** 手册周任务里已知无法自动完成的 */
 const WEEKLY_CANNOT = {
   53: '登录和平营地，靠日常使用累计',
@@ -452,7 +467,14 @@ const WEEKLY_CANNOT = {
   104: '需真实绑定企微助手',
   101: '需在 App 点开好友排行榜（未找到该页埋点参数）',
   72: '需在 App 打开壁纸库 H5（H5 埋点，无对应接口）',
-  76: '需在 App 点开绿洲专区页（试过 115004/115001 全部事件组合，进度不动）',
+  76: '需在 App 点开绿洲专区页（真机参数 115004/15/27 上报后仍不推进，见 docs 踩坑）',
+}
+
+/** 按标题兜底的「不可自动完成」说明（id 会变，标题不会） */
+const TITLE_CANNOT = {
+  '登录和平营地': '登录和平营地，靠日常使用累计',
+  '使用小组件': '需真机使用小组件（有 widgetslogreport 口，缺请求格式）',
+  '关注账号': '需真实绑定企微助手',
 }
 
 /** 把单次动作重复 N 次（分享类任务是计数口，跑满次数即进度走满） */
@@ -494,10 +516,11 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
         rows.push(row)
         continue
       }
-      const fn = WEEKLY_ACTIONS[id]
+      const title = (t.title || '').trim()
+      const fn = WEEKLY_ACTIONS[id] || TITLE_ACTIONS[title]
       if (!fn) {
         row.status = 'skip'
-        row.note = WEEKLY_CANNOT[id] || '暂不支持自动完成'
+        row.note = WEEKLY_CANNOT[id] || TITLE_CANNOT[title] || '暂不支持自动完成'
         out.skipped.push(t.title)
         rows.push(row)
         continue
@@ -538,11 +561,16 @@ export async function runWeeklyTasks(api, roleId, { maxWeeks = 8 } = {}) {
         r.note = '已完成，手册积分待手动领取'
         out.waitClaim.push(r.title)
       } else if (st === 0 && r.status === 'acted' && progressNumById.get(r.id) === r.p0) {
-        // 上报成功了但进度没动 —— 别显示「已执行」骗人，标成没做成
-        r.status = 'fail'
-        r.note = '上报成功但任务进度未推进'
-        out.acted = Math.max(0, out.acted - 1)
-        out.skipped.push(r.title)
+        if (r.title === '查看战绩复盘') {
+          // 复盘是「每天只计 1 次」的累计任务，同一天再跑本来就不会动，不算失败
+          r.note = '已执行（该任务每天只计 1 次，明天再跑会继续涨）'
+        } else {
+          // 上报成功了但进度没动 —— 别显示「已执行」骗人，标成没做成
+          r.status = 'fail'
+          r.note = '上报成功但任务进度未推进'
+          out.acted = Math.max(0, out.acted - 1)
+          out.skipped.push(r.title)
+        }
       }
     }
   }
