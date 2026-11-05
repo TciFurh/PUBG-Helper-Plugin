@@ -165,7 +165,7 @@ export class BattleList extends plugin {
         rows,
         sys: { scale: `style=transform:scale(1.4)` },
       })
-      e.reply([image, Button.category(tab, page, hasMore)])
+      e.reply([image, Button.category(tab.name, page, hasMore)])
     } catch (err) {
       e.reply(`❌ ${tab.name}战绩查询失败：` + (err.message || err))
     }
