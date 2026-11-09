@@ -1,4 +1,4 @@
-import { getBot } from 'jiuli'
+import { notifySession } from '../utils/notify.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createWxLoginSession, waitForWxLogin } from '../utils/wxQrLogin.js'
 import { getCamp, saveCamp, maskToken } from '../utils/storage.js'
@@ -96,16 +96,6 @@ export class WxLogin extends plugin {
 
     // 异步推送(优先按触发会话回推, 失败回落 e.reply)
     async _notify(e, msg) {
-        try {
-            if (e.group_id) {
-                await getBot().sendGroupMsg('bot1', e.group_id, msg)
-            } else {
-                await getBot().sendPrivateMsg('bot1', e.user_id, msg)
-            }
-            return true
-        } catch (err) {
-            try { await e.reply(msg) } catch { }
-            return false
-        }
+        return notifySession(e, msg)
     }
 }

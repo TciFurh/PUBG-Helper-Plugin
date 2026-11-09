@@ -1,7 +1,7 @@
 // 和平营地 QQ 扫码登录（页面式授权，王者营地同款方案）
 // 链路：输入 QQ 号 → puppeteer 打开 m_authorize(token) → 页面出码 → 扫码 → 拦截 auth:// 回调
 //   → 解析 access_token/openid → 营地 /user/login(qqconnect, uin=用户 QQ 号) 换凭证
-import { getBot } from 'jiuli'
+import { notifySession } from '../utils/notify.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import { createQQLoginSession, waitForQQLogin } from '../utils/qqPageLogin.js'
 import { getCamp, saveCamp, maskToken, getUserInfo, saveUserInfo } from '../utils/storage.js'
@@ -144,16 +144,6 @@ export class QqLogin extends plugin {
   }
 
   async _notify(e, msg) {
-    try {
-      if (e.group_id) {
-        await getBot().sendGroupMsg('bot1', e.group_id, msg)
-      } else {
-        await getBot().sendPrivateMsg('bot1', e.user_id, msg)
-      }
-      return true
-    } catch (err) {
-      try { await e.reply(msg) } catch { }
-      return false
-    }
+    return notifySession(e, msg)
   }
 }
