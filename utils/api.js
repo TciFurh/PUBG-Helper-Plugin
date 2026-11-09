@@ -713,6 +713,38 @@ class ApiService {
         return this._postForm(this.baseUrl.welfare_completetask, { ...this._h5Base(roleId), taskIndex: String(taskIndex) })
     }
 
+    // ---- 福利商城（真机抓包 2026-11-09：福利中心 → 福利商城 H5 的原生请求）----
+
+    /** 余额（totalScore=福利币；scoreList 里 type=3 福利币 / type=5 营地装饰碎片，带官方图标） */
+    async get_user_score(roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/getuserscore.php', this._h5Base(roleId))
+    }
+
+    /** 福利兑换列表（exchangeLimit=本期限购 exchangedCount=已换 expendScore=价格） */
+    async get_score_exchange(roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/getscoreexchangev2.php', this._h5Base(roleId))
+    }
+
+    /** 执行兑换（bonusId=商品 id） */
+    async score_exchange(bonusId, roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/scoreexchange.php', { ...this._h5Base(roleId), bonusId: String(bonusId) })
+    }
+
+    /** 夺宝奖池（drawType: fragment=碎片夺宝 score=限时抽奖；oneCost/multiCost=单抽/十连价） */
+    async get_score_draw(drawType, roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/getscoredraw.php', { ...this._h5Base(roleId), drawType })
+    }
+
+    /** 抽奖（times: 1=单抽 10=十连） */
+    async score_draw(drawType, times, roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/scoredraw.php', { ...this._h5Base(roleId), drawType, times: String(times) })
+    }
+
+    /** 抽奖中奖记录（pageId 从 0 开始，hasMore 翻页） */
+    async get_draw_history(drawType, pageId = 0, roleId) {
+        return this._postForm('https://c.gp.qq.com/h5/getdrawhistory.php', { ...this._h5Base(roleId), drawType, pageId: String(pageId) })
+    }
+
     /** 资讯流（浏览/点赞任务从这取 iInfoId） */
     async get_info_main_page() {
         return this._postForm(this.main + this.baseUrl.infomainpage, { type: '51005184', pos1: '2', sort: '2', page: '1' })

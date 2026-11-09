@@ -208,6 +208,11 @@ export class MyHomepage extends plugin {
             rankedWinRate: get(vsteamRanked, ['pro', 2, 'v', 'v']),
             rankedKills: get(vsteamRanked, ['pro', 3, 'v', 'v']),
             rankedKd: get(vsteamRanked, ['pro', 4, 'v', 'v']),
+            // 团竞-排位段位（当前赛季）
+            rankedDivIcon: vsteamRanked.divIcon || '',
+            rankedDivName: vsteamRanked.divName || '暂无',
+            rankedProgressText: `${vsteamRanked.currentScore ?? 0}/${vsteamRanked.levelUpScore ?? 0}`,
+            rankedProgressPercent: vsteamRanked.levelProc ?? 0,
 
             teamExpLevelIcon: escape.divIcon || '',
             teamExpLevelName: escape.divName || '',

@@ -29,6 +29,21 @@
 | 地铁赛季档案 | `getescaperecord` | `roleId` |
 | 古墓赛季档案 | `getlosttombrecord` | `roleId` |
 
+### 福利商城 / 碎片夺宝（真机抓包 2026-11-09，c.gp.qq.com，token 鉴权即可）
+
+| 用途 | 接口 | 关键参数 |
+|---|---|---|
+| 余额 | `c.gp.qq.com/gp/api/php/getuserscore.php` | scoreList: `type=3` 福利币 / `type=5` 装饰碎片（带官方图标） |
+| 兑换列表 | `c.gp.qq.com/gp/api/php/getscoreexchangev2.php` | `expendScore` 价格 / `exchangeLimit` 限购 / `exchangedCount` 已换 / `periodType` 0本期 1本日 2本周 |
+| 执行兑换 | `c.gp.qq.com/gp/api/php/scoreexchange.php` | `bonusId` / `roleId` |
+| 夺宝奖池 | `c.gp.qq.com/gp/api/php/getscoredraw.php` | `drawType=fragment` 碎片夺宝 / `score` 限时抽奖；`oneCost`/`multiCost` |
+| 抽奖 | `c.gp.qq.com/gp/api/php/scoredraw.php` | `drawType` / `times`(1/10) / `roleId` |
+| 中奖记录 | `c.gp.qq.com/h5/getdrawhistory.php` | `drawType` / `pageId`(从0) |
+
+角标规则（对照 App UI）：`rewardItemId` 以 `camp_` 开头 → 营地；`awardType=4` → 地铁；其余无角标。
+图标：福利币 `CurrencyIcon/small/fulibi.png`、装饰碎片 `CurrencyIcon/small/zhuangshisuipian_1.png`（getuserscore 的 scoreList 自带）。
+坑：商品图标字段叫 `bonusIcon`（抽奖项才叫 `icon`）；art-template 循环变量别叫 `it`（与内部别名冲突）。
+
 ### tabIndex 分类映射
 
 | tabIndex | 分类 | tabIndex | 分类 |

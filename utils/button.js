@@ -157,6 +157,23 @@ export default class Button {
     ])
   }
 
+  /** 福利商城 / 碎片夺宝 */
+  static welfare() {
+    return segment.button(
+      [
+        { text: '刷新商城', callback: '#和平福利' },
+        { text: '夺宝奖池', callback: '#和平夺宝' },
+        { text: '单抽', callback: '#和平夺宝 单抽' },
+        { text: '十连', callback: '#和平夺宝 十连' }
+      ],
+      [
+        { text: '资产', callback: '#和平资产' },
+        { text: '签到', callback: '#和平签到' },
+        { text: '主页', callback: '#和平主页' }
+      ]
+    )
+  }
+
   /** 签到详情 */
   static signin() {
     return segment.button(

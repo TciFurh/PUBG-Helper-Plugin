@@ -236,17 +236,25 @@
 
       <div class="card rounded-xl p-5">
         <div class="flex items-center justify-between mb-3">
-          <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">团竞-排位</span>
+          <div class="flex items-center gap-3">
+            <div class="card-alt w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+              <img src="{{rankedDivIcon}}" alt="团竞排位段位" class="w-full h-full object-contain" />
+            </div>
+            <div class="no-wrap">
+              <p class="text-xs text-secondary">团竞-排位</p>
+              <p class="text-sm font-semibold">{{rankedDivName}}</p>
+            </div>
+          </div>
+          <span class="text-xs text-secondary no-wrap">{{rankedProgressText}}</span>
         </div>
 
-        <div class="flex items-center gap-3 mb-2 card-alt rounded-lg px-3 py-2">
-          <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
-            <img src="{{vsTeamHighestIcon}}" alt="团竞历史最高" class="w-full h-full object-contain" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[10px] text-secondary no-wrap">历史最高</p>
-            <p class="text-sm font-semibold truncate-text">{{vsTeamHighestName}}</p>
-          </div>
+        <div class="h-2 card-alt rounded-full overflow-hidden mb-2">
+          <div class="h-full rounded-full" style="width: {{rankedProgressPercent}}%; background: linear-gradient(to right, var(--accent-rose), var(--accent-amber));"></div>
+        </div>
+
+        <div class="flex items-center justify-between mb-4 mt-3">
+          <span class="px-3 py-1 text-xs font-medium rounded-full mode-chip no-wrap">当前赛季</span>
+          <span class="text-[10px] text-secondary no-wrap">历史最高 · {{vsTeamHighestName}}</span>
         </div>
 
         <div class="flex items-center gap-3 mb-4 card-alt rounded-lg px-3 py-2">

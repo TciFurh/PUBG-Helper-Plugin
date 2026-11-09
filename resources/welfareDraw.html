@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #000000;
+    width: 1320px;
+    padding: 40px;
+  }
+  .card {
+    width: 1240px;
+    background: #101014;
+    border: 1px solid #262632;
+    border-radius: 32px;
+    padding: 40px 44px;
+  }
+  /* ---- 头部 ---- */
+  .head { display: flex; align-items: center; gap: 20px; padding-bottom: 26px; border-bottom: 1px solid #262632; margin-bottom: 26px; }
+  .head-name { font-size: 36px; font-weight: 800; color: #ffffff; }
+  .head-name .tag { font-size: 24px; color: #ffd479; margin-left: 14px; }
+  .head-sub { font-size: 23px; color: #8a8a8a; margin-top: 6px; }
+  .balance { margin-left: auto; display: flex; align-items: center; gap: 12px; background: #1a1a22; border: 1px solid #3a3a18; border-radius: 18px; padding: 12px 22px; }
+  .balance img { width: 52px; height: 52px; object-fit: contain; }
+  .balance .n { font-size: 34px; font-weight: 800; color: #fbbf24; }
+  .balance .l { font-size: 19px; color: #8a8a8a; margin-top: 2px; }
+  /* ---- 奖池 / 结果 ---- */
+  .sec-head { display: flex; align-items: baseline; gap: 14px; padding: 18px 22px; background: #17171d; border: 1px solid #262632; border-radius: 18px; margin-bottom: 20px; }
+  .sec-name { font-size: 28px; font-weight: 700; color: #ffffff; }
+  .sec-count { font-size: 23px; color: #8a8a8a; }
+  .sec-count b { color: #d4d4d4; }
+  .page-note { margin-left: auto; font-size: 23px; color: #8a8a8a; }
+  .items { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .tile { border-radius: 14px; overflow: hidden; border: 1px solid #2a2a36; background: #1c1c24; }
+  .tile.hit { border-color: #e91e8c; }
+  .tile-img { position: relative; height: 108px; display: flex; align-items: center; justify-content: center; background: #22222c; }
+  .tile-img img { max-width: 92px; max-height: 96px; object-fit: contain; }
+  .mark {
+    position: absolute; top: 5px; left: 5px; z-index: 2;
+    font-size: 14px; font-weight: 800; line-height: 1; letter-spacing: .5px;
+    padding: 3px 7px; border-radius: 7px; color: #fff;
+  }
+  .mark.metro { background: linear-gradient(135deg, #dc2626, #ef4444); }
+  .mark.camp { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .noimg { font-size: 32px; color: #3a3a48; }
+  .tile-name {
+    font-size: 19px; font-weight: 600; color: #e5e5e5; text-align: center;
+    padding: 6px 8px 7px; line-height: 1.3; height: 58px; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.35); overflow: hidden;
+  }
+  .tile-count { font-size: 16px; color: #8a8a8a; text-align: center; padding-bottom: 7px; background: rgba(0,0,0,.35); }
+  /* ---- 底部说明 ---- */
+  .foot { margin-top: 22px; font-size: 22px; color: #6a6a78; line-height: 1.7; }
+  .foot b { color: #d4d4d4; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div>
+      <div class="head-name">{{ title }}{{ if subtitle }}<span class="tag">{{ subtitle }}</span>{{ /if }}</div>
+      <div class="head-sub">{{ roleName }} · {{ updated }}</div>
+    </div>
+    {{ if balanceLabel }}
+    <div class="balance">
+      {{ if balanceIcon }}<img src="{{ balanceIcon }}" />{{ /if }}
+      <div><div class="n">{{ balance }}</div><div class="l">{{ balanceLabel }}</div></div>
+    </div>
+    {{ /if }}
+  </div>
+
+  <div class="sec-head">
+    <span class="sec-name">{{ secName }}</span>
+    <span class="sec-count">{{ secNote }}</span>
+    {{ if costNote }}<span class="page-note">{{ costNote }}</span>{{ /if }}
+  </div>
+
+  <div class="items">
+    {{ each items as item }}
+    <div class="tile {{ if item.hit }}hit{{ /if }}">
+      <div class="tile-img">
+        {{ if item.mark }}<span class="mark {{ item.markCls }}">{{ item.mark }}</span>{{ /if }}
+        {{ if item.icon }}<img src="{{ item.icon }}" />{{ else }}<span class="noimg">?</span>{{ /if }}
+      </div>
+      <div class="tile-name">{{ item.name }}</div>
+      <div class="tile-count">{{ item.count }}</div>
+    </div>
+    {{ /each }}
+  </div>
+
+  {{ if foot }}
+  <div class="foot">{{@ foot}}</div>
+  {{ /if }}
+</div>
+</body>
+</html>
