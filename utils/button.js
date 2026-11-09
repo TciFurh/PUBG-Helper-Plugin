@@ -30,7 +30,7 @@ export default class Button {
       ],
       [
         { text: '资产', callback: '#和平资产' },
-        { text: '营地币', callback: '#和平营地币' },
+        { text: '货币', callback: '#和平货币' },
         { text: '排行榜', callback: '#和平排行榜' }
       ]
     )
@@ -76,7 +76,7 @@ export default class Button {
       ],
       [
         { text: '资产', callback: '#和平资产' },
-        { text: '营地币', callback: '#和平营地币' },
+        { text: '货币', callback: '#和平货币' },
         { text: '签到', callback: '#和平签到' }
       ]
     )
@@ -142,7 +142,7 @@ export default class Button {
   /** 仓库资产 */
   static assets() {
     return segment.button([
-      { text: '营地币', callback: '#和平营地币' },
+      { text: '货币', callback: '#和平货币' },
       { text: '签到', callback: '#和平签到' },
       { text: '主页', callback: '#和平主页' }
     ])
@@ -179,7 +179,7 @@ export default class Button {
     return segment.button(
       [
         { text: '再签全部账号', callback: '#和平签到 全部' },
-        { text: '营地币', callback: '#和平营地币' }
+        { text: '货币', callback: '#和平货币' }
       ],
       [
         { text: '资产', callback: '#和平资产' },

@@ -48,7 +48,7 @@ export class WelfareCenter extends plugin {
             rule: [
                 { reg: '^#?和平福利(商城)?$', fnc: 'showMall' },
                 { reg: '^#?和平福利兑换\\s+(.+)$', fnc: 'doExchange' },
-                { reg: '^#?和平夺宝(单抽|十连|10连)?$', fnc: 'showDraw' },
+                { reg: '^#?和平夺宝\\s*(单抽|十连|10连)?$', fnc: 'showDraw' },
             ],
         })
     }
@@ -178,7 +178,7 @@ export class WelfareCenter extends plugin {
         const got = await this.getRole(e)
         if (!got) return
         const { roleId } = got
-        const action = (e.msg.match(/^#?和平夺宝(单抽|十连|10连)?$/)?.[1]) || ''
+        const action = (e.msg.match(/^#?和平夺宝\\s*(单抽|十连|10连)?$/)?.[1]) || ''
         const times = (action === '单抽') ? 1 : (action ? 10 : 0) // 无动作=只看奖池
         try {
             const bal = pickBalances((await apiService.get_user_score(roleId)).data)
