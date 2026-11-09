@@ -190,6 +190,14 @@ export class WelfareCenter extends plugin {
                 count: `×${it.num || it.itemCount || 1}`,
                 ...markOf(it),
             }))
+            // 轮盘：扇区角度与底色（conic-gradient 从顶部起，第 i 项落在第 i 个扇区中央）
+            const step = pool.length ? 360 / pool.length : 360
+            const wheelItems = pool.map((it, i) => ({ ...it, angle: i * step }))
+            const stops = []
+            for (let i = 0; i < pool.length; i++) {
+                stops.push(`${i % 2 ? '#ffe3b0' : '#fff6e4'} ${i * step}deg ${(i + 1) * step}deg`)
+            }
+            const wheelBg = `conic-gradient(from ${-step / 2}deg, ${stops.join(', ')})`
 
             if (!times) {
                 // 只看奖池 + 最近中奖记录
@@ -211,6 +219,8 @@ export class WelfareCenter extends plugin {
                     secName: '奖池一览',
                     secNote: `共 ${pool.length} 种奖励`,
                     costNote: `单抽 ${cfg.oneCost} · 十连 ${cfg.multiCost}`,
+                    wheelBg,
+                    wheelItems,
                     items: pool,
                     foot,
                 }

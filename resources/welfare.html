@@ -34,8 +34,15 @@
   .page-note { margin-left: auto; font-size: 23px; color: #8a8a8a; }
   /* ---- 兑换条目 ---- */
   .rows { display: flex; flex-direction: column; gap: 14px; }
-  .row { display: flex; align-items: center; gap: 20px; background: #141419; border: 1px solid #22222c; border-radius: 16px; padding: 16px 20px; }
+  .row { display: flex; align-items: center; gap: 18px; background: #141419; border: 1px solid #22222c; border-radius: 16px; padding: 16px 20px; }
   .row.afford { border-color: #3a3a26; }
+  .idx-badge {
+    flex-shrink: 0; width: 64px; height: 64px; border-radius: 16px;
+    background: #262632; border: 1px solid #3a3a4a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800; color: #9a9a9a;
+  }
+  .row.afford .idx-badge { background: #2a2a20; border-color: #4a4a2a; color: #fbbf24; }
   .row-img { position: relative; width: 104px; height: 104px; border-radius: 14px; background: #1c1c24; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .row-img img { max-width: 88px; max-height: 92px; object-fit: contain; }
   /* 地铁/营地角标 */
@@ -57,7 +64,6 @@
   .status { flex-shrink: 0; min-width: 210px; text-align: center; font-size: 22px; font-weight: 700; border-radius: 14px; padding: 14px 20px; }
   .status.ok { color: #d4d4d4; background: #262632; border: 1px solid #3a3a4a; }
   .status.done { color: #6a6a78; background: #17171d; border: 1px solid #22222c; }
-  .status .idx { font-size: 19px; color: #8a8a8a; font-weight: 400; margin-top: 4px; }
   /* ---- 底部说明 ---- */
   .foot { margin-top: 22px; font-size: 22px; color: #6a6a78; line-height: 1.7; }
   .foot b { color: #d4d4d4; font-weight: 600; }
@@ -91,6 +97,7 @@
   <div class="rows">
     {{ each items as item }}
     <div class="row {{ if item.afford }}afford{{ /if }}">
+      <div class="idx-badge">{{ item.idx }}</div>
       <div class="row-img">
         {{ if item.mark }}<span class="mark {{ item.markCls }}">{{ item.mark }}</span>{{ /if }}
         {{ if item.icon }}<img src="{{ item.icon }}" />{{ else }}<span style="font-size:34px;color:#3a3a48;">?</span>{{ /if }}
@@ -105,7 +112,6 @@
       </div>
       <div class="status {{ if item.exchangedCount >= item.exchangeLimit }}done{{ else }}ok{{ /if }}">
         {{ item.periodText }} {{ item.exchangedCount }}/{{ item.exchangeLimit }}
-        <div class="idx">#{{ item.idx }}</div>
       </div>
     </div>
     {{ /each }}

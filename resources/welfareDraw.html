@@ -26,6 +26,38 @@
   .balance img { width: 52px; height: 52px; object-fit: contain; }
   .balance .n { font-size: 34px; font-weight: 800; color: #fbbf24; }
   .balance .l { font-size: 19px; color: #8a8a8a; margin-top: 2px; }
+  /* ---- 轮盘 ---- */
+  .wheel-wrap { display: flex; justify-content: center; padding: 26px 0 6px; }
+  .wheel {
+    position: relative; width: 700px; height: 700px; border-radius: 50%;
+    box-shadow: 0 0 0 12px #262632, 0 0 0 16px #f5b942, 0 0 0 20px #1a1a22, 0 24px 70px rgba(245,185,66,.18);
+  }
+  .sector { position: absolute; inset: 0; }
+  .sector-inner {
+    position: absolute; top: 46px; left: 50%; width: 176px; margin-left: -88px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .sector-img { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; }
+  .sector-img img { max-width: 90px; max-height: 90px; object-fit: contain; filter: drop-shadow(0 5px 12px rgba(122,74,18,.3)); }
+  .sector-name { font-size: 21px; font-weight: 800; color: #7a4a12; text-align: center; line-height: 1.25; max-width: 176px; text-shadow: 0 1px 0 rgba(255,255,255,.55); }
+  .sector-count { font-size: 19px; font-weight: 700; color: #a06a20; }
+  .sector-mark { font-size: 15px; font-weight: 800; color: #fff; line-height: 1; padding: 3px 9px; border-radius: 9px; }
+  .sector-mark.metro { background: linear-gradient(135deg, #dc2626, #ef4444); }
+  .sector-mark.camp { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .hub {
+    position: absolute; top: 50%; left: 50%; width: 156px; height: 156px; margin: -78px 0 0 -78px;
+    border-radius: 50%; z-index: 4;
+    background: radial-gradient(circle at 35% 30%, #ffe9a8, #f5b942 58%, #d98f1f);
+    border: 7px solid #fff3d6;
+    box-shadow: 0 8px 22px rgba(0,0,0,.4), inset 0 -8px 14px rgba(160,90,0,.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 900; color: #7a3c00; letter-spacing: 3px; text-indent: 3px;
+  }
+  .pointer {
+    position: absolute; top: -30px; left: 50%; margin-left: -18px; z-index: 5;
+    width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
+    border-top: 34px solid #f5b942; filter: drop-shadow(0 3px 5px rgba(0,0,0,.45));
+  }
   /* ---- 奖池 / 结果 ---- */
   .sec-head { display: flex; align-items: baseline; gap: 14px; padding: 18px 22px; background: #17171d; border: 1px solid #262632; border-radius: 18px; margin-bottom: 20px; }
   .sec-name { font-size: 28px; font-weight: 700; color: #ffffff; }
@@ -77,6 +109,26 @@
     {{ if costNote }}<span class="page-note">{{ costNote }}</span>{{ /if }}
   </div>
 
+  {{ if wheelBg }}
+  <div class="wheel-wrap">
+    <div class="wheel" style="background: {{ wheelBg }}">
+      {{ each wheelItems as item }}
+      <div class="sector" style="transform: rotate({{ item.angle }}deg)">
+        <div class="sector-inner">
+          {{ if item.mark }}<span class="sector-mark {{ item.markCls }}">{{ item.mark }}</span>{{ /if }}
+          <div class="sector-img">{{ if item.icon }}<img src="{{ item.icon }}" />{{ else }}<span class="noimg">?</span>{{ /if }}</div>
+          <div class="sector-name">{{ item.name }}</div>
+          <div class="sector-count">{{ item.count }}</div>
+        </div>
+      </div>
+      {{ /each }}
+      <div class="hub">夺宝</div>
+      <div class="pointer"></div>
+    </div>
+  </div>
+  {{ /if }}
+
+  {{ if !wheelBg }}
   <div class="items">
     {{ each items as item }}
     <div class="tile {{ if item.hit }}hit{{ /if }}">
@@ -89,6 +141,7 @@
     </div>
     {{ /each }}
   </div>
+  {{ /if }}
 
   {{ if foot }}
   <div class="foot">{{@ foot}}</div>
