@@ -136,7 +136,8 @@ export class WelfareCenter extends plugin {
                 return e.reply(`❌ 福利币不足：需要 ${item.expendScore}，当前 ${bal.fulibi}`)
             }
 
-            const res = await apiService.score_exchange(item.bonusId, roleId)
+            // 列表条目主键字段是 id（无 bonusId 字段），兑换接口参数名恰好叫 bonusId
+            const res = await apiService.score_exchange(item.id, roleId)
             if (Number(res.returnCode) !== 0) {
                 return e.reply(`❌ 兑换失败：${res.returnMsg || res.returnCode}`)
             }
