@@ -3,6 +3,7 @@
  * 全部为读操作，接口来自 apktool 反编译提取（详见 docs/DEVELOPMENT.md）。
  *
  * - `#和平货币`     —— 营地货币（福利币/装饰碎片）+ 游戏内货币（点券/金币/服饰币/战备积分/物资币/荣耀勋章）
+ * - `#和平货币明细 [货币名] [天数]` —— 游戏货币流水（资产 → 货币明细同款，支持点券/服饰币/物资币/荣耀勋章/幸运币/绿洲币）
  * - `#和平访客`     —— 谁看过你的主页（最近 10 位）
  * - `#和平在线好友` —— 游戏好友在线状态
  * - `#和平赛事`     —— 官方赛事列表（PEL/PSI 等）
@@ -25,6 +26,7 @@ const GAME_ICONS = {
   战备积分: 'zhanbei.png',
   物资币: 'wuzibi.png',
   荣耀勋章: 'xunzhang.png',
+  幸运币: 'xingyunbi.png',
 }
 const __iconCache = new Map()
 function localCoinIcon(name) {
@@ -57,6 +59,7 @@ export class CampSocial extends plugin {
       priority: 1,
       rule: [
         { reg: '^#?和平(货币|营地币)$', fnc: 'coins' },
+        { reg: '^#?和平货币明细(?:\\s*(\\S+))?(?:\\s*(\\d+))?$', fnc: 'moneyFlow' },
         { reg: '^#?和平访客$', fnc: 'visits' },
         { reg: '^#?和平在线好友$', fnc: 'onlineFriends' },
         { reg: '^#?和平赛事$', fnc: 'leagues' },
@@ -121,6 +124,95 @@ export class CampSocial extends plugin {
       const lines = [`💰 ${roleName} 的货币资产`]
       for (const c of [...campCoins, ...gameCoins]) lines.push(`· ${c.name}：${c.numFmt}`)
       e.reply([lines.join('\n'), Button.assets()])
+    } catch (err) {
+      e.reply('❌ 查询失败：' + (err.message || err))
+    }
+  }
+
+  /** 流水支持的货币类型（真机抓包实测映射，3/5/7 为幸运币等零余额货币，7 推测=幸运币） */
+  static FLOW_TYPES = [
+    ['点券', 1],
+    ['服饰币', 2],
+    ['物资币', 4],
+    ['荣耀勋章', 6],
+    ['幸运币', 7],
+    ['绿洲币', 8],
+  ]
+
+  /**
+   * #和平货币明细 [货币名] [天数] —— 游戏货币流水（资产 → 货币明细同款数据）
+   * 例：#和平货币明细 / #和平货币明细 荣耀勋章 / #和平货币明细 点券 30
+   */
+  async moneyFlow(e) {
+    const ctx = this.#context(e)
+    if (!ctx) return e.reply(['❌ 未找到营地登录凭证，请先扫码登录', Button.bind()])
+    try {
+      const m = e.msg.match(/^#?和平货币明细(?:\s*(\S+))?(?:\s*(\d+))?$/)
+      let arg = m?.[1] || ''
+      let days = parseInt(m?.[2]) || 0
+      if (!days && /^(\S+?)([1-9]\d?)$/.test(arg) && parseInt(RegExp.$2) <= 90) {
+        arg = RegExp.$1
+        days = parseInt(RegExp.$2)
+      }
+      days = Math.min(90, Math.max(1, days || 7))
+      const types = CampSocial.FLOW_TYPES.filter(([name]) => !arg || name.includes(arg) || arg.includes(name))
+      if (!types.length) {
+        return e.reply(`❌ 没有叫「${arg}」的货币，支持查询：${CampSocial.FLOW_TYPES.map((t) => t[0]).join(' / ')}`)
+      }
+      const roleId = ctx.camp.roleId
+      const end = Math.floor(Date.now() / 1000)
+      const start = end - days * 86400
+      const pageSize = types.length === 1 ? 50 : 12
+      const sections = await Promise.all(types.map(async ([name, type]) => {
+        const res = await ctx.api.get_moneyflow(type, start, end, 1, pageSize, roleId).catch(() => null)
+        const flow = res?.data?.flow || []
+        let sumIn = 0
+        let sumOut = 0
+        const rows = flow.map((f) => {
+          const n = parseInt(f.changeCount) || 0
+          if (n >= 0) sumIn += n
+          else sumOut += -n
+          const d = new Date(Number(f.eventTime) * 1000)
+          const pad = (x) => String(x).padStart(2, '0')
+          return {
+            time: `${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
+            reason: f.reason || '未知来源',
+            change: f.changeCount,
+            cls: n >= 0 ? 'up' : 'down',
+            after: f.afterCount ?? '-',
+          }
+        })
+        return {
+          name,
+          days,
+          icon: localCoinIcon(name),
+          badge: name.replace('币', '').slice(0, 2),
+          rows,
+          hasMore: !!res?.data?.hasMore,
+          sumIn: sumIn ? sumIn.toLocaleString('en-US') : '',
+          sumOut: sumOut ? sumOut.toLocaleString('en-US') : '',
+        }
+      }))
+      const tplData = {
+        roleName: ctx.camp.nickname || ctx.camp.roleName || ctx.camp.userName || '我',
+        updated: new Date().toLocaleString('zh-CN', { hour12: false }),
+        days,
+        sections,
+      }
+      await localizeData(tplData)
+      const image = await puppeteer.screenshot('currencyFlow', {
+        tplFile: 'plugins/PUBG-Helper-Plugin/resources/currencyFlow.html',
+        ...tplData,
+      })
+      if (image) return e.reply([image])
+      // 兜底：渲染失败回文本
+      const lines = [`💰 ${tplData.roleName} 近 ${days} 天货币流水`]
+      for (const s of sections) {
+        lines.push(`【${s.name}】`)
+        for (const r of s.rows.slice(0, 5)) lines.push(`· ${r.time} ${r.change} ${r.reason}`)
+        if (!s.rows.length) lines.push('· 无记录')
+      }
+      e.reply(lines.join('\n'))
     } catch (err) {
       e.reply('❌ 查询失败：' + (err.message || err))
     }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1000px; background: linear-gradient(175deg, #14141c 0%, #101018 60%, #0c0c12 100%);
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif; color: #e8e8ea; padding: 30px 34px 36px;
+    }
+    .head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+    .title { font-size: 46px; font-weight: 900; letter-spacing: 2px;
+      background: linear-gradient(90deg, #f5b942, #ffdf8e); -webkit-background-clip: text; color: transparent; }
+    .role { text-align: right; font-size: 22px; color: #8a8a96; line-height: 1.5; }
+    .role b { color: #d4d4da; font-size: 24px; }
+    .hint { font-size: 20px; color: #6a6a76; margin-bottom: 22px; }
+    .hint code { color: #f5b942; font-family: inherit; }
+
+    .section { background: #17171f; border: 1px solid #23232e; border-radius: 18px; padding: 20px 24px 14px; margin-bottom: 20px; }
+    .sec-head { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; border-bottom: 1px dashed #2a2a36; }
+    .sec-icon { width: 52px; height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .sec-icon img { width: 48px; height: 48px; object-fit: contain; }
+    .sec-icon .badge { width: 46px; height: 46px; border-radius: 50%; background: #262632; border: 1px solid #3a3a4a;
+      color: #9a9aa6; font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .sec-name { font-size: 28px; font-weight: 800; color: #e8e8ea; }
+    .sec-sum { margin-left: auto; font-size: 20px; color: #8a8a96; }
+    .sec-sum b { font-size: 24px; }
+    .sum-in { color: #ff6b5e; } .sum-out { color: #3ecf8e; }
+
+    .row { display: flex; align-items: center; padding: 13px 4px; border-bottom: 1px solid #1e1e28; font-size: 22px; }
+    .row:last-child { border-bottom: none; }
+    .t { width: 250px; color: #8a8a96; font-size: 20px; flex-shrink: 0; }
+    .reason { flex: 1; color: #c8c8ce; padding-right: 14px; }
+    .chg { width: 150px; text-align: right; font-weight: 800; flex-shrink: 0; font-size: 23px; }
+    .chg.up { color: #ff6b5e; } .chg.down { color: #3ecf8e; }
+    .after { width: 150px; text-align: right; color: #8a8a96; flex-shrink: 0; font-size: 21px; }
+    .more { text-align: center; color: #6a6a76; font-size: 19px; padding-top: 10px; }
+    .empty { text-align: center; color: #6a6a76; font-size: 21px; padding: 16px 0 10px; }
+    .foot { text-align: center; color: #55555f; font-size: 18px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="title">游戏货币流水</div>
+    <div class="role"><b>{{ roleName }}</b><br/>{{ updated }}</div>
+  </div>
+  <div class="hint">查询范围近 {{ days }} 天 · 全部明细：<code>#和平货币明细 [货币名] [天数]</code>，如 #和平货币明细 荣耀勋章 30</div>
+
+  {{ each sections as sec }}
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-icon">
+        {{ if sec.icon }}<img src="{{ sec.icon }}" />{{ else }}<div class="badge">{{ sec.badge }}</div>{{ /if }}
+      </div>
+      <div class="sec-name">{{ sec.name }}</div>
+      <div class="sec-sum">
+        {{ if sec.sumIn }}<span class="sum-in">+{{ sec.sumIn }}</span>{{ /if }}
+        {{ if sec.sumOut }} <span class="sum-out">-{{ sec.sumOut }}</span>{{ /if }}
+        {{ if !sec.sumIn && !sec.sumOut }}近 {{ sec.days }} 天无变动{{ /if }}
+      </div>
+    </div>
+    {{ if sec.rows.length }}
+      {{ each sec.rows as r }}
+      <div class="row">
+        <div class="t">{{ r.time }}</div>
+        <div class="reason">{{ r.reason }}</div>
+        <div class="chg {{ r.cls }}">{{ r.change }}</div>
+        <div class="after">{{ r.after }}</div>
+      </div>
+      {{ /each }}
+      {{ if sec.hasMore }}<div class="more">仅显示最近 {{ sec.rows.length }} 条，缩小时限或分币种查询可看更多</div>{{ /if }}
+    {{ else }}
+      <div class="empty">查询范围内没有流水记录</div>
+    {{ /if }}
+  </div>
+  {{ /each }}
+
+  <div class="foot">数据来自和平营地 · 游戏货币流水</div>
+</body>
+</html>

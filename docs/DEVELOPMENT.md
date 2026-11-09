@@ -40,6 +40,16 @@
 | 抽奖 | `c.gp.qq.com/gp/api/php/scoredraw.php` | `drawType` / `times`(1/10) / `roleId` |
 | 中奖记录 | `c.gp.qq.com/h5/getdrawhistory.php` | `drawType` / `pageId`(从0) |
 
+### 游戏货币流水（资产 → 货币明细 H5，页面 `c.gp.qq.com/camp/activity/currencyList`）
+
+| 用途 | 接口 | 关键参数 |
+|---|---|---|
+| 货币流水 | `c.gp.qq.com/gp/api/php/getmoneyflow.php` | `moneyType` / `startTime` / `endTime`(unix) / `pageIndex` / `pageSize` / `serverIndex=5` |
+
+`moneyType` 实测映射（用 getcharmandcoins 余额对 afterCount 验证）：`1`=点券 `2`=服饰币 `4`=物资币 `6`=荣耀勋章 `8`=绿洲币；`3`/`5`/`7` 为幸运币等零余额货币（`7` 推测=幸运币）。返回 `data.flow[]`：`eventTime` / `changeCount`(带正负号) / `afterCount` / `reason`，`hasMore` 翻页。
+
+货币图标：福利币/装饰碎片用接口自带官方图；点券/金币/服饰币/战备积分/物资币/荣耀勋章/幸运币取自营地 APK res（`resources/currency/`，拼音命名 dq/jb/fs/zbjf；勋章与物资币、幸运币从 App 截图裁切）。
+
 角标规则（对照 App UI）：`rewardItemId` 以 `camp_` 开头 → 营地；`awardType=4` → 地铁；其余无角标。
 图标：福利币 `CurrencyIcon/small/fulibi.png`、装饰碎片 `CurrencyIcon/small/zhuangshisuipian_1.png`（getuserscore 的 scoreList 自带）。
 坑：商品图标字段叫 `bonusIcon`（抽奖项才叫 `icon`）；art-template 循环变量别叫 `it`（与内部别名冲突）。

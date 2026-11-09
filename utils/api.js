@@ -745,6 +745,21 @@ class ApiService {
         return this._postForm('https://c.gp.qq.com/h5/getdrawhistory.php', { ...this._h5Base(roleId), drawType, pageId: String(pageId) })
     }
 
+    /** 游戏货币流水（真机抓包 2026-11-09：资产 → 货币明细 H5）。
+     *  moneyType 实测映射：1=点券 2=服饰币 4=物资币 6=荣耀勋章 8=绿洲币（3/5/7 为幸运币等零余额货币）。
+     *  返回 data.flow[]: { eventTime, changeCount(+1000/-1000), afterCount, reason }，hasMore 翻页。 */
+    async get_moneyflow(moneyType, startTime, endTime, pageIndex = 1, pageSize = 20, roleId) {
+        return this._postForm('https://c.gp.qq.com/gp/api/php/getmoneyflow.php', {
+            ...this._h5Base(roleId),
+            moneyType: String(moneyType),
+            startTime: String(startTime),
+            endTime: String(endTime),
+            pageIndex: String(pageIndex),
+            pageSize: String(pageSize),
+            serverIndex: '5',
+        })
+    }
+
     /** 资讯流（浏览/点赞任务从这取 iInfoId） */
     async get_info_main_page() {
         return this._postForm(this.main + this.baseUrl.infomainpage, { type: '51005184', pos1: '2', sort: '2', page: '1' })
