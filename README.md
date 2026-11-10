@@ -8,7 +8,7 @@
 [![Fork](https://img.shields.io/github/forks/TciFurh/PUBG-Helper-Plugin?style=social)](https://github.com/TciFurh/PUBG-Helper-Plugin/network/members)
 [![License](https://img.shields.io/badge/license-MulanPSL--2.0-2ea44f)](./LICENSE)
 
-<sub>Yunzai-Bot V3 插件 · 支持 QQ / 微信双通道登录 · 战绩 / 主页 / 资产 / 周报全模式覆盖</sub>
+<sub>Yunzai-Bot V3 插件 · 支持 QQ / 微信双通道登录 · 战绩 / 主页 / 资产 / 周报 / 福利中心 / 货币流水全覆盖</sub>
 
 <br>
 
@@ -71,7 +71,7 @@ git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helpe
 
 ## 🎮 指令手册
 
-> 所有指令以 `#` 开头；`<尖括号>` 是必填参数，`[方括号]` 是可选参数。
+> 指令以 `#` 开头（多数场景可省略）；`<尖括号>` 是必填参数，`[方括号]` 是可选参数。图片下方的按钮点击后等价于发送对应指令。
 
 <details open>
 <summary><b>① 账号管理</b> — 绑定、切换、删除</summary>
@@ -167,10 +167,11 @@ git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helpe
 
 | 指令 | 作用 |
 |---|---|
-| `#和平签到` | 当前账号：营地签到 → 营地每日任务（点赞 / 分享 / 浏览 / 工具 / 充能，含领奖）→ 手册周任务（只做不领），出**结果卡片** |
+| `#和平签到` | 当前账号：营地签到 → 营地每日任务（点赞 / 分享 / 工具 / 充能等可自动完成的，含领奖）→ 手册周任务（只做不领），出**结果卡片** |
 | `#和平签到 全部` | 名下**所有已登录**账号逐个跑一遍，出**汇总卡片**（每账号一行：签到状态 / 任务完成 / 手册待领） |
 
 > 点赞做完会自动撤回，不在营地留社交痕迹；「启动游戏 / 取胜一局 / 好友观战」需要真实游戏行为，做不了，会用福利任务的刷新次数换掉。
+> **浏览页面类任务**（如「浏览一次找搭子首页」「浏览一次绿洲世界」）真机抓包逐字段复刻后仍不计数：服务端只认 App 自身会话，插件不做，需手动在 App 里点开。
 > 福利任务会**主动刷新下一轮**继续做继续领，直到当日刷新次数用尽。
 > 当天已签过不算失败：显示「今天已经签过到了」，但任务与手册部分照常补齐。
 > **手册积分不自动领取**，卡片只统计「手册待领」项数，需在游戏内手册页手动点掉。
@@ -186,11 +187,8 @@ git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helpe
 
 | 指令 | 作用 |
 |---|---|
-| `#和平主页` / `#和平主页<营地ID>` | 个人主页概览：段位、各模式数据、印记、队友点赞、最近战斗时间 |
-| `#和平资产` | 营地仓库资产，按时装 / 枪械 / 装备 / 载具 / 战备分类；可升级皮肤（升级枪）右上角标 `Lv.N` |
-| `#和平签到` | 签到 + 营地任务 + 手册一次做完，出**签到详情卡**（状态 / 福利币 / 碎片 / 活跃度 / 今日任务四格） |
-| `#和平签到 全部` | 名下所有已登录账号一起做，出**汇总卡片** |
-| `#和平营地币` | 福利币、营地装饰碎片等余额，出**资产卡片** |
+| `#和平主页` / `#和平主页<营地ID>` | 个人主页概览：段位（含团竞段位分数与进度条）、各模式数据、印记、队友点赞、最近战斗时间 |
+| `#和平资产` | 营地仓库资产，按时装 / 枪械 / 装备 / 载具 / 战备分类；可升级皮肤（升级枪）右上角标 `Lv.N`（各皮肤满级上限不同，只显示当前等级） |
 | `#和平访客` | 最近看过你主页的访客（昵称 / 角色 / 段位 / 时间） |
 | `#和平在线好友` | 游戏好友在线状态（含幸运星标记） |
 | `#和平赛事` | 官方赛事列表（PEL / PSI 等） |
@@ -201,8 +199,29 @@ git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helpe
 
 </details>
 
+<details open>
+<summary><b>⑥ 福利中心与货币</b> — 福利币兑换 / 碎片夺宝 / 货币流水</summary>
+
+<br>
+
+| 指令 | 作用 |
+|---|---|
+| `#和平福利` / `#和平福利商城` | 福利商城：福利币余额 + 带序号的兑换列表（含营地 / 地铁角标），出**商城卡片** |
+| `#和平福利兑换 <编号/名称>` | 用福利币兑换指定商品，出**兑换结果卡**；余额不足或限购已满会直接提示，不扣币 |
+| `#和平夺宝` | 碎片夺宝**轮盘奖池**：奖品、单抽 / 十连价格、最近中奖记录 |
+| `#和平夺宝 单抽` | 抽 1 次，出**结果卡片**（消耗装饰碎片） |
+| `#和平夺宝 十连` | 抽 10 次，出**结果卡片**；`10连` / `十抽` / `10抽` 等效 |
+| `#和平货币` | 营地 + 游戏内全部货币总览，带官方图标：福利币 / 装饰碎片 / 点券 / 金币 / 服饰币 / 战备积分 / 物资币 / 荣耀勋章 |
+| `#和平货币明细 [货币名] [天数]` | 游戏货币收支流水，默认近 7 天、最多 90 天；支持 `#和平货币明细 点券30` 连写 |
+
+> ⚠️ **只发 `#和平夺宝` 是看奖池，不抽奖**：抽奖必须带动作词（`单抽` / `十连`），或点击图片下方的「单抽 / 十连」按钮。
+> 十连一次扣 `multiCost` 装饰碎片并返回 10 件奖励；碎片来自每日签到与营地任务。
+> 限时抽奖（`drawType=score`）暂未支持，当前只做碎片夺宝（`fragment`）。
+
+</details>
+
 <details>
-<summary><b>⑥ 设置与系统</b></summary>
+<summary><b>⑦ 设置与系统</b></summary>
 
 <br>
 
@@ -296,6 +315,16 @@ git clone https://github.com/TciFurh/PUBG-Helper-Plugin.git ./plugins/PUBG-Helpe
 
 </details>
 
+<details>
+<summary><b>#和平夺宝 十连只出奖池图？</b></summary>
+
+<br>
+
+抽奖要带动作词：发 `#和平夺宝 十连`（或点图片下方的「十连」按钮）；只发 `#和平夺宝` 表示查看奖池。
+另外两种常见情况：装饰碎片余额不足会直接提示；旧版本存在动作解析缺陷（已修复），更新插件后重试。
+
+</details>
+
 ---
 
 ## 📦 凭证提取模块（LSPosed）
@@ -337,15 +366,19 @@ PUBG-Helper-Plugin/
 │  ├─ login.js  wxLogin.js  qqLogin.js   # 三种登录方式
 │  ├─ myHomepage.js  weeklyReport.js     # 主页 / 周报
 │  ├─ battleList.js  recentBattle.js     # 战绩列表 / 单局详情
-│  └─ assetAndSign.js  marksmanshipSkills.js  news.js  preference.js  help.js
+│  ├─ welfare.js  campSocial.js  leaderboard.js  # 福利中心 / 货币与社交 / 排行榜
+│  └─ assetAndSign.js  marksmanshipSkills.js  news.js  preference.js  help.js  details.js
 ├─ utils/
 │  ├─ api.js             # 营地 HTTP 接口封装（唯一出口）
 │  ├─ battleFmt.js       # 纯格式化：数字、品质色、晋级赛、胜负文案
 │  ├─ battleView.js      # 视图模型：接口结构 → 模板可直接吃的形状
 │  ├─ battleCache.js     # 战绩列表缓存（编号 ↔ 详情 靠它对齐）
+│  ├─ localImg.js  button.js  notify.js  # 图片本地化 / QQ Bot 按钮 / 登录回推
 │  └─ storage.js  wxQrLogin.js  qqPageLogin.js  qqCampLogin.js
 └─ resources/            # HTML 模板（puppeteer 渲染成图）
-   └─ battlelist.html  battledetail.html  myHomepage.html ...
+   ├─ battlelist.html  battledetail.html  myHomepage.html ...
+   ├─ welfare.html  welfareDraw.html  currency.html  currencyFlow.html
+   └─ currency/          # 从营地 APK / 界面提取的官方货币图标
 ```
 
 **一次查询的链路**
@@ -379,6 +412,11 @@ PUBG-Helper-Plugin/
 - [x] 周报
 - [x] 最近战绩 + 单局详情（经典 / 地铁 / 超体 / 团竞）
 - [x] 全部战绩（10 分类 + 分页）
+- [x] 福利中心：福利币兑换商城 + 碎片夺宝（单抽 / 十连）
+- [x] 货币总览与游戏货币流水（带官方图标）
+- [x] 跨用户段位排行榜 / 团竞段位进度
+- [x] QQ / 微信扫码登录 + 多账号切换
+- [ ] 限时抽奖（drawType=score）
 - [ ] 想到啥再做
 
 ---

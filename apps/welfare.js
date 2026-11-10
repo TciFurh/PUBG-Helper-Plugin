@@ -48,7 +48,7 @@ export class WelfareCenter extends plugin {
             rule: [
                 { reg: '^#?和平福利(商城)?$', fnc: 'showMall' },
                 { reg: '^#?和平福利兑换\\s+(.+)$', fnc: 'doExchange' },
-                { reg: '^#?和平夺宝\\s*(单抽|十连|10连)?$', fnc: 'showDraw' },
+                { reg: '^#?和平夺宝\\s*(单抽|十连|10连|十抽|10抽|1抽|一抽)?\\s*$', fnc: 'showDraw' },
             ],
         })
     }
@@ -178,8 +178,10 @@ export class WelfareCenter extends plugin {
         const got = await this.getRole(e)
         if (!got) return
         const { roleId } = got
-        const action = (e.msg.match(/^#?和平夺宝\\s*(单抽|十连|10连)?$/)?.[1]) || ''
-        const times = (action === '单抽') ? 1 : (action ? 10 : 0) // 无动作=只看奖池
+        // 此处是正则字面量，空白只能写单个 \s；rule 是字符串才需要写双反斜杠。
+        // 之前误写成 \\s（匹配字面反斜杠），导致带空格的「单抽/十连」永远提取不到动作，抽奖分支根本不会执行。
+        const action = (e.msg.match(/^#?和平夺宝\s*(单抽|十连|10连|十抽|10抽|1抽|一抽)?\s*$/)?.[1]) || ''
+        const times = !action ? 0 : (/^(单抽|1抽|一抽)$/.test(action) ? 1 : 10) // 无动作=只看奖池
         try {
             const bal = pickBalances((await apiService.get_user_score(roleId)).data)
             const cfgRes = await apiService.get_score_draw('fragment', roleId)

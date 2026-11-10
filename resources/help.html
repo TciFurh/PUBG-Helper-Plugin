@@ -7,7 +7,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     width: 900px;
-    height: 1600px;
+    height: 1700px;
     overflow: hidden;
     background: #0b0b0e;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -57,7 +57,7 @@
     <div class="logo">和</div>
     <div class="head-text">
       <div class="title">和平精英 · 命令手册</div>
-      <div class="sub">发指令即可，<b>不带 # 也生效</b> · 战绩/资产/签到/查询</div>
+      <div class="sub">发指令即可，<b>不带 # 也生效</b> · 战绩/资产/福利/货币/签到</div>
     </div>
   </div>
 
@@ -82,12 +82,28 @@
       <div class="row"><div class="cmd">#王牌印记 <em>/ #枪械熟练度</em></div><div class="desc">荣誉墙 / 枪械熟练度</div></div>
     </div>
 
-    <!-- 资产 -->
+    <!-- 仓库资产 -->
     <div class="card">
-      <div class="card-title"><span class="chip purple">资产</span><span class="card-name">仓库 · 签到</span></div>
+      <div class="card-title"><span class="chip purple">资产</span><span class="card-name">仓库资产</span></div>
       <div class="row"><div class="cmd">#和平资产</div><div class="desc">分类菜单（时装/枪械/装备/战备）</div></div>
-      <div class="row"><div class="cmd">#和平资产 时装 <em>[粉色]</em></div><div class="desc">默认只看套装，可加品质筛选</div></div>
-      <div class="row"><div class="cmd">#和平营地币</div><div class="desc">营地币 / 福利明细</div></div>
+      <div class="row"><div class="cmd">#和平资产 时装 <em>[粉色]</em></div><div class="desc">默认只看套装，可加品质筛选：紫/粉/红</div></div>
+      <div class="row"><div class="cmd">#和平资产 枪械</div><div class="desc">可升级皮肤（升级枪）右上角标 Lv.N</div></div>
+    </div>
+
+    <!-- 福利中心 -->
+    <div class="card">
+      <div class="card-title"><span class="chip green">福利</span><span class="card-name">福利中心 · 碎片夺宝</span></div>
+      <div class="row"><div class="cmd">#和平福利 <em>[商城]</em></div><div class="desc">福利币余额 + 带序号的兑换列表</div></div>
+      <div class="row"><div class="cmd">#和平福利兑换 <em>编号/名称</em></div><div class="desc">用福利币兑换，出兑换结果图</div></div>
+      <div class="row"><div class="cmd">#和平夺宝</div><div class="desc">轮盘奖池 + 单抽/十连价格 + 最近中奖</div></div>
+      <div class="row"><div class="cmd">#和平夺宝 单抽 / 十连</div><div class="desc">消耗装饰碎片抽奖，出结果图（按钮可直接点）</div></div>
+    </div>
+
+    <!-- 货币与签到 -->
+    <div class="card">
+      <div class="card-title"><span class="chip">货币</span><span class="card-name">货币 · 签到</span></div>
+      <div class="row"><div class="cmd">#和平货币</div><div class="desc">营地 + 游戏内全部货币，带官方图标</div></div>
+      <div class="row"><div class="cmd">#和平货币明细 <em>[货币名] [天数]</em></div><div class="desc">收支流水（默认近 7 天，最多 90 天）</div></div>
       <div class="row"><div class="cmd">#和平签到</div><div class="desc">签到 + 营地任务 + 手册任务（积分手动领）</div></div>
       <div class="row"><div class="cmd">#和平签到 全部</div><div class="desc">名下所有已登录账号一起做完</div></div>
     </div>
@@ -95,7 +111,7 @@
     <!-- 查询 -->
     <div class="card">
       <div class="card-title"><span class="chip orange">查询</span><span class="card-name">主页与营地</span></div>
-      <div class="row"><div class="cmd">#和平主页 <em>[营地ID]</em></div><div class="desc">个人主页数据</div></div>
+      <div class="row"><div class="cmd">#和平主页 <em>[营地ID]</em></div><div class="desc">个人主页数据（含团竞段位进度）</div></div>
       <div class="row"><div class="cmd">#和平资讯 <em>[编号]</em></div><div class="desc">营地资讯 / 攻略</div></div>
       <div class="row"><div class="cmd">#和平访客 <em>/ #和平在线好友</em></div><div class="desc">访客记录 / 在线好友</div></div>
       <div class="row"><div class="cmd">#和平赛事</div><div class="desc">赛事信息</div></div>
@@ -109,12 +125,12 @@
       <div class="row"><div class="cmd">#和平插件更新</div><div class="desc">拉取最新版本（主人）</div></div>
       <div class="row"><div class="cmd">#和平插件更新日志</div><div class="desc">查看最近改动</div></div>
     </div>
-  </div>
 
     <!-- 常见问题 -->
     <div class="card">
-      <div class="card-title"><span class="chip" style="background:#f5c451">FAQ</span><span class="card-name">常见问题</span></div>
+      <div class="card-title"><span class="chip green">FAQ</span><span class="card-name">常见问题</span></div>
       <div class="row"><div class="cmd">提示「未绑定凭证」</div><div class="desc">先 #和平QQ登录，或 #提交和平 手动填</div></div>
+      <div class="row"><div class="cmd">夺宝只出了奖池图</div><div class="desc">抽奖要带动作：#和平夺宝 单抽 / 十连</div></div>
       <div class="row"><div class="cmd">战绩显示暂无对局</div><div class="desc">刚打完先等 2-3 分钟；换分类再看</div></div>
       <div class="row"><div class="cmd">资产图很慢 / 缺图</div><div class="desc">首次会缓存图片，缺图是上游没图标</div></div>
       <div class="row"><div class="cmd">更新失败</div><div class="desc">隔几分钟重试；插件不随更新丢数据</div></div>
@@ -124,7 +140,7 @@
   <div class="foot">
     <div class="t">使用提示</div>
     <div class="l">
-      指令 <b># 可省略</b> · 卡片按钮可直接点 · 详细说明 <b>#和平详解</b>
+      指令 <b># 可省略</b> · 卡片按钮可直接点 · 详细说明 <b>#和平详解</b> · 纯文本菜单 <b>#和平帮助文本</b>
     </div>
   </div>
 </div>
